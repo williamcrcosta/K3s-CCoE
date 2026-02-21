@@ -4,12 +4,12 @@ metadata:
   name: platform
   namespace: platform-argocd
 spec:
-  description: "CCoE - Platform"
+  description: "CCoE - Platform Project"
   sourceRepos:
-    - "*"
+    - "https://github.com/williamcrcosta/K3s-CCoE.git"
   destinations:
     - namespace: "*"
-      server: https://kubernetes.default.svc
+      server: "https://kubernetes.default.svc"
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"
