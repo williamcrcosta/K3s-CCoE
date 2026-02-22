@@ -1,31 +1,18 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: AppProject
-# metadata:
-#   name: platform
-#   namespace: platform-argocd
-# spec:
-#   description: "CCoE - Platform Project"
-#   sourceRepos:
-#     - "https://github.com/williamcrcosta/K3s-CCoE.git"
-#   destinations:
-#     - namespace: "*"
-#       server: "https://kubernetes.default.svc"
-#   clusterResourceWhitelist:
-#     - group: "*"
-#       kind: "*"
-
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: platform
   namespace: platform-argocd
 spec:
-  description: "Platform project (homelab)"
+  description: "Platform project (CCoE)"
   sourceRepos:
-    - "*"
+    - "https://github.com/williamcrcosta/K3s-CCoE.git"
   destinations:
     - namespace: "*"
       server: https://kubernetes.default.svc
   clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceWhitelist:
     - group: "*"
       kind: "*"
