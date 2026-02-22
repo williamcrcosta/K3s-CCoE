@@ -8,6 +8,7 @@ spec:
   sourceRepos:
     - "https://github.com/williamcrcosta/K3s-CCoE.git"
     - "https://charts.jetstack.io"
+    - "https://charts.longhorn.io"
   destinations:
     - namespace: "*"
       server: https://kubernetes.default.svc
