@@ -3,7 +3,15 @@ kind: Kustomization
 
 resources:
   - projects/platform.yaml
+<<<<<<< HEAD
   - apps/cert-manager.yaml
   - apps/longhorn.yaml
   - apps/observability.yaml
   - ../../apps/whoami
+=======
+  - ../../infra/cert-manager
+  - ../../infra/longhorn
+  - ../../infra/observability
+  - ../../apps/whoami
+  - ../../infra/longhorn
+>>>>>>> d7cc940 (feat: add longhorn storage via argocd)
