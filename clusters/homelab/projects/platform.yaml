@@ -6,7 +6,7 @@ metadata:
 spec:
   description: "Platform project (CCoE)"
   sourceRepos:
-    - "https://github.com/williamcrcosta/K3s-CCoE.git"
+    - https://github.com/williamcrcosta/K3s-CCoE.git
   destinations:
     - namespace: "*"
       server: https://kubernetes.default.svc
