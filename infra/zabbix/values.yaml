@@ -1,0 +1,11 @@
+USER-SUPPLIED VALUES:
+postgresql:
+  persistence:
+    enabled: true
+    storageClass: local-path
+    storageSize: 10Gi
+zabbixImageTag: ubuntu-7.0.23
+zabbixWeb:
+  service:
+    nodePort: 30082
+    type: NodePort

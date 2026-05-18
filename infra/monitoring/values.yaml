@@ -1,0 +1,19 @@
+USER-SUPPLIED VALUES:
+grafana:
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClassName: local-path
+  plugins:
+  - alexanderzobnin-zabbix-app
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+          - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+          storageClassName: local-path
