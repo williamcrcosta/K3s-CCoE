@@ -18,6 +18,15 @@ spec:
             storageClassName: local-path
           plugins:
           - alexanderzobnin-zabbix-app
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            hosts:
+            - grafana.wcrpc.lan
+            tls:
+            - hosts:
+              - grafana.wcrpc.lan
+              secretName: wcrpc-tls
         prometheus:
           prometheusSpec:
             storageSpec:
@@ -29,6 +38,15 @@ spec:
                     requests:
                       storage: 20Gi
                   storageClassName: local-path
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            hosts:
+            - prometheus.wcrpc.lan
+            tls:
+            - hosts:
+              - prometheus.wcrpc.lan
+              secretName: wcrpc-tls
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
