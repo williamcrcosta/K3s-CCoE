@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: technitium-web
+  namespace: dns
+spec:
+  selector:
+    app: technitium
+  ports:
+  - name: web
+    port: 80
+    targetPort: 5380
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: technitium-dns
+  namespace: dns
+spec:
+  selector:
+    app: technitium
+  type: NodePort
+  ports:
+  - name: dns-udp
+    port: 53
+    targetPort: 53
+    protocol: UDP
+    nodePort: 30053
+  - name: dns-tcp
+    port: 53
+    targetPort: 53
+    protocol: TCP
+    nodePort: 30053

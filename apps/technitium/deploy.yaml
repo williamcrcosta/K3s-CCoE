@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: technitium
+  namespace: dns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: technitium
+  template:
+    metadata:
+      labels:
+        app: technitium
+    spec:
+      nodeSelector:
+        role: dns
+      containers:
+      - name: technitium
+        image: technitium/dns-server:15.2.0
+        ports:
+        - containerPort: 5380
+          name: web
+        - containerPort: 53
+          name: dns-udp
+          protocol: UDP
+        - containerPort: 53
+          name: dns-tcp
+          protocol: TCP
+        env:
+        - name: DNS_SERVER_DOMAIN
+          value: "technitium.wcrpc.lan"
+        volumeMounts:
+        - name: data
+          mountPath: /etc/dns
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: technitium-data

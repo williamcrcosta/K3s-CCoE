@@ -7,3 +7,4 @@ resources:
   - apps/observability.yaml
   - ../../infra/longhorn
   - ../../apps/whoami
+  - ../../apps/technitium
