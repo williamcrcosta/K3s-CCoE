@@ -22,3 +22,24 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager-config
+  namespace: platform-argocd
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/williamcrcosta/K3s-CCoE.git
+    targetRevision: main
+    path: infra/cert-manager
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
