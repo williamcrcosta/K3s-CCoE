@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: platform-argocd
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/williamcrcosta/K3s-CCoE.git
+    targetRevision: main
+    path: infra/argocd
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: platform-argocd
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
