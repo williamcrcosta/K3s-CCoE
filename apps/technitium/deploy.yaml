@@ -24,9 +24,11 @@ spec:
         - containerPort: 53
           name: dns-udp
           protocol: UDP
+          hostPort: 53
         - containerPort: 53
           name: dns-tcp
           protocol: TCP
+          hostPort: 53
         env:
         - name: DNS_SERVER_DOMAIN
           value: "technitium.wcrpc.lan"
