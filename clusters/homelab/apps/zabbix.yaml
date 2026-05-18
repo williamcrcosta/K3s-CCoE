@@ -28,6 +28,7 @@ spec:
     - group: apps
       kind: StatefulSet
       jqPathExpressions:
+        - .spec.volumeClaimTemplates[]?.status
         - .spec.volumeClaimTemplates[]?.metadata.annotations
         - .spec.volumeClaimTemplates[]?.metadata.labels
         - .spec.volumeClaimTemplates[]?.spec.storageClassName
