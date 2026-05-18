@@ -7,5 +7,6 @@ resources:
   - apps/observability.yaml
   - apps/technitium.yaml
   - apps/monitoring.yaml
+  - apps/zabbix.yaml
   - ../../infra/longhorn
   - ../../apps/whoami

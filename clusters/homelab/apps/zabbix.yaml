@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: zabbix
+  namespace: platform-argocd
+spec:
+  project: platform
+  source:
+    repoURL: https://zabbix-community.github.io/helm-zabbix
+    chart: zabbix
+    targetRevision: 7.0.12
+    helm:
+      values: |
+        postgresql:
+          persistence:
+            enabled: true
+            storageClass: local-path
+            storageSize: 10Gi
+        zabbixImageTag: ubuntu-7.0.23
+        zabbixWeb:
+          service:
+            nodePort: 30082
+            type: NodePort
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: zabbix
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
