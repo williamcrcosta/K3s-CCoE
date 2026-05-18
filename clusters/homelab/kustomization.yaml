@@ -5,6 +5,7 @@ resources:
   - projects/platform.yaml
   - apps/cert-manager.yaml
   - apps/observability.yaml
+  - apps/technitium.yaml
   - ../../infra/longhorn
   - ../../apps/whoami
   - ../../apps/technitium
