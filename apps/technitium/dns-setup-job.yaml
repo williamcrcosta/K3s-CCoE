@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: technitium-dns-setup
+  namespace: dns
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: dns-setup
+        image: curlimages/curl:8.5.0
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          BASE="http://technitium-web.dns.svc.cluster.local"
+          PASS="admin"
+
+          echo "Logging in..."
+          TOKEN=$(curl -sf -X POST "$BASE/api/user/login" \
+            -d "user=admin&pass=${PASS}&includeInfo=false" \
+            | sed 's/.*"token":"\([^"]*\)".*/\1/')
+
+          echo "Creating zone wcrpc.lan..."
+          curl -sf -X POST "$BASE/api/zones/create?token=$TOKEN" \
+            -d "zone=wcrpc.lan&type=Primary" || true
+
+          echo "Adding DNS records..."
+          IP="192.168.159.128"
+          for SUB in grafana prometheus zabbix argocd longhorn technitium dashboard; do
+            curl -sf -X POST "$BASE/api/zones/records/add?token=$TOKEN" \
+              -d "zone=wcrpc.lan&domain=${SUB}.wcrpc.lan&type=A&ipAddress=${IP}&ttl=300" || true
+            echo "Added: ${SUB}.wcrpc.lan -> ${IP}"
+          done
+
+          echo "DNS setup complete."

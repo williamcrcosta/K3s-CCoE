@@ -6,3 +6,4 @@ resources:
   - deploy.yaml
   - svc.yaml
   - ingress.yaml
+  - dns-setup-job.yaml
