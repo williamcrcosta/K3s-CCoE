@@ -27,8 +27,11 @@ spec:
   ignoreDifferences:
     - group: apps
       kind: StatefulSet
-      jsonPointers:
-        - /spec/volumeClaimTemplates
+      jqPathExpressions:
+        - .spec.volumeClaimTemplates[]?.metadata.annotations
+        - .spec.volumeClaimTemplates[]?.metadata.labels
+        - .spec.volumeClaimTemplates[]?.spec.storageClassName
+        - .spec.volumeClaimTemplates[]?.spec.volumeMode
   syncPolicy:
     automated:
       prune: true
