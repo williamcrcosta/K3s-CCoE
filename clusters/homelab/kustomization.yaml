@@ -12,3 +12,4 @@ resources:
   - apps/kubernetes-dashboard.yaml
   - apps/sealed-secrets.yaml
   - ../../infra/longhorn
+  - ../../infra/zabbix
