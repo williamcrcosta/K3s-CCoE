@@ -6,5 +6,6 @@ resources:
   - apps/cert-manager.yaml
   - apps/observability.yaml
   - apps/technitium.yaml
+  - apps/monitoring.yaml
   - ../../infra/longhorn
   - ../../apps/whoami
