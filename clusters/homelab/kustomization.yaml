@@ -8,5 +8,6 @@ resources:
   - apps/technitium.yaml
   - apps/monitoring.yaml
   - apps/zabbix.yaml
+  - apps/kubernetes-dashboard.yaml
   - ../../infra/longhorn
   - ../../apps/whoami

@@ -1,67 +1,23 @@
 apiVersion: v1
-items:
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"k8s-app":"dashboard-metrics-scraper"},"name":"dashboard-metrics-scraper","namespace":"kubernetes-dashboard"},"spec":{"ports":[{"port":8000,"targetPort":8000}],"selector":{"k8s-app":"dashboard-metrics-scraper"}}}
-    creationTimestamp: "2026-02-09T17:53:26Z"
-    labels:
-      k8s-app: dashboard-metrics-scraper
-    name: dashboard-metrics-scraper
-    namespace: kubernetes-dashboard
-    resourceVersion: "30857"
-    uid: 29740947-11ec-44c9-a7bb-0fb7897406d9
-  spec:
-    clusterIP: 10.43.96.64
-    clusterIPs:
-    - 10.43.96.64
-    internalTrafficPolicy: Cluster
-    ipFamilies:
-    - IPv4
-    ipFamilyPolicy: SingleStack
-    ports:
-    - port: 8000
-      protocol: TCP
-      targetPort: 8000
-    selector:
-      k8s-app: dashboard-metrics-scraper
-    sessionAffinity: None
-    type: ClusterIP
-  status:
-    loadBalancer: {}
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"k8s-app":"kubernetes-dashboard"},"name":"kubernetes-dashboard","namespace":"kubernetes-dashboard"},"spec":{"ports":[{"port":443,"targetPort":8443}],"selector":{"k8s-app":"kubernetes-dashboard"}}}
-    creationTimestamp: "2026-02-09T17:53:26Z"
-    labels:
-      k8s-app: kubernetes-dashboard
-    name: kubernetes-dashboard
-    namespace: kubernetes-dashboard
-    resourceVersion: "30843"
-    uid: ce2348b6-e644-4cb7-804d-4c296dcc2843
-  spec:
-    clusterIP: 10.43.33.200
-    clusterIPs:
-    - 10.43.33.200
-    internalTrafficPolicy: Cluster
-    ipFamilies:
-    - IPv4
-    ipFamilyPolicy: SingleStack
-    ports:
-    - port: 443
-      protocol: TCP
-      targetPort: 8443
-    selector:
-      k8s-app: kubernetes-dashboard
-    sessionAffinity: None
-    type: ClusterIP
-  status:
-    loadBalancer: {}
-kind: List
+kind: Service
 metadata:
-  resourceVersion: ""
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+spec:
+  selector:
+    app: kubernetes-dashboard
+  ports:
+  - port: 443
+    targetPort: 8443
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashboard-metrics-scraper
+  namespace: kubernetes-dashboard
+spec:
+  selector:
+    app: dashboard-metrics-scraper
+  ports:
+  - port: 8000
+    targetPort: 8000
