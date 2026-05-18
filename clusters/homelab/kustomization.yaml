@@ -10,4 +10,5 @@ resources:
   - apps/monitoring.yaml
   - apps/zabbix.yaml
   - apps/kubernetes-dashboard.yaml
+  - apps/sealed-secrets.yaml
   - ../../infra/longhorn
