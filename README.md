@@ -1,0 +1,199 @@
+# K3s Homelab — Documentação de Arquitetura
+
+> Cluster Kubernetes de alta disponibilidade para homelab, gerenciado por GitOps via ArgoCD.
+
+---
+
+## Topologia
+
+```
+Internet
+    │
+    └── Rede Local: 192.168.159.0/24
+            │
+            ├── k8s-cp      192.168.159.128  (Control Plane + Worker)
+            │     ├── OS: Ubuntu 24.04.1 LTS
+            │     ├── K3s: v1.34.3+k3s1
+            │     └── Runtime: containerd 2.1.5
+            │
+            └── k8s-worker  192.168.159.129  (Worker)
+                  ├── OS: Ubuntu 24.04.4 LTS
+                  ├── K3s: v1.34.3+k3s1
+                  └── Runtime: containerd 2.1.5
+```
+
+---
+
+## Stack de Infraestrutura
+
+| Componente | Tecnologia | Função |
+|---|---|---|
+| Container Orchestration | K3s v1.34 | Kubernetes leve para homelab |
+| GitOps | ArgoCD | Reconciliação contínua via Git |
+| Ingress Controller | Traefik (K3s built-in) | Roteamento HTTP/HTTPS |
+| Storage | Longhorn | Block storage distribuído com replicação |
+| DNS Interno | Technitium | Resolução DNS para `*.wcrpc.lan` |
+| Certificados | cert-manager + Self-signed CA | TLS interno |
+| Secrets | Sealed Secrets | Secrets cifrados no Git |
+
+---
+
+## Aplicações
+
+| App | URL | Namespace | Storage |
+|---|---|---|---|
+| ArgoCD | https://argocd.wcrpc.lan | `platform-argocd` | — |
+| Grafana | https://grafana.wcrpc.lan | `monitoring` | Longhorn 5Gi |
+| Prometheus | interno | `monitoring` | Longhorn 20Gi |
+| Zabbix | https://zabbix.wcrpc.lan | `zabbix` | Longhorn 10Gi (PostgreSQL) |
+| Longhorn UI | https://longhorn.wcrpc.lan | `longhorn-system` | — |
+| Kubernetes Dashboard | https://kubernetes-dashboard.wcrpc.lan | `kubernetes-dashboard` | — |
+| Technitium DNS | https://dns.wcrpc.lan / UDP:53 | `dns` | Longhorn 2Gi |
+
+---
+
+## Arquitetura de Storage
+
+```
+Longhorn (distribuído entre os 2 nodes)
+├── technitium-data          2Gi   (DNS config)
+├── monitoring-grafana       5Gi   (Grafana DB)
+├── prometheus-db            20Gi  (Prometheus TSDB)
+└── postgresql-data-zabbix   10Gi  (Zabbix PostgreSQL)
+
+Replicação: 2 réplicas por volume (k8s-cp + k8s-worker)
+StorageClass default: longhorn
+```
+
+---
+
+## Arquitetura de Rede
+
+```
+Cliente → 192.168.159.128:443 (NodePort Traefik)
+        → Traefik IngressController
+        → Service ClusterIP
+        → Pod
+
+DNS: *.wcrpc.lan → 192.168.159.128 (Technitium)
+     Fallback: 1.1.1.1, 8.8.8.8
+
+NodePorts expostos:
+  - 30080: Traefik HTTP
+  - 30443: Traefik HTTPS
+  - 30053/UDP: Technitium DNS
+  - 30081: Zabbix Server (active checks)
+  - 30082: Zabbix Web (NodePort direto)
+```
+
+---
+
+## Arquitetura GitOps
+
+```
+GitHub (williamcrcosta/K3s-CCoE)
+    │
+    └── ArgoCD (App of Apps pattern)
+            │
+            ├── clusters/homelab/root.yml          ← Root App
+            ├── clusters/homelab/kustomization.yaml
+            └── clusters/homelab/apps/
+                    ├── argocd.yaml
+                    ├── cert-manager.yaml
+                    ├── longhorn.yaml
+                    ├── monitoring.yaml
+                    ├── sealed-secrets.yaml
+                    ├── technitium.yaml
+                    ├── zabbix.yaml
+                    └── kubernetes-dashboard.yaml
+```
+
+### Fluxo de Deploy
+1. Push no branch `main`
+2. ArgoCD detecta mudança (polling a cada 3min ou webhook)
+3. ArgoCD reconcilia o estado do cluster com o Git
+4. Helm/Kustomize aplicam os manifests
+
+---
+
+## Estrutura do Repositório
+
+```
+K3s-CCoE/
+├── README.md                        ← Este arquivo
+├── MIGRATION_PLAN.md                ← Histórico de migrações
+├── DISASTER_RECOVERY.md             ← Plano de recuperação
+├── apps/
+│   ├── technitium/                  ← Manifests Technitium DNS
+│   └── kubernetes-dashboard/        ← Manifests K8s Dashboard
+├── infra/
+│   ├── argocd/                      ← Patches ArgoCD
+│   ├── cert-manager/                ← ClusterIssuers
+│   ├── longhorn/                    ← Ingress Longhorn
+│   ├── monitoring/                  ← Values extras Prometheus
+│   ├── sealed-secrets/              ← App Sealed Secrets
+│   └── zabbix/                      ← Ingress + values Zabbix
+├── clusters/
+│   └── homelab/
+│       ├── root.yml                 ← App of Apps entry point
+│       ├── kustomization.yaml
+│       ├── projects/
+│       │   └── platform.yaml        ← ArgoCD Project
+│       └── apps/                    ← ArgoCD Application manifests
+└── secrets/                         ← Sealed Secrets (cifrados)
+```
+
+---
+
+## Monitoração
+
+- **Prometheus** — coleta métricas de todos os nodes e pods via kube-prometheus-stack
+- **Grafana** — dashboards automáticos: Kubernetes, Nodes, Pods, Storage
+- **Zabbix** — monitoração tradicional dos nodes (CPU, RAM, disco, rede)
+  - Agent instalado em `k8s-cp` e `k8s-worker`
+  - 394 hosts monitorados, 17.931 items ativos
+
+---
+
+## Evoluções Futuras
+
+### Curto Prazo
+- **AlertManager** — notificações via Telegram para alertas críticos
+- **Backup externo Longhorn** — snapshots para S3/NFS fora do cluster
+- **Grafana dashboards no Git** — persistir como ConfigMaps para não perder após recriação
+
+### Médio Prazo
+- **Resource limits** — definir `requests` e `limits` para todos os pods
+- **Network Policies** — isolar namespaces (zabbix não acessa monitoring, etc.)
+- **Zabbix templates K3s** — monitorar pods, PVCs e nodes via Zabbix
+- **Let's Encrypt** — migrar para certificados públicos válidos com DNS challenge
+
+### Longo Prazo
+- **Segundo cluster** — expandir para multi-cluster com ArgoCD gerenciando ambos
+- **Velero** — backup completo do cluster (namespaces, secrets, PVCs)
+- **CI/CD pipeline** — GitHub Actions para validar manifests antes do merge
+
+---
+
+## Manutenção
+
+### Health Check rápido
+```bash
+~/cluster-health.sh
+```
+
+### Ver status ArgoCD
+```bash
+kubectl get applications -n platform-argocd
+```
+
+### Ver volumes Longhorn
+```bash
+kubectl get volumes.longhorn.io -n longhorn-system
+```
+
+### Forçar sync de um app
+```bash
+kubectl annotate application <app> -n platform-argocd argocd.argoproj.io/refresh=hard --overwrite
+```
+

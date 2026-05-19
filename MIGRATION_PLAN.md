@@ -10,50 +10,62 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 
 ## Resultado Final
 
-| App | Namespace | Gerenciado pelo ArgoCD | Ingress no Git |
-|---|---|---|---|
-| ArgoCD | `platform-argocd` | ✅ self-managed | ✅ `infra/argocd/ingress.yaml` |
-| Longhorn | `longhorn-system` | ✅ | ✅ `infra/longhorn/ingress.yaml` |
-| Cert Manager | `cert-manager` | ✅ | — |
-| Technitium DNS | `dns` | ✅ | ✅ `apps/technitium/ingress.yaml` |
-| Monitoring (Grafana + Prometheus) | `monitoring` | ✅ | ✅ helm values |
-| Zabbix | `zabbix` | ✅ | ✅ helm values |
-| Kubernetes Dashboard | `kubernetes-dashboard` | ✅ | ✅ `apps/kubernetes-dashboard/ingressroute.yaml` |
+| App | Namespace | ArgoCD | Storage | Versão |
+|---|---|---|---|---|
+| ArgoCD | `platform-argocd` | ✅ self-managed | — | v2.x |
+| Longhorn | `longhorn-system` | ✅ | — | v1.x |
+| Cert Manager | `cert-manager` | ✅ | — | v1.14.5 |
+| Sealed Secrets | `kube-system` | ✅ | — | latest |
+| Technitium DNS | `dns` | ✅ | Longhorn 2Gi | latest |
+| Monitoring (Grafana + Prometheus) | `monitoring` | ✅ | Longhorn 5Gi + 20Gi | kube-prometheus-stack |
+| Zabbix | `zabbix` | ✅ | Longhorn 10Gi | 7.0.26 |
+| Kubernetes Dashboard | `kubernetes-dashboard` | ✅ | — | latest |
 
 ---
 
-## Melhorias Pendentes
+## Histórico de Etapas Concluídas
 
-| Item | Prioridade | Status |
+### Fase 1 — GitOps Base
+- [x] ArgoCD instalado e self-managed via Git
+- [x] Projeto `platform` criado no ArgoCD
+- [x] Root App (App of Apps) configurado
+- [x] Todos os apps migrados para ArgoCD
+
+### Fase 2 — Infraestrutura
+- [x] Longhorn instalado como StorageClass default
+- [x] `local-path` removido como default
+- [x] Cert-manager com ClusterIssuer self-signed via GitOps
+- [x] Sealed Secrets para senhas/TLS no Git
+
+### Fase 3 — Networking
+- [x] Traefik como ingress controller (K3s default)
+- [x] Technitium DNS como DNS server interno
+- [x] Ingresses criados para todos os serviços
+- [x] TLS self-signed em todos os ingresses
+
+### Fase 4 — Migração de Storage (local-path → Longhorn)
+- [x] Grafana PVC migrado para Longhorn (5Gi)
+- [x] Prometheus PVC migrado para Longhorn (20Gi)
+- [x] Zabbix PostgreSQL PVC migrado para Longhorn (10Gi)
+- [x] Dados do Zabbix restaurados (394 hosts, 17931 items)
+
+### Fase 5 — Zabbix
+- [x] Zabbix Agent configurado em k8s-cp e k8s-worker
+- [x] Zabbix atualizado para 7.0.26
+- [x] Frontend conectando ao server corretamente
+
+---
+
+## Melhorias Futuras
+
+| Item | Prioridade | Descrição |
 |---|---|---|
-| Sealed Secrets (senhas/TLS no Git) | Alta | 🔄 Em progresso |
-| Technitium zona DNS no Git (Job) | Média | 🔄 Em progresso |
-| ArgoCD `--insecure` flag no Git | Média | 🔄 Em progresso |
+| AlertManager receivers | Alta | Configurar notificações Telegram/email |
+| Backup externo Longhorn | Alta | S3 ou NFS para backup dos volumes |
+| Resource limits | Média | Definir requests/limits para todos os pods |
+| Network Policies | Média | Isolar namespaces por política |
+| Zabbix monitorar K3s | Média | Templates para monitorar nodes e pods |
+| Grafana dashboards no Git | Média | Persistir dashboards como ConfigMaps |
+| Let's Encrypt | Baixa | Migrar para certificados públicos válidos |
+| Multi-cluster | Baixa | Expandir para segundo cluster |
 
----
-
-## Estrutura do Repositório
-
-```
-K3s-CCoE/
-├── apps/
-│   ├── technitium/
-│   └── kubernetes-dashboard/
-├── infra/
-│   ├── argocd/
-│   ├── longhorn/
-│   ├── monitoring/
-│   └── zabbix/
-└── clusters/
-    └── homelab/
-        ├── kustomization.yaml
-        ├── projects/
-        │   └── platform.yaml
-        └── apps/
-            ├── argocd.yaml
-            ├── cert-manager.yaml
-            ├── monitoring.yaml
-            ├── zabbix.yaml
-            ├── technitium.yaml
-            └── kubernetes-dashboard.yaml
-```
