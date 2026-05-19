@@ -18,6 +18,8 @@ spec:
             storageSize: 10Gi
         zabbixImageTag: ubuntu-7.0.26
         zabbixWeb:
+          zabbixServerHost: zabbix-zabbix-server
+          zabbixServerPort: 10051
           service:
             nodePort: 30082
             type: NodePort
