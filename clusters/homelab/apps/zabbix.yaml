@@ -16,7 +16,7 @@ spec:
             enabled: true
             storageClass: longhorn
             storageSize: 10Gi
-        zabbixImageTag: ubuntu-7.0.23
+        zabbixImageTag: ubuntu-7.0.26
         zabbixWeb:
           service:
             nodePort: 30082
