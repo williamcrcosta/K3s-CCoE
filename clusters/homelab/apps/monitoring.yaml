@@ -15,7 +15,7 @@ spec:
           persistence:
             enabled: true
             size: 5Gi
-            storageClassName: local-path
+            storageClassName: longhorn
           plugins:
           - alexanderzobnin-zabbix-app
           ingress:
@@ -37,7 +37,7 @@ spec:
                   resources:
                     requests:
                       storage: 20Gi
-                  storageClassName: local-path
+                  storageClassName: longhorn
           ingress:
             enabled: true
             ingressClassName: traefik

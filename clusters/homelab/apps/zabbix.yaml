@@ -14,7 +14,7 @@ spec:
         postgresql:
           persistence:
             enabled: true
-            storageClass: local-path
+            storageClass: longhorn
             storageSize: 10Gi
         zabbixImageTag: ubuntu-7.0.23
         zabbixWeb:
