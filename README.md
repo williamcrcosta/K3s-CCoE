@@ -13,12 +13,12 @@ Internet
             │
             ├── k8s-cp      192.168.159.128  (Control Plane + Worker)
             │     ├── OS: Ubuntu 24.04.1 LTS
-            │     ├── K3s: v1.34.3+k3s1
+            │     ├── K3s: v1.36.0+k3s1
             │     └── Runtime: containerd 2.1.5
             │
             └── k8s-worker  192.168.159.129  (Worker)
                   ├── OS: Ubuntu 24.04.4 LTS
-                  ├── K3s: v1.34.3+k3s1
+                  ├── K3s: v1.36.0+k3s1
                   └── Runtime: containerd 2.1.5
 ```
 
@@ -28,7 +28,7 @@ Internet
 
 | Componente | Tecnologia | Função |
 |---|---|---|
-| Container Orchestration | K3s v1.34 | Kubernetes leve para homelab |
+| Container Orchestration | K3s v1.36 | Kubernetes leve para homelab |
 | GitOps | ArgoCD | Reconciliação contínua via Git |
 | Ingress Controller | Traefik (K3s built-in) | Roteamento HTTP/HTTPS |
 | Storage | Longhorn | Block storage distribuído com replicação |
@@ -147,7 +147,7 @@ K3s-CCoE/
 
 ## Monitoração
 
-- **Prometheus** — coleta métricas de todos os nodes e pods via kube-prometheus-stack
+- **Prometheus** — coleta métricas de todos os nodes e pods via kube-prometheus-stack 82.2.0
 - **Grafana** — dashboards automáticos: Kubernetes, Nodes, Pods, Storage
 - **Zabbix** — monitoração tradicional dos nodes (CPU, RAM, disco, rede)
   - Agent instalado em `k8s-cp` e `k8s-worker`
@@ -196,4 +196,54 @@ kubectl get volumes.longhorn.io -n longhorn-system
 ```bash
 kubectl annotate application <app> -n platform-argocd argocd.argoproj.io/refresh=hard --overwrite
 ```
+
+
+---
+
+## IA / LLM no Cluster
+
+Opções para rodar modelos de IA localmente:
+
+### 1. Ollama (recomendado para iniciar)
+```yaml
+# Helm chart disponível: ollama/ollama
+deploy:
+  image: ollama/ollama:latest
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "2"
+    limits:
+      memory: "8Gi"
+      cpu: "4"
+  nodeSelector:
+    kubernetes.io/hostname: k8s-cp  # GPU node preferencial
+```
+**Modelos suportados:** llama3, mistral, codellama, etc.
+**Persistência:** PVC para ~/.ollama/models
+
+### 2. LocalAI (API OpenAI-compatible)
+- Drop-in replacement para API da OpenAI
+- Suporta gguf, onnx, outros formatos
+- Ideal para integrar com aplicativos existentes
+
+### 3. vLLM (alta performance)
+- Otimizado para throughput
+- Suporta múltiplos GPUs
+- Batching eficiente
+
+### Requisitos de Hardware
+| Config | Mínimo | Recomendado |
+|---|---|---|
+| CPU | 4 cores | 8+ cores |
+| RAM | 8 GB | 16+ GB |
+| GPU | Opcional | NVIDIA RTX 3060+ (12GB VRAM) |
+| Storage | 20 GB | 100+ GB SSD |
+
+### Passos para Implementar
+1. **Verificar GPU:** `lspci | grep -i nvidia`
+2. **Instalar NVIDIA Operator:** via Helm
+3. **Deploy Ollama:** com nodeSelector para node com GPU
+4. **Expor via Ingress:** ollama.wcrpc.lan
+5. **Integrar com apps:** via service `ollama:11434`
 

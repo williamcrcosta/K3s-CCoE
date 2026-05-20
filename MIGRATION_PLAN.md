@@ -18,6 +18,7 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 | Sealed Secrets | `kube-system` | ✅ | — | latest |
 | Technitium DNS | `dns` | ✅ | Longhorn 2Gi | latest |
 | Monitoring (Grafana + Prometheus) | `monitoring` | ✅ | Longhorn 5Gi + 20Gi | kube-prometheus-stack |
+| **K3s** | — | — | — | **v1.36.0+k3s1** |
 | Zabbix | `zabbix` | ✅ | Longhorn 10Gi | 7.0.26 |
 | Kubernetes Dashboard | `kubernetes-dashboard` | ✅ | — | latest |
 
@@ -68,4 +69,32 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 | Grafana dashboards no Git | Média | Persistir dashboards como ConfigMaps |
 | Let's Encrypt | Baixa | Migrar para certificados públicos válidos |
 | Multi-cluster | Baixa | Expandir para segundo cluster |
+
+
+---
+
+## Melhorias Futuras
+
+| Item | Prioridade | Descrição |
+|---|---|---|
+| **LLM/AI (Ollama)** | Alta | Deploy modelos de IA locais (llama3, mistral) |
+| AlertManager receivers | Alta | Configurar notificações Telegram/email |
+| Backup externo Longhorn | Alta | S3 ou NFS para backup dos volumes |
+| Resource limits | Média | Definir requests/limits para todos os pods |
+| Network Policies | Média | Isolar namespaces por política |
+| Zabbix monitorar K3s | Média | Templates para monitorar nodes e pods |
+| Grafana dashboards no Git | Média | Persistir dashboards como ConfigMaps |
+| Let's Encrypt | Baixa | Migrar para certificados públicos válidos |
+| Multi-cluster | Baixa | Expandir para segundo cluster |
+
+---
+
+## Log de Atualizações
+
+| Data | Componente | De | Para |
+|---|---|---|---|
+| 2026-05-20 | K3s | v1.34.3+k3s1 | **v1.36.0+k3s1** |
+| 2026-05-20 | kube-prometheus-stack | 81.5.0 | **82.2.0** |
+| 2026-05-19 | Zabbix | 7.0.23 | **7.0.26** |
+| 2026-05-19 | Storage | local-path | **Longhorn** (PVCs migrados) |
 
