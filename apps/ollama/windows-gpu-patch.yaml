@@ -1,0 +1,19 @@
+# Patch para usar Ollama no Windows Host com GPU
+# Aplicar: kubectl apply -f apps/ollama/windows-gpu-patch.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: open-webui
+  namespace: ollama
+spec:
+  template:
+    spec:
+      containers:
+      - name: webui
+        env:
+        - name: OLLAMA_BASE_URL
+          value: "http://192.168.159.1:11434"  # Windows host
+        - name: ENABLE_SIGNUP
+          value: "false"
+        - name: DEFAULT_LOCALE
+          value: "pt-BR"
