@@ -98,3 +98,54 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 | 2026-05-19 | Zabbix | 7.0.23 | **7.0.26** |
 | 2026-05-19 | Storage | local-path | **Longhorn** (PVCs migrados) |
 
+
+---
+
+## Evoluções de IA — Análise de Impactos
+
+### 1. Web Search Tools no Open WebUI
+
+**Objetivo:** Adicionar capacidade de busca em tempo real ao modelo local via DuckDuckGo/Brave Search APIs.
+
+**Impactos Positivos:**
+| Aspecto | Descrição |
+|---|---|
+| **Dados atualizados** | Modelo acessa informações pós-2024 (treinamento dos modelos) |
+| **Privacidade parcial** | Queries de busca saem, mas prompts/locais ficam no cluster |
+| **Custo** | DuckDuckGo gratuito; Brave Search tem tier gratuito |
+| **Integração** | Funciona com todos os modelos locais (llama3, mistral, etc) |
+
+**Impactos Negativos:**
+| Aspecto | Descrição |
+|---|---|
+| **Privacidade reduzida** | Termos de busca expostos à API externa |
+| **Latência** | +2-5s por query (busca web + processamento LLM) |
+| **Rate limits** | APIs gratuitas têm limites diários (ex: 100-1000 queries) |
+| **Dependência externa** | Se API cai, funcionalidade offline fica indisponível |
+| **Configuração** | Requer API keys e setup de tools no WebUI |
+
+**Alternativas Consideradas:**
+| Opção | Custo | Privacidade | Facilidade |
+|---|---|---|---|
+| DuckDuckGo API | Grátis | Média | Fácil |
+| Brave Search API | Grátis (limitado) | Média | Fácil |
+| Google Custom Search | Pago | Baixa | Média |
+| Perplexity Pro | ~R$60/mês | Baixa | Plug-and-play |
+
+**Recomendação:** Implementar com **DuckDuckGo** (gratuito, sem login) para uso ocasional. Manter 100% offline como default.
+
+**Status:** 🔄 Análise de requisitos
+
+---
+
+### 2. RAG com Documentação do Cluster
+
+**Objetivo:** Indexar documentação K3s, manifests do GitOps, runbooks para consulta via IA.
+
+**Impactos:**
+- **Positivo:** Assistente responde sobre ARQUITETURA ESPECÍFICA do seu cluster
+- **Negativo:** Requer embedding models (mais RAM/GPU)
+- **Tecnologia:** ChromaDB/Pinecone + embeddings local (nomic-embed-text)
+
+**Status:** 📋 Backlog
+
