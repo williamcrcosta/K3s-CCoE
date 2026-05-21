@@ -8,6 +8,10 @@ patches:
     target:
       kind: ConfigMap
       name: argocd-cm
+  - path: argocd-cmd-params-patch.yaml
+    target:
+      kind: ConfigMap
+      name: argocd-cmd-params-cm
   - path: repo-server-patch.yaml
     target:
       kind: Deployment
