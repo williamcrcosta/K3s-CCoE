@@ -48,6 +48,9 @@ spec:
         - .spec.volumeClaimTemplates[]?.spec.storageClassName
         - .spec.volumeClaimTemplates[]?.spec.volumeMode
         - .spec.persistentVolumeClaimRetentionPolicy
+        - .spec.podManagementPolicy
+        - .spec.revisionHistoryLimit
+        - .spec.updateStrategy
   syncPolicy:
     automated:
       prune: true
