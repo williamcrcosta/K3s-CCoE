@@ -47,6 +47,7 @@ spec:
         - .spec.volumeClaimTemplates[]?.metadata.labels
         - .spec.volumeClaimTemplates[]?.spec.storageClassName
         - .spec.volumeClaimTemplates[]?.spec.volumeMode
+        - .spec.persistentVolumeClaimRetentionPolicy
   syncPolicy:
     automated:
       prune: true
