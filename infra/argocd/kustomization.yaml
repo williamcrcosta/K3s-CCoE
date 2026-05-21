@@ -4,6 +4,10 @@ resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/v3.3.1/manifests/install.yaml
   - ingress.yaml
 patches:
+  - path: argocd-cm-patch.yaml
+    target:
+      kind: ConfigMap
+      name: argocd-cm
   - path: repo-server-patch.yaml
     target:
       kind: Deployment
