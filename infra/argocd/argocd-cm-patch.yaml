@@ -4,6 +4,7 @@ metadata:
   name: argocd-cm
   namespace: platform-argocd
 data:
+  server.side.diff.enabled: "false"
   resource.customizations.ignoreDifferences.apps_StatefulSet: |
     jqPathExpressions:
       - .spec.persistentVolumeClaimRetentionPolicy
