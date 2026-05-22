@@ -200,6 +200,51 @@ kubectl annotate application <app> -n platform-argocd argocd.argoproj.io/refresh
 
 ---
 
+## Troubleshooting
+
+### ArgoCD v3.x — StatefulSet `OutOfSync` loop infinito
+
+**Sintoma:** App ArgoCD com `OutOfSync` em loop (`autoHealAttemptsCount` crescendo continuamente) mesmo após sync bem-sucedido. Apenas StatefulSets com `volumeClaimTemplates` afetados.
+
+**Causa:** O ArgoCD v3.0.0 tornou `serverSideDiff=true` o **default** (breaking change). Com essa configuração, o diff é calculado via SSA dry-run, que sempre retorna campos injetados pelo Kubernetes como drift — e o `ignoreDifferences` **não é honrado** nesse fluxo.
+
+Campos injetados pelo Kubernetes que causam o drift (não presentes no Helm chart):
+- `spec.persistentVolumeClaimRetentionPolicy`
+- `spec.podManagementPolicy`
+- `spec.revisionHistoryLimit`
+- `spec.updateStrategy`
+
+**Fix 1 — desabilitar serverSideDiff globalmente em `infra/argocd/argocd-cm-patch.yaml`:**
+```yaml
+data:
+  server.side.diff.enabled: "false"
+```
+
+**Fix 2 — ignorar campos k8s-injected no app em `clusters/homelab/apps/zabbix.yaml`:**
+```yaml
+ignoreDifferences:
+  - group: apps
+    kind: StatefulSet
+    jsonPointers:
+      - /spec/persistentVolumeClaimRetentionPolicy
+      - /spec/podManagementPolicy
+      - /spec/revisionHistoryLimit
+      - /spec/updateStrategy
+    jqPathExpressions:
+      - .spec.volumeClaimTemplates[]?.status
+      - .spec.volumeClaimTemplates[]?.metadata.annotations
+      - .spec.volumeClaimTemplates[]?.metadata.labels
+      - .spec.volumeClaimTemplates[]?.spec.storageClassName
+      - .spec.volumeClaimTemplates[]?.spec.volumeMode
+syncPolicy:
+  syncOptions:
+    - RespectIgnoreDifferences=true
+```
+
+> **Nota:** A chave `controller.diff.server.side` no `argocd-cmd-params-cm` **não funciona** no ArgoCD v3.x para este propósito. O controle correto é via `server.side.diff.enabled` no `argocd-cm`.
+
+---
+
 ## IA / LLM no Cluster
 
 Opções para rodar modelos de IA localmente:
