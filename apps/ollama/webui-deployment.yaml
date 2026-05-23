@@ -5,6 +5,8 @@ metadata:
   namespace: ollama
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: open-webui
@@ -14,7 +16,7 @@ spec:
         app: open-webui
     spec:
       nodeSelector:
-        kubernetes.io/hostname: k8s-cp
+        kubernetes.io/hostname: k8s-worker
       containers:
       - name: webui
         image: ghcr.io/open-webui/open-webui:main
