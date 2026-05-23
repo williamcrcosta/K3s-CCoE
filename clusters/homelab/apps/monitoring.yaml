@@ -12,6 +12,8 @@ spec:
     helm:
       values: |
         grafana:
+          deploymentStrategy:
+            type: Recreate
           persistence:
             enabled: true
             size: 5Gi
