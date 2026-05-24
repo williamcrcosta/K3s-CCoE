@@ -42,5 +42,5 @@ spec:
           mountPath: /app/backend/data
       volumes:
       - name: data
-        persistentClaim:
+        persistentVolumeClaim:
           claimName: ollama-webui-data

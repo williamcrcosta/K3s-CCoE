@@ -50,5 +50,5 @@ spec:
           periodSeconds: 5
       volumes:
       - name: models
-        persistentClaim:
+        persistentVolumeClaim:
           claimName: ollama-models
