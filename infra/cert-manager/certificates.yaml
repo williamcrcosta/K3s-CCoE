@@ -1,0 +1,92 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wcrpc-tls
+  namespace: monitoring
+spec:
+  secretName: wcrpc-tls
+  issuerRef:
+    name: wcrpc-ca-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - grafana.wcrpc.lan
+    - prometheus.wcrpc.lan
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wcrpc-tls
+  namespace: zabbix
+spec:
+  secretName: wcrpc-tls
+  issuerRef:
+    name: wcrpc-ca-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - zabbix.wcrpc.lan
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wcrpc-tls
+  namespace: platform-argocd
+spec:
+  secretName: wcrpc-tls
+  issuerRef:
+    name: wcrpc-ca-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - argocd.wcrpc.lan
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wcrpc-tls
+  namespace: longhorn-system
+spec:
+  secretName: wcrpc-tls
+  issuerRef:
+    name: wcrpc-ca-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - longhorn.wcrpc.lan
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wcrpc-tls
+  namespace: dns
+spec:
+  secretName: wcrpc-tls
+  issuerRef:
+    name: wcrpc-ca-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - technitium.wcrpc.lan
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wcrpc-tls
+  namespace: ollama
+spec:
+  secretName: wcrpc-tls
+  issuerRef:
+    name: wcrpc-ca-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - ai.wcrpc.lan
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wcrpc-tls
+  namespace: kubernetes-dashboard
+spec:
+  secretName: wcrpc-tls
+  issuerRef:
+    name: wcrpc-ca-issuer
+    kind: ClusterIssuer
+  dnsNames:
+    - dashboard.wcrpc.lan
