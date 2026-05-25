@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: zabbix
   namespace: platform-argocd
+  annotations:
+    argocd.argoproj.io/compare-options: ServerSideDiff=false
 spec:
   project: platform
   source:
@@ -41,12 +43,11 @@ spec:
   ignoreDifferences:
     - group: apps
       kind: StatefulSet
-      jsonPointers:
-        - /spec/persistentVolumeClaimRetentionPolicy
-        - /spec/podManagementPolicy
-        - /spec/revisionHistoryLimit
-        - /spec/updateStrategy
       jqPathExpressions:
+        - .spec.persistentVolumeClaimRetentionPolicy
+        - .spec.podManagementPolicy
+        - .spec.revisionHistoryLimit
+        - .spec.updateStrategy
         - .spec.volumeClaimTemplates[]?.status
         - .spec.volumeClaimTemplates[]?.metadata.annotations
         - .spec.volumeClaimTemplates[]?.metadata.labels
