@@ -243,6 +243,42 @@ syncPolicy:
 
 > **Nota:** A chave `controller.diff.server.side` no `argocd-cmd-params-cm` **não funciona** no ArgoCD v3.x para este propósito. O controle correto é via `server.side.diff.enabled` no `argocd-cm`.
 
+### Root cause definitivo — `managedFields` com ownership do argocd-controller
+
+Se o loop persistir mesmo com `ignoreDifferences` correto, o problema pode estar no `managedFields` do StatefulSet.
+O ArgoCD não ignora diferenças de campos que ele mesmo **possui ownership** via Server-Side Apply.
+
+**Diagnóstico:**
+```bash
+kubectl get statefulset zabbix-postgresql -n zabbix --show-managed-fields -o json | \
+  python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+for mf in d['metadata']['managedFields']:
+    spec = mf.get('fieldsV1',{}).get('f:spec',{})
+    print(f'manager={mf.get("manager")} op={mf.get("operation")} spec={[k[2:] for k in spec.keys()]}')
+"
+```
+
+Se `manager=argocd-controller op=Apply` aparecer com campos como `persistentVolumeClaimRetentionPolicy`, `podManagementPolicy`, etc., o `ignoreDifferences` será ignorado.
+
+**Solução — recriar o StatefulSet sem perda de dados:**
+```bash
+# 1. Pausar selfHeal
+kubectl patch application zabbix -n platform-argocd --type=merge \
+  -p '{"spec":{"syncPolicy":{"automated":{"selfHeal":false}}}}'
+
+# 2. Deletar StatefulSet preservando pod e PVC
+kubectl delete statefulset zabbix-postgresql -n zabbix --cascade=orphan
+
+# 3. Reativar selfHeal — ArgoCD recria o StatefulSet limpo
+kubectl patch application zabbix -n platform-argocd --type=merge \
+  -p '{"spec":{"syncPolicy":{"automated":{"selfHeal":true}}}}'
+kubectl annotate application zabbix -n platform-argocd argocd.argoproj.io/refresh=hard --overwrite
+```
+
+> O pod e o PVC (`postgresql-data-zabbix-postgresql-0`) são preservados. Sem perda de dados.
+
 ---
 
 ## IA / LLM no Cluster
