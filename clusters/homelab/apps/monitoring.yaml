@@ -31,6 +31,7 @@ spec:
               secretName: wcrpc-tls
         prometheus:
           prometheusSpec:
+            retention: 3d
             storageSpec:
               volumeClaimTemplate:
                 spec:
