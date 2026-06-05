@@ -51,8 +51,11 @@ spec:
         - .spec.volumeClaimTemplates[]?.status
         - .spec.volumeClaimTemplates[]?.metadata.annotations
         - .spec.volumeClaimTemplates[]?.metadata.labels
+        - .spec.volumeClaimTemplates[]?.metadata.name
         - .spec.volumeClaimTemplates[]?.spec.storageClassName
         - .spec.volumeClaimTemplates[]?.spec.volumeMode
+        - .spec.volumeClaimTemplates[]?.spec.resources
+        - .spec.volumeClaimTemplates[]?.spec.accessModes
   syncPolicy:
     automated:
       prune: true
