@@ -29,3 +29,9 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+
+  ignoreDifferences:
+    - group: longhorn.io
+      kind: Setting
+      jsonPointers:
+        - /value
