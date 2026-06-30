@@ -4,9 +4,10 @@ metadata:
   name: argocd
   namespace: platform-argocd
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 spec:
-  ingressClassName: traefik
+  ingressClassName: nginx
   rules:
   - host: argocd.wcrpc.lan
     http:
