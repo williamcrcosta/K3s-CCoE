@@ -11,7 +11,7 @@ spec:
     - "https://charts.longhorn.io"
     - "https://prometheus-community.github.io/helm-charts"
     - "https://zabbix-community.github.io/helm-zabbix"
-    - "https://bitnami-labs.github.io/sealed-secrets"
+    - "https://github.com/bitnami-labs/sealed-secrets.git"
   destinations:
     - namespace: "*"
       server: https://kubernetes.default.svc
