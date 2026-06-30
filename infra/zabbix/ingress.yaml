@@ -3,10 +3,8 @@ kind: Ingress
 metadata:
   name: zabbix
   namespace: zabbix
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
 spec:
-  ingressClassName: traefik
+  ingressClassName: nginx
   rules:
   - host: zabbix.wcrpc.lan
     http:
