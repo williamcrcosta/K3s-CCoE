@@ -4,7 +4,7 @@ metadata:
   name: technitium
   namespace: dns
 spec:
-  ingressClassName: traefik
+  ingressClassName: nginx
   rules:
   - host: technitium.wcrpc.lan
     http:
