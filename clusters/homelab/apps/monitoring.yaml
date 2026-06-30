@@ -22,7 +22,7 @@ spec:
           - alexanderzobnin-zabbix-app
           ingress:
             enabled: true
-            ingressClassName: traefik
+            ingressClassName: nginx
             hosts:
             - grafana.wcrpc.lan
             tls:
@@ -43,7 +43,7 @@ spec:
                   storageClassName: longhorn
           ingress:
             enabled: true
-            ingressClassName: traefik
+            ingressClassName: nginx
             hosts:
             - prometheus.wcrpc.lan
             tls:
