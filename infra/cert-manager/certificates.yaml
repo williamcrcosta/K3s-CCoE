@@ -69,19 +69,6 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: wcrpc-tls
-  namespace: ollama
-spec:
-  secretName: wcrpc-tls
-  issuerRef:
-    name: wcrpc-ca-issuer
-    kind: ClusterIssuer
-  dnsNames:
-    - ai.wcrpc.lan
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: wcrpc-tls
   namespace: kubernetes-dashboard
 spec:
   secretName: wcrpc-tls
