@@ -32,7 +32,7 @@ spec:
             -d "zone=wcrpc.lan&type=Primary" || true
 
           echo "Adding DNS records..."
-          IP="192.168.159.128"
+          IP="192.168.50.20"
           for SUB in grafana prometheus zabbix argocd longhorn technitium dashboard; do
             curl -sf -X POST "$BASE/api/zones/records/add?token=$TOKEN" \
               -d "zone=wcrpc.lan&domain=${SUB}.wcrpc.lan&type=A&ipAddress=${IP}&ttl=300" || true

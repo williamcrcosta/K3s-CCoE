@@ -16,7 +16,7 @@ spec:
         app: ollama
     spec:
       nodeSelector:
-        kubernetes.io/hostname: k8s-worker  # Node com mais RAM livre
+        kubernetes.io/hostname: rke2-worker-01  # Node com mais RAM livre
       containers:
       - name: ollama
         image: ollama/ollama:latest
