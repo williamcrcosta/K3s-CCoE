@@ -35,3 +35,8 @@ spec:
       kind: Setting
       jsonPointers:
         - /value
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /status
+        - /spec/conversion/webhook/clientConfig/caBundle
