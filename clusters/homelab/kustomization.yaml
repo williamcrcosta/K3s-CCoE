@@ -5,7 +5,7 @@ resources:
   - projects/platform.yaml
   - apps/argocd.yaml
   - apps/cert-manager.yaml
-  - apps/observability.yaml
+  #- apps/observability.yaml
   - apps/technitium.yaml
   - apps/monitoring.yaml
   - apps/zabbix.yaml
