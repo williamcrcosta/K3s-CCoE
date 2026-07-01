@@ -32,6 +32,7 @@ spec:
         prometheus:
           prometheusSpec:
             retention: 3d
+            replicas: 0
             storageSpec:
               volumeClaimTemplate:
                 spec:
