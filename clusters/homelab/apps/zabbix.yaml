@@ -20,23 +20,28 @@ spec:
             storageSize: 10Gi
         zabbixImageTag: ubuntu-7.0.27
         zabbixWeb:
-          zabbixServerHost: zabbix-zabbix-server
-          zabbixServerPort: 10051
-          service:
-            nodePort: 30082
-            type: NodePort
-          ingress:
-            enabled: true
-            ingressClassName: nginx
-            hosts:
-            - host: zabbix.wcrpc.lan
-              paths:
-              - path: /
-                pathType: Prefix
-            tls:
-            - hosts:
-              - zabbix.wcrpc.lan
-              secretName: wcrpc-tls
+  zabbixServerHost: zabbix-zabbix-server
+  zabbixServerPort: 10051
+  extraEnv:
+    - name: ZBX_SERVER_HOST
+      value: zabbix-zabbix-server
+    - name: ZBX_SERVER_PORT
+      value: "10051"
+  service:
+    nodePort: 30082
+    type: NodePort
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+    - host: zabbix.wcrpc.lan
+      paths:
+      - path: /
+        pathType: Prefix
+    tls:
+    - hosts:
+      - zabbix.wcrpc.lan
+      secretName: wcrpc-tls
   destination:
     server: https://kubernetes.default.svc
     namespace: zabbix
