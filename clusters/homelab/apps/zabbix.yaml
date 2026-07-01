@@ -18,7 +18,7 @@ spec:
             enabled: true
             storageClass: longhorn
             storageSize: 10Gi
-        zabbixImageTag: ubuntu-7.0.28
+        zabbixImageTag: ubuntu-7.0.27
         zabbixWeb:
           zabbixServerHost: zabbix-zabbix-server
           zabbixServerPort: 10051
