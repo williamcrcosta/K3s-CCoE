@@ -1,13 +1,24 @@
-USER-SUPPLIED VALUES:
 grafana:
+  deploymentStrategy:
+    type: Recreate
   persistence:
     enabled: true
     size: 5Gi
-    storageClassName: local-path
+    storageClassName: longhorn
   plugins:
   - alexanderzobnin-zabbix-app
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+    - grafana.wcrpc.lan
+    tls:
+    - hosts:
+      - grafana.wcrpc.lan
+      secretName: wcrpc-tls
 prometheus:
   prometheusSpec:
+    retention: 3d
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -17,3 +28,12 @@ prometheus:
             requests:
               storage: 20Gi
           storageClassName: longhorn
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      hosts:
+      - prometheus.wcrpc.lan
+      tls:
+      - hosts:
+        - prometheus.wcrpc.lan
+        secretName: wcrpc-tls

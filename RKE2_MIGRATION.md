@@ -2,6 +2,8 @@
 
 > Plano de migração do cluster homelab K3s para RKE2, mantendo o cluster atual em paralelo durante a transição (zero downtime).
 
+> **✅ MIGRAÇÃO CONCLUÍDA** — O cluster RKE2 está em produção. Para o status real, topologia, versões e próximos passos, consulte `RKE2_MIGRATION_STATUS.md`. Este documento permanece como histórico do planejamento.
+
 ---
 
 ## Por que migrar?

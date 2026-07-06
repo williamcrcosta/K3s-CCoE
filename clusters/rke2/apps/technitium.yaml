@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: root-homelab
+  name: technitium
   namespace: platform-argocd
 spec:
   project: platform
   source:
     repoURL: https://github.com/williamcrcosta/K3s-CCoE.git
     targetRevision: main
-    path: clusters/rke2
+    path: apps/technitium
   destination:
     server: https://kubernetes.default.svc
-    namespace: platform-argocd
+    namespace: dns
   syncPolicy:
     automated:
       prune: true

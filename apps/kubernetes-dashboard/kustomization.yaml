@@ -5,4 +5,5 @@ resources:
   - rbac.yaml
   - deploy.yaml
   - svc.yaml
-  - ingressroute.yaml
+  - ingress.yaml
+  # - ingressroute.yaml  # mantido como historico; substituido por ingress.yaml no RKE2

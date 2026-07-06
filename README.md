@@ -1,6 +1,6 @@
-# K3s Homelab — Documentação de Arquitetura
+# RKE2 Homelab — Documentação de Arquitetura
 
-> Cluster Kubernetes de alta disponibilidade para homelab, gerenciado por GitOps via ArgoCD.
+> Cluster Kubernetes hardened para homelab, gerenciado por GitOps via ArgoCD. Migrado de K3s para RKE2 para simular um ambiente corporativo real.
 
 ---
 
@@ -9,18 +9,20 @@
 ```
 Internet
     │
-    └── Rede Local: 192.168.159.0/24
+    └── Rede Local: 192.168.50.0/24
             │
-            ├── k8s-cp      192.168.159.128  (Control Plane + Worker)
-            │     ├── OS: Ubuntu 24.04.1 LTS
-            │     ├── K3s: v1.36.0+k3s1
-            │     └── Runtime: containerd 2.1.5
+            ├── rke2-cp-01      192.168.50.20  (Control Plane)
+            │     ├── OS: Rocky Linux 9.8 (Blue Onyx)
+            │     ├── RKE2: v1.35.6+rke2r1
+            │     └── Runtime: containerd
             │
-            └── k8s-worker  192.168.159.129  (Worker)
-                  ├── OS: Ubuntu 24.04.4 LTS
-                  ├── K3s: v1.36.0+k3s1
-                  └── Runtime: containerd 2.1.5
+            └── rke2-worker-01  192.168.50.21  (Worker)
+                  ├── OS: Rocky Linux 9.8 (Blue Onyx)
+                  ├── RKE2: v1.35.6+rke2r1
+                  └── Runtime: containerd
 ```
+
+> **Histórico:** este cluster foi migrado de K3s (Ubuntu 24.04, IPs `192.168.159.128/129`) para RKE2. Ver `RKE2_MIGRATION.md` (plano) e `RKE2_MIGRATION_STATUS.md` (status real).
 
 ---
 
@@ -28,13 +30,14 @@ Internet
 
 | Componente | Tecnologia | Função |
 |---|---|---|
-| Container Orchestration | K3s v1.36 | Kubernetes leve para homelab |
-| GitOps | ArgoCD | Reconciliação contínua via Git |
-| Ingress Controller | Traefik (K3s built-in) | Roteamento HTTP/HTTPS |
-| Storage | Longhorn | Block storage distribuído com replicação |
+| Container Orchestration | RKE2 v1.35.6+rke2r1 | Kubernetes hardened para homelab/enterprise |
+| CNI | Canal (Flannel + Calico) | Rede com suporte nativo a NetworkPolicy |
+| GitOps | ArgoCD v3.3.1 | Reconciliação contínua via Git |
+| Ingress Controller | NGINX Ingress Controller (RKE2 hardened) | Roteamento HTTP/HTTPS |
+| Storage | Longhorn v1.7.2 | Block storage distribuído com replicação |
 | DNS Interno | Technitium | Resolução DNS para `*.wcrpc.lan` |
-| Certificados | cert-manager + Self-signed CA | TLS interno |
-| Secrets | Sealed Secrets | Secrets cifrados no Git |
+| Certificados | cert-manager v1.14.5 + Self-signed CA | TLS interno |
+| Secrets | Sealed Secrets v0.26.3 | Secrets cifrados no Git |
 
 ---
 
@@ -44,11 +47,12 @@ Internet
 |---|---|---|---|
 | ArgoCD | https://argocd.wcrpc.lan | `platform-argocd` | — |
 | Grafana | https://grafana.wcrpc.lan | `monitoring` | Longhorn 5Gi |
-| Prometheus | interno | `monitoring` | Longhorn 20Gi |
+| Prometheus | https://prometheus.wcrpc.lan | `monitoring` | Longhorn 20Gi |
 | Zabbix | https://zabbix.wcrpc.lan | `zabbix` | Longhorn 10Gi (PostgreSQL) |
 | Longhorn UI | https://longhorn.wcrpc.lan | `longhorn-system` | — |
-| Kubernetes Dashboard | https://kubernetes-dashboard.wcrpc.lan | `kubernetes-dashboard` | — |
-| Technitium DNS | https://dns.wcrpc.lan / UDP:53 | `dns` | Longhorn 2Gi |
+| Kubernetes Dashboard | https://dashboard.wcrpc.lan | `kubernetes-dashboard` | — |
+| Technitium DNS | https://technitium.wcrpc.lan / UDP:53 | `dns` | Longhorn 2Gi |
+| Ollama / Open WebUI | https://ai.wcrpc.lan | `ollama` | Longhorn 20Gi+ |
 
 ---
 
@@ -59,9 +63,11 @@ Longhorn (distribuído entre os 2 nodes)
 ├── technitium-data          2Gi   (DNS config)
 ├── monitoring-grafana       5Gi   (Grafana DB)
 ├── prometheus-db            20Gi  (Prometheus TSDB)
-└── postgresql-data-zabbix   10Gi  (Zabbix PostgreSQL)
+├── postgresql-data-zabbix   10Gi  (Zabbix PostgreSQL)
+├── ollama-models            20Gi  (Modelos Ollama)
+└── ollama-webui-data         5Gi  (Open WebUI)
 
-Replicação: 2 réplicas por volume (k8s-cp + k8s-worker)
+Replicação: 2 réplicas por volume (rke2-cp-01 + rke2-worker-01)
 StorageClass default: longhorn
 ```
 
@@ -70,21 +76,22 @@ StorageClass default: longhorn
 ## Arquitetura de Rede
 
 ```
-Cliente → 192.168.159.128:443 (NodePort Traefik)
-        → Traefik IngressController
+Cliente → 192.168.50.20:443 (NodePort NGINX / LoadBalancer)
+        → NGINX Ingress Controller (RKE2 hardened)
         → Service ClusterIP
         → Pod
 
-DNS: *.wcrpc.lan → 192.168.159.128 (Technitium)
+DNS: *.wcrpc.lan → 192.168.50.20 (Technitium)
      Fallback: 1.1.1.1, 8.8.8.8
 
 NodePorts expostos:
-  - 30080: Traefik HTTP
-  - 30443: Traefik HTTPS
+  - 80/443: NGINX HTTP/HTTPS
   - 30053/UDP: Technitium DNS
   - 30081: Zabbix Server (active checks)
   - 30082: Zabbix Web (NodePort direto)
 ```
+
+> **Histórico:** no K3s o ingress era Traefik (NodePorts 30080/30443). No RKE2 usamos NGINX Ingress Controller hardened.
 
 ---
 
@@ -95,9 +102,9 @@ GitHub (williamcrcosta/K3s-CCoE)
     │
     └── ArgoCD (App of Apps pattern)
             │
-            ├── clusters/homelab/root.yml          ← Root App
-            ├── clusters/homelab/kustomization.yaml
-            └── clusters/homelab/apps/
+            ├── clusters/rke2/root.yml          ← Root App (RKE2)
+            ├── clusters/rke2/kustomization.yaml
+            └── clusters/rke2/apps/
                     ├── argocd.yaml
                     ├── cert-manager.yaml
                     ├── longhorn.yaml
@@ -105,10 +112,14 @@ GitHub (williamcrcosta/K3s-CCoE)
                     ├── sealed-secrets.yaml
                     ├── technitium.yaml
                     ├── zabbix.yaml
-                    └── kubernetes-dashboard.yaml
+                    ├── kubernetes-dashboard.yaml
+                    └── ollama.yaml
 ```
 
+> **Nota:** o app `root-homelab` existente no cluster foi redirecionado para `clusters/rke2`. A pasta `clusters/homelab/` permanece como histórico do K3s.
+
 ### Fluxo de Deploy
+
 1. Push no branch `main`
 2. ArgoCD detecta mudança (polling a cada 3min ou webhook)
 3. ArgoCD reconcilia o estado do cluster com o Git
@@ -121,25 +132,29 @@ GitHub (williamcrcosta/K3s-CCoE)
 ```
 K3s-CCoE/
 ├── README.md                        ← Este arquivo
-├── MIGRATION_PLAN.md                ← Histórico de migrações
-├── DISASTER_RECOVERY.md             ← Plano de recuperação
+├── MIGRATION_PLAN.md                ← Histórico de migrações GitOps
+├── RKE2_MIGRATION.md                ← Plano original de migração K3s → RKE2
+├── RKE2_MIGRATION_STATUS.md         ← Status real da migração
+├── DISASTER_RECOVERY.md             ← Plano de recuperação (RKE2)
 ├── apps/
-│   ├── technitium/                  ← Manifests Technitium DNS
-│   └── kubernetes-dashboard/        ← Manifests K8s Dashboard
+│   ├── kubernetes-dashboard/        ← Manifests K8s Dashboard
+│   ├── ollama/                      ← Manifests Ollama + Open WebUI
+│   └── technitium/                  ← Manifests Technitium DNS
 ├── infra/
 │   ├── argocd/                      ← Patches ArgoCD
 │   ├── cert-manager/                ← ClusterIssuers
-│   ├── longhorn/                    ← Ingress Longhorn
-│   ├── monitoring/                  ← Values extras Prometheus
+│   ├── longhorn/                    ← App Longhorn + ingress
+│   ├── monitoring/                  ← App kube-prometheus-stack
 │   ├── sealed-secrets/              ← App Sealed Secrets
 │   └── zabbix/                      ← Ingress + values Zabbix
 ├── clusters/
-│   └── homelab/
-│       ├── root.yml                 ← App of Apps entry point
+│   ├── homelab/                     ← K3s histórico (não usado ativamente)
+│   └── rke2/                        ← RKE2 ativo
+│       ├── root.yml
 │       ├── kustomization.yaml
 │       ├── projects/
-│       │   └── platform.yaml        ← ArgoCD Project
-│       └── apps/                    ← ArgoCD Application manifests
+│       │   └── platform.yaml
+│       └── apps/
 └── secrets/                         ← Sealed Secrets (cifrados)
 ```
 
@@ -150,8 +165,8 @@ K3s-CCoE/
 - **Prometheus** — coleta métricas de todos os nodes e pods via kube-prometheus-stack 82.2.0
 - **Grafana** — dashboards automáticos: Kubernetes, Nodes, Pods, Storage
 - **Zabbix** — monitoração tradicional dos nodes (CPU, RAM, disco, rede)
-  - Agent instalado em `k8s-cp` e `k8s-worker`
-  - 394 hosts monitorados, 17.931 items ativos
+  - Agent instalado em `rke2-cp-01` e `rke2-worker-01`
+  - 394+ hosts monitorados, 17.000+ items ativos
 
 ---
 
@@ -164,8 +179,8 @@ K3s-CCoE/
 
 ### Médio Prazo
 - **Resource limits** — definir `requests` e `limits` para todos os pods
-- **Network Policies** — isolar namespaces (zabbix não acessa monitoring, etc.)
-- **Zabbix templates K3s** — monitorar pods, PVCs e nodes via Zabbix
+- **Network Policies** — isolar namespaces (zabbix, monitoring, dns, etc.)
+- **Zabbix templates RKE2** — monitorar pods, PVCs e nodes via Zabbix
 - **Let's Encrypt** — migrar para certificados públicos válidos com DNS challenge
 
 ### Longo Prazo
@@ -176,6 +191,13 @@ K3s-CCoE/
 ---
 
 ## Manutenção
+
+### Configurar kubectl no RKE2
+
+```bash
+export PATH=$PATH:/var/lib/rancher/rke2/bin
+export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+```
 
 ### Health Check rápido
 ```bash
@@ -197,6 +219,10 @@ kubectl get volumes.longhorn.io -n longhorn-system
 kubectl annotate application <app> -n platform-argocd argocd.argoproj.io/refresh=hard --overwrite
 ```
 
+### Snapshot etcd
+```bash
+rke2 etcd-snapshot save --name "manual-$(date +%Y%m%d-%H%M%S)"
+```
 
 ---
 
@@ -220,7 +246,7 @@ data:
   server.side.diff.enabled: "false"
 ```
 
-**Fix 2 — ignorar campos k8s-injected no app em `clusters/homelab/apps/zabbix.yaml`:**
+**Fix 2 — ignorar campos k8s-injected no app em `clusters/rke2/apps/zabbix.yaml`:**
 ```yaml
 ignoreDifferences:
   - group: apps
@@ -256,7 +282,7 @@ import json,sys
 d=json.load(sys.stdin)
 for mf in d['metadata']['managedFields']:
     spec = mf.get('fieldsV1',{}).get('f:spec',{})
-    print(f'manager={mf.get("manager")} op={mf.get("operation")} spec={[k[2:] for k in spec.keys()]}')
+    print(f'manager={mf.get('manager')} op={mf.get('operation')} spec={[k[2:] for k in spec.keys()]}')
 "
 ```
 
@@ -298,7 +324,7 @@ deploy:
       memory: "8Gi"
       cpu: "4"
   nodeSelector:
-    kubernetes.io/hostname: k8s-cp  # GPU node preferencial
+    kubernetes.io/hostname: rke2-worker-01  # GPU node preferencial
 ```
 **Modelos suportados:** llama3, mistral, codellama, etc.
 **Persistência:** PVC para ~/.ollama/models
@@ -325,6 +351,5 @@ deploy:
 1. **Verificar GPU:** `lspci | grep -i nvidia`
 2. **Instalar NVIDIA Operator:** via Helm
 3. **Deploy Ollama:** com nodeSelector para node com GPU
-4. **Expor via Ingress:** ollama.wcrpc.lan
+4. **Expor via Ingress:** ai.wcrpc.lan
 5. **Integrar com apps:** via service `ollama:11434`
-

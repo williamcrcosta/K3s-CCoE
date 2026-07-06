@@ -41,15 +41,15 @@ spec:
                     requests:
                       storage: 20Gi
                   storageClassName: longhorn
-            ingress:
-              enabled: true
-              ingressClassName: nginx
-              hosts:
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            hosts:
+            - prometheus.wcrpc.lan
+            tls:
+            - hosts:
               - prometheus.wcrpc.lan
-              tls:
-              - hosts:
-                - prometheus.wcrpc.lan
-                secretName: wcrpc-tls
+              secretName: wcrpc-tls
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

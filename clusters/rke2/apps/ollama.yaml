@@ -1,17 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: root-homelab
+  name: ollama
   namespace: platform-argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"  # Depois de infraestrutura base
 spec:
   project: platform
   source:
     repoURL: https://github.com/williamcrcosta/K3s-CCoE.git
     targetRevision: main
-    path: clusters/rke2
+    path: apps/ollama
   destination:
     server: https://kubernetes.default.svc
-    namespace: platform-argocd
+    namespace: ollama
   syncPolicy:
     automated:
       prune: true
