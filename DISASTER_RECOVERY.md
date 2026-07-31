@@ -396,3 +396,110 @@ rke2 etcd-snapshot save --name "manual-$(date +%Y%m%d-%H%M%S)"
 # Listar snapshots
 rke2 etcd-snapshot ls
 ```
+
+---
+
+## Cenário 6 — Corrupção de disco VM após shutdown inesperado do Proxmox
+
+> **Ocorrência:** 2026-07-30 — Proxmox travou e foi desligado no "dedão". Worker `rke2-worker-01` entrou em emergency mode com erro `/dev/sda: Can't open blockdev`.
+
+### Sintomas
+
+- VM em boot loop no emergency mode
+- Mensagem repetitiva: `You are in emergency mode`
+- Erro no kernel: `/dev/sda: Can't open blockdev`
+- Node aparece como `NotReady` no cluster
+
+### Procedimento de Recuperação
+
+**1. Acessar o console da VM pelo Proxmox e entrar com senha root**
+
+**2. Corrigir partição FAT32 (EFI/boot — `/dev/sda1`):**
+```bash
+fsck -y /dev/sda1
+# Saída esperada: "Filesystem was changed" — OK
+```
+
+**3. Corrigir partição XFS (root — `/dev/sda2`):**
+```bash
+# XFS usa xfs_repair, não fsck
+xfs_repair /dev/sda2
+# Se der erro "mounted filesystem", significa que já está montado e OK
+# Fatal error "couldn't initialize XFS library" no emergency mode é normal — ignorar
+```
+
+**4. Reiniciar:**
+```bash
+systemctl reboot
+```
+
+**5. Verificar que o node voltou ao cluster:**
+```bash
+/var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml get nodes
+```
+
+**6. Aguardar Longhorn remontar volumes (~2-3 min) e verificar pods:**
+```bash
+/var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml get pods -A | grep -v "Running\|Completed"
+```
+
+### Avisos normais no boot (inofensivos)
+- `evm: overlay not supported`
+- `WireGuard TECH PREVIEW: WireGuard may not be fully supported`
+- `Warning: Deprecated Driver is detected: ip_set`
+
+---
+
+## Cenário 7 — ArgoCD: erro `resourceVersion: Invalid value: 0`
+
+> **Ocorrência:** 2026-07-30 — Após editar Application via `kubectl replace`, o ArgoCD ficou em loop de falha ao tentar sincronizar.
+
+### Sintoma
+```
+applications.argoproj.io "zabbix" is invalid: metadata.resourceVersion: Invalid value: 0: must be specified for an update
+```
+
+### Causa
+O `kubectl replace` substitui o `last-applied-configuration`, corrompendo o mecanismo de patch do ArgoCD.
+
+### Fix
+Usar **server-side apply** para restaurar o estado correto:
+```bash
+kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+  apply --server-side --force-conflicts \
+  -f clusters/homelab/apps/<arquivo>.yaml
+```
+
+### Prevenção
+> **Nunca usar `kubectl replace` em recursos gerenciados pelo ArgoCD.**
+> Sempre editar via Git + push. Se necessário editar direto, usar `kubectl patch` ou `kubectl apply`.
+
+---
+
+## Cenário 8 — Zabbix: "server is not running" após redeploy
+
+> **Ocorrência:** 2026-07-30 — Após sync do ArgoCD, frontend do Zabbix exibia "Zabbix server is not running".
+
+### Causa
+O `zabbix.conf.php` lê a variável de ambiente `ZBX_SERVER_HOST` para saber onde está o server.
+Se o `extraEnv` não estiver definido nos values do Helm, essa variável fica ausente.
+
+### Configuração obrigatória no `zabbix.yaml`
+```yaml
+zabbixWeb:
+  enabled: true                          # obrigatório — evita nil pointer no Helm template
+  zabbixServerHost: zabbix-zabbix-server
+  zabbixServerPort: 10051
+  extraEnv:
+    - name: ZBX_SERVER_HOST              # obrigatório — lido pelo zabbix.conf.php
+      value: zabbix-zabbix-server
+    - name: ZBX_SERVER_PORT
+      value: "10051"
+```
+
+### Fix rápido (sem alterar Git)
+```bash
+kubectl rollout restart deployment/zabbix-zabbix-web -n zabbix
+# Verificar env
+kubectl exec -n zabbix deployment/zabbix-zabbix-web -- env | grep ZBX_SERVER
+```

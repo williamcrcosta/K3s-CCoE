@@ -240,3 +240,36 @@ Os itens abaixo foram identificados como inconsistentes e **já foram atualizado
 ---
 
 > Este documento **não excluiu nenhum arquivo**. Todos os arquivos antigos foram mantidos; onde necessário, foram criados novos arquivos ou atualizações focadas para refletir o RKE2.
+
+---
+
+## 12. Incidente 2026-07-30 — Proxmox Crash & Recovery
+
+### O que aconteceu
+- Proxmox travou e foi desligado inesperadamente
+- Worker `rke2-worker-01` entrou em emergency mode por corrupção de disco (`/dev/sda`)
+- Múltiplos pods em `Terminating`/`Pending`, Zabbix postgres em `ContainerCreating` há 6h
+
+### O que foi resolvido
+| Item | Status |
+|---|---|
+| Worker node (`rke2-worker-01`) | ✅ Recuperado via fsck + xfs_repair |
+| Cluster nodes | ✅ Ambos `Ready` |
+| Longhorn volumes | ✅ Remontados automaticamente |
+| Todos os pods | ✅ Running/Completed |
+| ArgoCD `root-homelab` | ✅ Synced + Healthy |
+| ArgoCD `zabbix` | ✅ Synced + Healthy |
+| Zabbix server connection | ✅ Restaurado (`ZBX_SERVER_HOST`) |
+
+### Fixes permanentes aplicados ao Git
+1. `clusters/homelab/apps/zabbix.yaml` e `clusters/rke2/apps/zabbix.yaml`:
+   - Adicionado `zabbixWeb.enabled: true` (fix nil pointer no Helm template)
+   - Restaurado `extraEnv` com `ZBX_SERVER_HOST` e `ZBX_SERVER_PORT`
+   - Atualizado `zabbixImageTag: ubuntu-7.0.28`
+   - Removido `extraEnv` duplicado (mantido apenas o necessário)
+
+### Lições aprendidas
+- **Nunca usar `kubectl replace`** em recursos gerenciados pelo ArgoCD
+- O `zabbixWeb.enabled: true` é obrigatório nos Helm values
+- O `extraEnv` com `ZBX_SERVER_HOST` é obrigatório para o frontend conectar ao server
+- Ver `DISASTER_RECOVERY.md` cenários 6, 7 e 8 para detalhes
