@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://zabbix-community.github.io/helm-zabbix
     chart: zabbix
-    targetRevision: 7.0.12
+    targetRevision: 7.1.0
     helm:
       values: |
         postgresql:
@@ -43,24 +43,6 @@ spec:
             - hosts:
               - zabbix.wcrpc.lan
               secretName: wcrpc-tls
-        extraManifests:
-          - apiVersion: v1
-            kind: Service
-            metadata:
-              name: zabbix-server-trapper
-              namespace: zabbix
-            spec:
-              type: NodePort
-              selector:
-                app.kubernetes.io/component: server
-                app.kubernetes.io/instance: zabbix
-                app.kubernetes.io/name: zabbix
-              ports:
-                - name: zabbix-trapper
-                  port: 10051
-                  targetPort: 10051
-                  nodePort: 30051
-                  protocol: TCP
   destination:
     server: https://kubernetes.default.svc
     namespace: zabbix
