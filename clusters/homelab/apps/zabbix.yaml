@@ -23,6 +23,11 @@ spec:
           enabled: true
           zabbixServerHost: zabbix-zabbix-server
           zabbixServerPort: 10051
+          extraEnv:
+            - name: ZBX_SERVER_HOST
+              value: zabbix-zabbix-server
+            - name: ZBX_SERVER_PORT
+              value: "10051"
           service:
             nodePort: 30082
             type: NodePort
