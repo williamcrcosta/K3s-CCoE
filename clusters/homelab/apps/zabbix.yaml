@@ -18,15 +18,11 @@ spec:
             enabled: true
             storageClass: longhorn
             storageSize: 10Gi
-        zabbixImageTag: ubuntu-7.0.27
+        zabbixImageTag: ubuntu-7.0.28
         zabbixWeb:
+          enabled: true
           zabbixServerHost: zabbix-zabbix-server
           zabbixServerPort: 10051
-          extraEnv:
-            - name: ZBX_SERVER_HOST
-              value: zabbix-zabbix-server
-            - name: ZBX_SERVER_PORT
-              value: "10051"
           service:
             nodePort: 30082
             type: NodePort
