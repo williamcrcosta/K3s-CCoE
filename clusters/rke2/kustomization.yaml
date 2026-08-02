@@ -14,4 +14,4 @@ resources:
   #- apps/ollama.yaml
   - ../../infra/longhorn
   - ../../infra/zabbix
-  - ../../infra/monitoring/grafana-secret.yaml
+  - ../../infra/monitoring-secrets
