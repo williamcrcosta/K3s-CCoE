@@ -503,3 +503,67 @@ kubectl rollout restart deployment/zabbix-zabbix-web -n zabbix
 # Verificar env
 kubectl exec -n zabbix deployment/zabbix-zabbix-web -- env | grep ZBX_SERVER
 ```
+
+
+---
+
+## Cenario 9 - Resetar senha do Grafana (admin)
+
+> **Ocorrencia:** 2026-08-02 - Necessidade de trocar a senha padrao do Grafana de forma GitOps-friendly.
+
+### Causa raiz importante
+O Grafana usa banco **SQLite persistente** (`persistence.enabled: true`). A env var
+`GF_SECURITY_ADMIN_PASSWORD` (seja via `adminPassword` direto ou via `admin.existingSecret`)
+**so e aplicada na criacao inicial do banco**. Se o usuario `admin` ja existe no banco,
+alterar o secret/env var **nao muda a senha ja persistida**. E necessario resetar via
+`grafana-cli` diretamente no pod.
+
+### Passo 1 - Criar o SealedSecret com a senha desejada
+```bash
+KUBECONFIG=/etc/rancher/rke2/rke2.yaml kubectl create secret generic grafana-admin-credentials \
+  --from-literal=admin-user=admin \
+  --from-literal='admin-password=SUA_SENHA_AQUI' \
+  --namespace monitoring --dry-run=client -o yaml | \
+  KUBECONFIG=/etc/rancher/rke2/rke2.yaml kubeseal \
+    --controller-name sealed-secrets-controller \
+    --controller-namespace kube-system \
+    --format yaml > infra/monitoring-secrets/grafana-secret.yaml
+```
+
+> Cuidado com caracteres especiais (`!`, `&`) na senha - use aspas simples no `--from-literal`.
+
+### Passo 2 - Referenciar o secret no Helm values (`clusters/homelab/apps/monitoring.yaml`)
+```yaml
+grafana:
+  admin:
+    existingSecret: grafana-admin-credentials
+    userKey: admin-user
+    passwordKey: admin-password
+```
+
+> `infra/monitoring-secrets/` tem seu proprio `kustomization.yaml` e e referenciado como
+> diretorio em `clusters/homelab/kustomization.yaml` e `clusters/rke2/kustomization.yaml`.
+> **Nao** referencie arquivos individuais fora do diretorio raiz do kustomize - o Kustomize
+> bloqueia isso por seguranca (`accumulating resources ... security; file is not in or below`).
+> Sempre crie um subdiretorio com seu proprio `kustomization.yaml`.
+
+### Passo 3 - Commit e sync
+```bash
+git add clusters/homelab/apps/monitoring.yaml infra/monitoring-secrets/
+git commit -m "fix: update grafana admin credentials"
+git push origin main
+kubectl annotate application root-homelab -n platform-argocd argocd.argoproj.io/refresh=hard --overwrite
+```
+
+### Passo 4 - Resetar a senha no banco (OBRIGATORIO se o secret ja existia antes)
+```bash
+kubectl exec -n monitoring deployment/monitoring-grafana -c grafana -- \
+  grafana-cli admin reset-admin-password 'SUA_SENHA_AQUI'
+```
+Saida esperada: `Admin password changed successfully`
+
+### Verificacao
+```bash
+kubectl exec -n monitoring deployment/monitoring-grafana -c grafana -- env | grep GF_SECURITY
+```
+Login em `https://grafana.wcrpc.lan` com `admin` / `SUA_SENHA_AQUI`.
