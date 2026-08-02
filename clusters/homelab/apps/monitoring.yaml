@@ -12,6 +12,10 @@ spec:
     helm:
       values: |
         grafana:
+          admin:
+            existingSecret: grafana-admin-credentials
+            userKey: admin-user
+            passwordKey: admin-password
           deploymentStrategy:
             type: Recreate
           persistence:
