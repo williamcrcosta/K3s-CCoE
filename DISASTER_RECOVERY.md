@@ -567,3 +567,125 @@ Saida esperada: `Admin password changed successfully`
 kubectl exec -n monitoring deployment/monitoring-grafana -c grafana -- env | grep GF_SECURITY
 ```
 Login em `https://grafana.wcrpc.lan` com `admin` / `SUA_SENHA_AQUI`.
+
+
+---
+
+## Cenario 10 - Configurar monitoramento do Proxmox VE (pve-exporter)
+
+> **Ocorrencia:** 2026-08-02/03 - Adicao de monitoramento detalhado do Proxmox no Grafana.
+
+### Visao geral
+O Proxmox e monitorado via **Zabbix** (template `Proxmox VE by HTTP`) para infra geral,
+mas para um dashboard rico no Grafana (VMs, LXC, ZFS, sensores, PSI pressure, etc) usamos
+o exporter Prometheus **`bigtcze/pve-exporter`** (Go), instalado diretamente no host Proxmox.
+
+> **Atencao:** existe tambem o pacote Python `prometheus-pve-exporter` (znerol), mas ele usa
+> nomenclatura de metricas diferente (`pve_up`, `pve_cpu_usage_ratio`, label `id=`) e
+> **nao e compativel** com o dashboard `24550-proxmox-ve-pve-exporter` do Grafana. O dashboard
+> exige `bigtcze/pve-exporter`, que expoe metricas como `pve_node_up`, `pve_node_cpu_load`
+> (label `node=`).
+
+### Passo 1 - Criar role, user e token de API no Proxmox (somente leitura)
+```bash
+ssh root@192.168.50.250
+
+# nome do role NAO pode comecar com "PVE" (namespace reservado)
+pveum role add ExporterRole -privs 'VM.Audit,Datastore.Audit,Sys.Audit'
+pveum user add pve-exporter@pve --comment 'Prometheus PVE Exporter'
+pveum aclmod / -user pve-exporter@pve -role ExporterRole
+pveum user token add pve-exporter@pve monitoring --privsep 0
+# copiar o "value" (token secret) retornado
+```
+
+### Passo 2 - Instalar o binario `bigtcze/pve-exporter`
+```bash
+useradd --system --no-create-home --shell /usr/sbin/nologin pve-exporter
+wget -qO /usr/local/bin/pve-exporter \
+  https://github.com/bigtcze/pve-exporter/releases/latest/download/pve-exporter-linux-amd64
+chmod +x /usr/local/bin/pve-exporter
+```
+
+### Passo 3 - Configurar
+```bash
+mkdir -p /etc/pve-exporter
+cat > /etc/pve-exporter/config.yml << 'EOF'
+proxmox:
+  host: "localhost"
+  port: 8006
+  token_id: "pve-exporter@pve!monitoring"
+  token_secret: "SEU_TOKEN_AQUI"
+  insecure_skip_verify: true
+server:
+  listen_address: ":9221"
+  metrics_path: "/metrics"
+EOF
+chown root:pve-exporter /etc/pve-exporter/config.yml
+chmod 640 /etc/pve-exporter/config.yml
+```
+
+### Passo 4 - Servico systemd
+```bash
+cat > /etc/systemd/system/pve-exporter.service << 'EOF'
+[Unit]
+Description=Proxmox VE Exporter for Prometheus
+Documentation=https://github.com/bigtcze/pve-exporter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pve-exporter
+Group=pve-exporter
+ExecStart=/usr/local/bin/pve-exporter -config /etc/pve-exporter/config.yml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl daemon-reload
+systemctl enable --now pve-exporter
+```
+
+### Passo 5 - Scrape config no Prometheus (GitOps)
+Em `clusters/homelab/apps/monitoring.yaml` (dentro de `prometheus.prometheusSpec`):
+```yaml
+additionalScrapeConfigs:
+  - job_name: proxmox-pve
+    static_configs:
+      - targets:
+          - 192.168.50.250:9221
+    metrics_path: /metrics
+```
+Commit + push + `kubectl annotate application monitoring -n platform-argocd argocd.argoproj.io/refresh=hard --overwrite`.
+
+### Passo 6 - Dashboard Grafana persistido via ConfigMap (GitOps)
+O dashboard `24550 - Proxmox VE - pve-exporter` foi customizado (fix de queries + paineis extras)
+e salvo como ConfigMap em `infra/monitoring-dashboards/grafana-dashboard-proxmox-pve-exporter.yaml`,
+com label `grafana_dashboard: "1"` — o sidecar `grafana-sc-dashboard` (ja incluso no
+kube-prometheus-stack) carrega automaticamente.
+
+Para exportar o dashboard atual do Grafana e atualizar o ConfigMap:
+```bash
+GRAFANA_POD=$(kubectl get pod -n monitoring -l app.kubernetes.io/name=grafana -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n monitoring deployment/monitoring-grafana -c grafana -- \
+  wget -qO- --header="Authorization: Basic $(echo -n 'admin:SENHA' | base64)" \
+  http://localhost:3000/api/dashboards/uid/pve-exporter > /tmp/dash.json
+# extrair campo .dashboard, remover .id, colocar em data['proxmox-pve-exporter.json'] do ConfigMap
+```
+
+### Paineis sem dados (limitacao do exporter)
+O `bigtcze/pve-exporter` usa apenas a API REST do Proxmox — **nao coleta SMART nem sensores
+de hardware reais** (precisaria de acesso root a `/dev/sdX` e `lm-sensors` no host). Os paineis
+de **ZFS Pool Health/Fragmentation**, **Disk SMART/Temperature/Health**, e **Fan Speeds**
+ficam com "No data" propositalmente — nao ha exporter adicional configurado para isso (nao
+prioritario neste momento).
+
+### Verificacao
+```bash
+curl -s "http://192.168.50.250:9221/metrics" | grep pve_node_up
+# No Prometheus:
+kubectl exec -n monitoring prometheus-monitoring-kube-prometheus-prometheus-0 -c prometheus -- \
+  wget -qO- 'http://localhost:9090/api/v1/query?query=pve_node_up'
+```
