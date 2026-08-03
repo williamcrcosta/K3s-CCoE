@@ -3,4 +3,6 @@ kind: ConfigMap
 metadata:
   name: argocd-cmd-params-cm
   namespace: platform-argocd
-data: {}
+data:
+  controller.status.processors: "5"
+  controller.operation.processors: "2"

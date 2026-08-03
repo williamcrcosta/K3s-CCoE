@@ -8,3 +8,11 @@ data:
   resource.customizations.ignoreDifferences.apps_StatefulSet: |
     jqPathExpressions:
       - .spec.persistentVolumeClaimRetentionPolicy
+  resource.exclusions: |
+    - apiGroups:
+        - "*"
+      kinds:
+        - Event
+        - Endpoints
+        - EndpointSlice
+        - Lease
