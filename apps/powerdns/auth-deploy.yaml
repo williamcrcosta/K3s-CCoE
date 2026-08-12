@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: powerdns-auth
+  namespace: dns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: powerdns-auth
+  template:
+    metadata:
+      labels:
+        app: powerdns-auth
+    spec:
+      nodeSelector:
+        role: dns
+      initContainers:
+      - name: init-db
+        image: keinos/sqlite3:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          mkdir -p /var/lib/powerdns
+          if [ ! -f /var/lib/powerdns/pdns.sqlite3 ]; then
+            sqlite3 /var/lib/powerdns/pdns.sqlite3 < /etc/powerdns/schema.sql
+          fi
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/powerdns
+        - name: schema
+          mountPath: /etc/powerdns
+      containers:
+      - name: powerdns-auth
+        image: powerdns/pdns-auth-49:4.9.5
+        args:
+        - --launch=gsqlite3
+        - --gsqlite3-database=/var/lib/powerdns/pdns.sqlite3
+        - --gsqlite3-pragma-foreign-keys=1
+        - --local-address=0.0.0.0
+        - --local-port=5300
+        - --primary=yes
+        - --api=yes
+        - --api-key=wcrpc-lan-api-key
+        - --webserver=yes
+        - --webserver-address=0.0.0.0
+        - --webserver-port=8081
+        - --webserver-allow-from=0.0.0.0/0,::/0
+        - --default-ttl=300
+        - --dnsupdate=yes
+        - --allow-axfr-ips=0.0.0.0/0,::/0
+        ports:
+        - containerPort: 5300
+          name: dns-auth-udp
+          protocol: UDP
+        - containerPort: 5300
+          name: dns-auth-tcp
+          protocol: TCP
+        - containerPort: 8081
+          name: web
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/powerdns
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: powerdns-auth-data
+      - name: schema
+        configMap:
+          name: powerdns-auth-schema

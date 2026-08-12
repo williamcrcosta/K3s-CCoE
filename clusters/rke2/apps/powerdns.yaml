@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: powerdns
+  namespace: platform-argocd
+spec:
+  project: platform
+  source:
+    repoURL: https://github.com/williamcrcosta/K3s-CCoE.git
+    targetRevision: main
+    path: apps/powerdns
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dns
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

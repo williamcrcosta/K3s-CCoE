@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: powerdns-recursor
+  namespace: dns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: powerdns-recursor
+  template:
+    metadata:
+      labels:
+        app: powerdns-recursor
+    spec:
+      nodeSelector:
+        role: dns
+      containers:
+      - name: powerdns-recursor
+        image: powerdns/pdns-recursor-53:5.3.8
+        args:
+        - --local-address=0.0.0.0
+        - --local-port=53
+        - --allow-from=192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,127.0.0.0/8
+        - --forward-zones=wcrpc.lan=powerdns-auth.dns.svc.cluster.local:5300
+        - --webserver=yes
+        - --webserver-address=0.0.0.0
+        - --webserver-port=8082
+        - --webserver-allow-from=0.0.0.0/0,::/0
+        - --api-key=wcrpc-lan-api-key
+        - --dnssec=off
+        ports:
+        - containerPort: 53
+          name: dns-udp
+          protocol: UDP
+        - containerPort: 53
+          name: dns-tcp
+          protocol: TCP
+        - containerPort: 8082
+          name: web

@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: powerdns-zone-setup
+  namespace: dns
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: setup
+        image: curlimages/curl:8.5.0
+        command:
+        - sh
+        - -c
+        - |
+          set -e
+          API="http://powerdns-auth.dns.svc.cluster.local:8081"
+          KEY="wcrpc-lan-api-key"
+          ZONE="wcrpc.lan"
+          IP="192.168.50.20"
+
+          echo "Creating zone ${ZONE}..."
+          curl -sf -X POST "${API}/api/v1/servers/localhost/zones" \
+            -H "X-API-Key: ${KEY}" \
+            -H "Content-Type: application/json" \
+            -d "{\"name\":\"${ZONE}.\",\"kind\":\"Native\",\"nameservers\":[]}" || true
+
+          echo "Adding A records pointing to ${IP}..."
+          for SUB in powerdns technitium grafana prometheus zabbix argocd longhorn dashboard; do
+            curl -sf -X PATCH "${API}/api/v1/servers/localhost/zones/${ZONE}." \
+              -H "X-API-Key: ${KEY}" \
+              -H "Content-Type: application/json" \
+              -d "{\"rrsets\":[{\"name\":\"${SUB}.${ZONE}.\",\"type\":\"A\",\"ttl\":300,\"records\":[{\"content\":\"${IP}\",\"disabled\":false}]}]}" || true
+            echo "Added: ${SUB}.${ZONE} -> ${IP}"
+          done
+
+          echo "DNS setup complete."

@@ -17,6 +17,7 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 | Cert Manager | `cert-manager` | ✅ | — | v1.14.5 |
 | Sealed Secrets | `kube-system` | ✅ | — | latest |
 | Technitium DNS | `dns` | ✅ | Longhorn 2Gi | latest |
+| PowerDNS | `dns` | ✅ | Longhorn 2Gi | auth 4.9.5 / recursor 5.3.8 |
 | Monitoring (Grafana + Prometheus) | `monitoring` | ✅ | Longhorn 5Gi + 20Gi | kube-prometheus-stack |
 | **K3s** | — | — | — | **v1.36.0+k3s1** |
 | Zabbix | `zabbix` | ✅ | Longhorn 10Gi | 7.0.26 |
@@ -97,6 +98,7 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 | 2026-05-20 | kube-prometheus-stack | 81.5.0 | **82.2.0** |
 | 2026-05-19 | Zabbix | 7.0.23 | **7.0.26** |
 | 2026-05-19 | Storage | local-path | **Longhorn** (PVCs migrados) |
+| 2026-08-11 | DNS interno | Technitium | **PowerDNS** (Authoritative + Recursor) |
 
 
 ---

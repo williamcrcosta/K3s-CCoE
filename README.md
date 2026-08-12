@@ -52,6 +52,7 @@ Internet
 | Longhorn UI | https://longhorn.wcrpc.lan | `longhorn-system` | — |
 | Kubernetes Dashboard | https://dashboard.wcrpc.lan | `kubernetes-dashboard` | — |
 | Technitium DNS | https://technitium.wcrpc.lan / UDP:53 | `dns` | Longhorn 2Gi |
+| PowerDNS | https://powerdns.wcrpc.lan / TCP/UDP:30054 | `dns` | Longhorn 2Gi (SQLite) |
 | Ollama / Open WebUI | https://ai.wcrpc.lan | `ollama` | Longhorn 20Gi+ |
 
 ---
@@ -81,12 +82,15 @@ Cliente → 192.168.50.20:443 (NodePort NGINX / LoadBalancer)
         → Service ClusterIP
         → Pod
 
-DNS: *.wcrpc.lan → 192.168.50.20 (Technitium)
-     Fallback: 1.1.1.1, 8.8.8.8
+DNS:
+  - Ativo:  *.wcrpc.lan → 192.168.50.20 (Technitium, UDP 53)
+  - Teste:  *.wcrpc.lan → 192.168.50.20:30054 (PowerDNS, TCP/UDP 30054)
+  - Futuro: PowerDNS Recursor na porta 53 após desativação do Technitium
 
 NodePorts expostos:
   - 80/443: NGINX HTTP/HTTPS
   - 30053/UDP: Technitium DNS
+  - 30054/TCP+UDP: PowerDNS Recursor (modo transição)
   - 30081: Zabbix Server (active checks)
   - 30082: Zabbix Web (NodePort direto)
 ```
@@ -111,6 +115,7 @@ GitHub (williamcrcosta/K3s-CCoE)
                     ├── monitoring.yaml
                     ├── sealed-secrets.yaml
                     ├── technitium.yaml
+                    ├── powerdns.yaml
                     ├── zabbix.yaml
                     ├── kubernetes-dashboard.yaml
                     └── ollama.yaml
@@ -139,7 +144,8 @@ K3s-CCoE/
 ├── apps/
 │   ├── kubernetes-dashboard/        ← Manifests K8s Dashboard
 │   ├── ollama/                      ← Manifests Ollama + Open WebUI
-│   └── technitium/                  ← Manifests Technitium DNS
+│   ├── powerdns/                    ← Manifests PowerDNS
+│   └── technitium/                  ← Manifests Technitium DNS (legado)
 ├── infra/
 │   ├── argocd/                      ← Patches ArgoCD
 │   ├── cert-manager/                ← ClusterIssuers

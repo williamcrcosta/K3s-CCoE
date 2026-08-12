@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: powerdns-recursor
+  namespace: dns
+spec:
+  selector:
+    app: powerdns-recursor
+  type: NodePort
+  ports:
+  - name: dns-udp
+    port: 53
+    targetPort: 53
+    nodePort: 30054
+    protocol: UDP
+  - name: dns-tcp
+    port: 53
+    targetPort: 53
+    nodePort: 30054
+    protocol: TCP
+  - name: web
+    port: 8082
+    targetPort: 8082
