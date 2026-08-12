@@ -35,7 +35,7 @@ spec:
             curl -sf -X PATCH "${API}/api/v1/servers/localhost/zones/${ZONE}." \
               -H "X-API-Key: ${KEY}" \
               -H "Content-Type: application/json" \
-              -d "{\"rrsets\":[{\"name\":\"${SUB}.${ZONE}.\",\"type\":\"A\",\"ttl\":300,\"records\":[{\"content\":\"${IP}\",\"disabled\":false}]}]}" || true
+              -d "{\"rrsets\":[{\"name\":\"${SUB}.${ZONE}.\",\"type\":\"A\",\"ttl\":300,\"changetype\":\"REPLACE\",\"records\":[{\"content\":\"${IP}\",\"set-ptr\":false,\"disabled\":false}]}]}" || true
             echo "Added: ${SUB}.${ZONE} -> ${IP}"
           done
 
