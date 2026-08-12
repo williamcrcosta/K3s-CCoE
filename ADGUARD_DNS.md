@@ -1,5 +1,10 @@
 # DNS Local — AdGuard Home no Proxmox
 
+## Endereços
+
+- **UI / Admin:** http://192.168.50.25:3001/
+- **Servidor DNS:** `192.168.50.25:53` (usar este IP como DNS nos dispositivos/roteador)
+
 ## Decisão
 
 O PowerDNS Authoritative + Recursor foi testado no cluster RKE2, mas devido à complexidade de manutenção do backend SQLite e ausência de UI integrada, optamos por manter o **DNS primário fora do cluster**, no **AdGuard Home** rodando no Proxmox.
