@@ -51,8 +51,7 @@ Internet
 | Zabbix | https://zabbix.wcrpc.lan | `zabbix` | Longhorn 10Gi (PostgreSQL) |
 | Longhorn UI | https://longhorn.wcrpc.lan | `longhorn-system` | — |
 | Kubernetes Dashboard | https://dashboard.wcrpc.lan | `kubernetes-dashboard` | — |
-| Technitium DNS | https://technitium.wcrpc.lan / UDP:53 | `dns` | Longhorn 2Gi |
-| PowerDNS | https://powerdns.wcrpc.lan / TCP/UDP:30054 | `dns` | Longhorn 2Gi (SQLite) |
+| PowerDNS | https://powerdns.wcrpc.lan / UDP:53 | `dns` | Longhorn 2Gi (SQLite) |
 | Ollama / Open WebUI | https://ai.wcrpc.lan | `ollama` | Longhorn 20Gi+ |
 
 ---
@@ -82,15 +81,12 @@ Cliente → 192.168.50.20:443 (NodePort NGINX / LoadBalancer)
         → Service ClusterIP
         → Pod
 
-DNS:
-  - Ativo:  *.wcrpc.lan → 192.168.50.20 (Technitium, UDP 53)
-  - Teste:  *.wcrpc.lan → 192.168.50.20:30054 (PowerDNS, TCP/UDP 30054)
-  - Futuro: PowerDNS Recursor na porta 53 após desativação do Technitium
+DNS: *.wcrpc.lan → 192.168.50.20 (PowerDNS Recursor, UDP 53)
+     Fallback: 1.1.1.1, 8.8.8.8
 
-NodePorts expostos:
+NodePorts / portas expostas:
   - 80/443: NGINX HTTP/HTTPS
-  - 30053/UDP: Technitium DNS
-  - 30054/TCP+UDP: PowerDNS Recursor (modo transição)
+  - 53/UDP+TCP: PowerDNS Recursor (hostPort no node `role: dns`)
   - 30081: Zabbix Server (active checks)
   - 30082: Zabbix Web (NodePort direto)
 ```
@@ -114,7 +110,6 @@ GitHub (williamcrcosta/K3s-CCoE)
                     ├── longhorn.yaml
                     ├── monitoring.yaml
                     ├── sealed-secrets.yaml
-                    ├── technitium.yaml
                     ├── powerdns.yaml
                     ├── zabbix.yaml
                     ├── kubernetes-dashboard.yaml
@@ -145,7 +140,7 @@ K3s-CCoE/
 │   ├── kubernetes-dashboard/        ← Manifests K8s Dashboard
 │   ├── ollama/                      ← Manifests Ollama + Open WebUI
 │   ├── powerdns/                    ← Manifests PowerDNS
-│   └── technitium/                  ← Manifests Technitium DNS (legado)
+│   └── technitium/                  ← Manifests Technitium DNS (desativado)
 ├── infra/
 │   ├── argocd/                      ← Patches ArgoCD
 │   ├── cert-manager/                ← ClusterIssuers

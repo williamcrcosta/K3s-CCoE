@@ -16,8 +16,8 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 | Longhorn | `longhorn-system` | ✅ | — | v1.x |
 | Cert Manager | `cert-manager` | ✅ | — | v1.14.5 |
 | Sealed Secrets | `kube-system` | ✅ | — | latest |
-| Technitium DNS | `dns` | ✅ | Longhorn 2Gi | latest |
 | PowerDNS | `dns` | ✅ | Longhorn 2Gi | auth 4.9.5 / recursor 5.3.8 |
+| Technitium DNS | `dns` | ❌ | Longhorn 2Gi | desativado |
 | Monitoring (Grafana + Prometheus) | `monitoring` | ✅ | Longhorn 5Gi + 20Gi | kube-prometheus-stack |
 | **K3s** | — | — | — | **v1.36.0+k3s1** |
 | Zabbix | `zabbix` | ✅ | Longhorn 10Gi | 7.0.26 |
@@ -41,7 +41,8 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 
 ### Fase 3 — Networking
 - [x] Traefik como ingress controller (K3s default)
-- [x] Technitium DNS como DNS server interno
+- [x] PowerDNS como DNS server interno
+- [x] Technitium DNS desativado em favor do PowerDNS
 - [x] Ingresses criados para todos os serviços
 - [x] TLS self-signed em todos os ingresses
 

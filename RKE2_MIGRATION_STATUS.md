@@ -61,8 +61,8 @@ Rede local: 192.168.50.0/24
 | **Sealed Secrets** | `kube-system` | `0.26.3` | Synced / Healthy |
 | **Kubernetes Dashboard** | `kubernetes-dashboard` | latest | Synced / Healthy |
 | **Monitoring** | `monitoring` | Chart `82.2.0` / Operator `v0.89.0` | Synced / Healthy |
-| **Technitium DNS** | `dns` | latest | Synced / **Degraded** |
-| **PowerDNS** | `dns` | auth 4.9.5 / recursor 5.3.8 | **In Progress** / Healthy |
+| **PowerDNS** | `dns` | auth 4.9.5 / recursor 5.3.8 | Synced / Healthy |
+| **Technitium DNS** | `dns` | latest | **Desativado** |
 | **Zabbix** | `zabbix` | `7.0.27` | **Unknown** / Healthy |
 | **root-homelab** | `platform-argocd` | — | **OutOfSync** / Healthy |
 
@@ -77,8 +77,8 @@ Rede local: 192.168.50.0/24
 | Prometheus | `prometheus.wcrpc.lan` |
 | Longhorn UI | `longhorn.wcrpc.lan` |
 | Kubernetes Dashboard | `dashboard.wcrpc.lan` |
-| Technitium | `technitium.wcrpc.lan` |
 | PowerDNS | `powerdns.wcrpc.lan` |
+| Technitium | `technitium.wcrpc.lan` | (desativado)
 | Zabbix | `zabbix.wcrpc.lan` |
 
 ---
