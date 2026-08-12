@@ -18,11 +18,15 @@ spec:
       initContainers:
       - name: init-db
         image: keinos/sqlite3:latest
+        securityContext:
+          runAsUser: 0
         command:
         - /bin/sh
         - -c
         - |
+          set -e
           mkdir -p /var/lib/powerdns
+          chown -R 0:0 /var/lib/powerdns
           if [ ! -f /var/lib/powerdns/pdns.sqlite3 ]; then
             sqlite3 /var/lib/powerdns/pdns.sqlite3 < /etc/powerdns/schema.sql
           fi

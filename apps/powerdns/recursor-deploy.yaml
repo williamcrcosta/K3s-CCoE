@@ -22,6 +22,7 @@ spec:
         - --local-address=0.0.0.0
         - --local-port=53
         - --allow-from=192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,127.0.0.0/8
+        - --system-resolver-ttl=60
         - --forward-zones=wcrpc.lan=powerdns-auth.dns.svc.cluster.local:5300
         - --webserver=yes
         - --webserver-address=0.0.0.0
@@ -33,8 +34,10 @@ spec:
         - containerPort: 53
           name: dns-udp
           protocol: UDP
+          hostPort: 53
         - containerPort: 53
           name: dns-tcp
           protocol: TCP
+          hostPort: 53
         - containerPort: 8082
           name: web
