@@ -35,7 +35,7 @@ Internet
 | GitOps | ArgoCD v3.3.1 | Reconciliação contínua via Git |
 | Ingress Controller | NGINX Ingress Controller (RKE2 hardened) | Roteamento HTTP/HTTPS |
 | Storage | Longhorn v1.7.2 | Block storage distribuído com replicação |
-| DNS Interno | Technitium | Resolução DNS para `*.wcrpc.lan` |
+| DNS Interno | AdGuard Home no Proxmox | Resolução DNS e rewrites para `*.wcrpc.lan` (ver `ADGUARD_DNS.md`) |
 | Certificados | cert-manager v1.14.5 + Self-signed CA | TLS interno |
 | Secrets | Sealed Secrets v0.26.3 | Secrets cifrados no Git |
 
@@ -51,7 +51,7 @@ Internet
 | Zabbix | https://zabbix.wcrpc.lan | `zabbix` | Longhorn 10Gi (PostgreSQL) |
 | Longhorn UI | https://longhorn.wcrpc.lan | `longhorn-system` | — |
 | Kubernetes Dashboard | https://dashboard.wcrpc.lan | `kubernetes-dashboard` | — |
-| PowerDNS | https://powerdns.wcrpc.lan / UDP:53 | `dns` | Longhorn 2Gi (SQLite) |
+| PowerDNS | — | `dns` | Longhorn 2Gi (SQLite) | desativado |
 | Ollama / Open WebUI | https://ai.wcrpc.lan | `ollama` | Longhorn 20Gi+ |
 
 ---
@@ -81,12 +81,11 @@ Cliente → 192.168.50.20:443 (NodePort NGINX / LoadBalancer)
         → Service ClusterIP
         → Pod
 
-DNS: *.wcrpc.lan → 192.168.50.20 (PowerDNS Recursor, UDP 53)
+DNS: *.wcrpc.lan → 192.168.50.20 (AdGuard Home no Proxmox)
      Fallback: 1.1.1.1, 8.8.8.8
 
-NodePorts / portas expostas:
+Portas expostas:
   - 80/443: NGINX HTTP/HTTPS
-  - 53/UDP+TCP: PowerDNS Recursor (hostPort no node `role: dns`)
   - 30081: Zabbix Server (active checks)
   - 30082: Zabbix Web (NodePort direto)
 ```
@@ -139,8 +138,9 @@ K3s-CCoE/
 ├── apps/
 │   ├── kubernetes-dashboard/        ← Manifests K8s Dashboard
 │   ├── ollama/                      ← Manifests Ollama + Open WebUI
-│   ├── powerdns/                    ← Manifests PowerDNS
+│   ├── powerdns/                    ← Manifests PowerDNS (desativado)
 │   └── technitium/                  ← Manifests Technitium DNS (desativado)
+├── ADGUARD_DNS.md                   ← Decisão e configuração DNS no Proxmox
 ├── infra/
 │   ├── argocd/                      ← Patches ArgoCD
 │   ├── cert-manager/                ← ClusterIssuers

@@ -61,7 +61,8 @@ Rede local: 192.168.50.0/24
 | **Sealed Secrets** | `kube-system` | `0.26.3` | Synced / Healthy |
 | **Kubernetes Dashboard** | `kubernetes-dashboard` | latest | Synced / Healthy |
 | **Monitoring** | `monitoring` | Chart `82.2.0` / Operator `v0.89.0` | Synced / Healthy |
-| **PowerDNS** | `dns` | auth 4.9.5 / recursor 5.3.8 | Synced / Healthy |
+| **AdGuard Home** | Proxmox | — | DNS local com rewrites |
+| **PowerDNS** | `dns` | auth 4.9.5 / recursor 5.3.8 | **Desativado** |
 | **Technitium DNS** | `dns` | latest | **Desativado** |
 | **Zabbix** | `zabbix` | `7.0.27` | **Unknown** / Healthy |
 | **root-homelab** | `platform-argocd` | — | **OutOfSync** / Healthy |
