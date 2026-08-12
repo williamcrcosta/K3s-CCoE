@@ -32,7 +32,8 @@ spec:
             sqlite3 /var/lib/powerdns/pdns.sqlite3 < /etc/powerdns/schema.sql
           fi
           chown -R 0:0 /var/lib/powerdns
-          chmod -R 660 /var/lib/powerdns
+          chmod 770 /var/lib/powerdns
+          chmod 660 /var/lib/powerdns/pdns.sqlite3
         volumeMounts:
         - name: data
           mountPath: /var/lib/powerdns
