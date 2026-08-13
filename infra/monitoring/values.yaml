@@ -18,7 +18,7 @@ grafana:
       secretName: wcrpc-tls
 prometheus:
   prometheusSpec:
-    retention: 3d
+    retention: 30d
     storageSpec:
       volumeClaimTemplate:
         spec:
