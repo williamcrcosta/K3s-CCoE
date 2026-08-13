@@ -41,6 +41,12 @@ spec:
                     requests:
                       storage: 20Gi
                   storageClassName: longhorn
+            additionalScrapeConfigs:
+              - job_name: node-192.168.50.250
+                static_configs:
+                  - targets:
+                      - 192.168.50.250:9100
+                metrics_path: /metrics
           ingress:
             enabled: true
             ingressClassName: nginx
