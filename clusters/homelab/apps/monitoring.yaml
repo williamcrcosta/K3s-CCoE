@@ -35,7 +35,7 @@ spec:
               secretName: wcrpc-tls
         prometheus:
           prometheusSpec:
-            retention: 3d
+            retention: 30d
             additionalScrapeConfigs:
               - job_name: proxmox-pve
                 static_configs:
