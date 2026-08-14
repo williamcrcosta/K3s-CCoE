@@ -42,6 +42,11 @@ spec:
                   - targets:
                       - 192.168.50.250:9221
                 metrics_path: /metrics
+              - job_name: node-192.168.50.250
+                static_configs:
+                  - targets:
+                      - 192.168.50.250:9100
+                metrics_path: /metrics
             storageSpec:
               volumeClaimTemplate:
                 spec:
