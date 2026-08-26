@@ -31,3 +31,26 @@ spec:
     name: selfsigned-issuer
     kind: ClusterIssuer
     group: cert-manager.io
+
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-wccosta
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: william-crcosta@outlook.com
+    privateKeySecretRef:
+      name: letsencrypt-wccosta
+    solvers:
+    - dns01:
+        azureDNS:
+          clientID: f60da7fc-6118-4373-a54a-eb9d7c2599fa
+          clientSecretSecretRef:
+            name: azuredns-config
+            key: client-secret
+          tenantID: 959d0b5c-960d-48aa-aed9-8ffe74e05790
+          subscriptionID: 99433210-484b-482d-af20-1fabe24fc6fc
+          resourceGroupName: RG-Services
+          hostedZoneName: wccosta.com.br

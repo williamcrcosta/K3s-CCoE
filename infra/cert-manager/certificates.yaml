@@ -64,3 +64,74 @@ spec:
     kind: ClusterIssuer
   dnsNames:
     - dashboard.wcrpc.lan
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wccosta-tls
+  namespace: kubernetes-dashboard
+spec:
+  secretName: wccosta-tls
+  issuerRef:
+    name: letsencrypt-wccosta
+    kind: ClusterIssuer
+  dnsNames:
+    - dashboard.wccosta.com.br
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wccosta-tls
+  namespace: longhorn-system
+spec:
+  secretName: wccosta-tls
+  issuerRef:
+    name: letsencrypt-wccosta
+    kind: ClusterIssuer
+  dnsNames:
+    - longhorn.wccosta.com.br
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wccosta-tls
+  namespace: monitoring
+spec:
+  secretName: wccosta-tls
+  issuerRef:
+    name: letsencrypt-wccosta
+    kind: ClusterIssuer
+  dnsNames:
+    - grafana.wccosta.com.br
+    - prometheus.wccosta.com.br
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wccosta-tls
+  namespace: platform-argocd
+spec:
+  secretName: wccosta-tls
+  issuerRef:
+    name: letsencrypt-wccosta
+    kind: ClusterIssuer
+  dnsNames:
+    - argocd.wccosta.com.br
+
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wccosta-tls
+  namespace: zabbix
+spec:
+  secretName: wccosta-tls
+  issuerRef:
+    name: letsencrypt-wccosta
+    kind: ClusterIssuer
+  dnsNames:
+    - zabbix.wccosta.com.br

@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/williamcrcosta/K3s-CCoE.git
     targetRevision: main
-    path: clusters/rke2
+    path: clusters/homelab
   destination:
     server: https://kubernetes.default.svc
     namespace: platform-argocd
