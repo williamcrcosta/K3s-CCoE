@@ -56,6 +56,9 @@ spec:
             - hosts:
               - prometheus.wccosta.com.br
               secretName: wccosta-tls
+        defaultRules:
+          disabled:
+            KubeCPUOvercommit: true
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
