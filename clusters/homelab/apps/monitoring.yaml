@@ -28,11 +28,11 @@ spec:
             enabled: true
             ingressClassName: nginx
             hosts:
-            - grafana.wcrpc.lan
+            - grafana.wccosta.com.br
             tls:
             - hosts:
-              - grafana.wcrpc.lan
-              secretName: wcrpc-tls
+              - grafana.wccosta.com.br
+              secretName: wccosta-tls
         prometheus:
           prometheusSpec:
             retention: 30d
@@ -60,11 +60,11 @@ spec:
             enabled: true
             ingressClassName: nginx
             hosts:
-            - prometheus.wcrpc.lan
+            - prometheus.wccosta.com.br
             tls:
             - hosts:
-              - prometheus.wcrpc.lan
-              secretName: wcrpc-tls
+              - prometheus.wccosta.com.br
+              secretName: wccosta-tls
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
