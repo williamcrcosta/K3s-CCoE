@@ -73,17 +73,14 @@ Rede local: 192.168.50.0/24
 
 | Aplicação | Host |
 |---|---|
-| ArgoCD | `argocd.wcrpc.lan` |
-| Grafana | `grafana.wcrpc.lan` |
-| Prometheus | `prometheus.wcrpc.lan` |
-| Longhorn UI | `longhorn.wcrpc.lan` |
-| Kubernetes Dashboard | `dashboard.wcrpc.lan` |
-| PowerDNS | `powerdns.wcrpc.lan` |
-| Technitium | `technitium.wcrpc.lan` | (desativado)
-| Zabbix | `zabbix.wcrpc.lan` |
-
----
-
+| ArgoCD |  |
+| Grafana |  |
+| Prometheus |  |
+| Longhorn UI |  |
+| Kubernetes Dashboard |  |
+| Zabbix |  |
+| PowerDNS |  | (desativado)
+| Technitium |  | (desativado)
 ## 5. Evoluções Implementadas
 
 ### 5.1 Infraestrutura

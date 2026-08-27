@@ -73,6 +73,8 @@ metadata:
   namespace: kubernetes-dashboard
 spec:
   secretName: wccosta-tls
+  privateKey:
+    rotationPolicy: Always
   issuerRef:
     name: letsencrypt-wccosta
     kind: ClusterIssuer
@@ -87,6 +89,8 @@ metadata:
   namespace: longhorn-system
 spec:
   secretName: wccosta-tls
+  privateKey:
+    rotationPolicy: Always
   issuerRef:
     name: letsencrypt-wccosta
     kind: ClusterIssuer
@@ -101,6 +105,8 @@ metadata:
   namespace: monitoring
 spec:
   secretName: wccosta-tls
+  privateKey:
+    rotationPolicy: Always
   issuerRef:
     name: letsencrypt-wccosta
     kind: ClusterIssuer
@@ -116,6 +122,8 @@ metadata:
   namespace: platform-argocd
 spec:
   secretName: wccosta-tls
+  privateKey:
+    rotationPolicy: Always
   issuerRef:
     name: letsencrypt-wccosta
     kind: ClusterIssuer
@@ -130,6 +138,8 @@ metadata:
   namespace: zabbix
 spec:
   secretName: wccosta-tls
+  privateKey:
+    rotationPolicy: Always
   issuerRef:
     name: letsencrypt-wccosta
     kind: ClusterIssuer

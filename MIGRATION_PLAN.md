@@ -70,7 +70,7 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 | Network Policies | Média | Isolar namespaces por política |
 | Zabbix monitorar K3s | Média | Templates para monitorar nodes e pods |
 | Grafana dashboards no Git | Média | Persistir dashboards como ConfigMaps |
-| Let's Encrypt | Baixa | Migrar para certificados públicos válidos |
+| Let's Encrypt | ✅ Concluído | Certificados públicos wccosta.com.br via Azure DNS |
 | Multi-cluster | Baixa | Expandir para segundo cluster |
 
 
@@ -87,7 +87,7 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 | Network Policies | Média | Isolar namespaces por política |
 | Zabbix monitorar K3s | Média | Templates para monitorar nodes e pods |
 | Grafana dashboards no Git | Média | Persistir dashboards como ConfigMaps |
-| Let's Encrypt | Baixa | Migrar para certificados públicos válidos |
+| Let's Encrypt | ✅ Concluído | Certificados públicos wccosta.com.br via Azure DNS |
 | Multi-cluster | Baixa | Expandir para segundo cluster |
 
 ---
@@ -96,6 +96,8 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 
 | Data | Componente | De | Para |
 |---|---|---|---|
+| 2026-08-26 | Certificados TLS | wcrpc-ca self-signed | **Let's Encrypt wccosta.com.br** (Azure DNS) |
+| 2026-08-26 | DNS interno | *.wcrpc.lan | ***.wccosta.com.br** no AdGuard |
 | 2026-05-20 | K3s | v1.34.3+k3s1 | **v1.36.0+k3s1** |
 | 2026-05-20 | kube-prometheus-stack | 81.5.0 | **82.2.0** |
 | 2026-05-19 | Zabbix | 7.0.23 | **7.0.26** |

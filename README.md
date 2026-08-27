@@ -36,7 +36,7 @@ Internet
 | Ingress Controller | NGINX Ingress Controller (RKE2 hardened) | Roteamento HTTP/HTTPS |
 | Storage | Longhorn v1.7.2 | Block storage distribuído com replicação |
 | DNS Interno | AdGuard Home no Proxmox | Resolução DNS e rewrites para `*.wcrpc.lan` (ver `ADGUARD_DNS.md`) |
-| Certificados | cert-manager v1.14.5 + Self-signed CA | TLS interno |
+| Certificados | cert-manager v1.14.5 + Let's Encrypt (Azure DNS) | TLS interno |
 | Secrets | Sealed Secrets v0.26.3 | Secrets cifrados no Git |
 
 ---
@@ -45,14 +45,14 @@ Internet
 
 | App | URL | Namespace | Storage |
 |---|---|---|---|
-| ArgoCD | https://argocd.wcrpc.lan | `platform-argocd` | — |
-| Grafana | https://grafana.wcrpc.lan | `monitoring` | Longhorn 5Gi |
-| Prometheus | https://prometheus.wcrpc.lan | `monitoring` | Longhorn 20Gi |
-| Zabbix | https://zabbix.wcrpc.lan | `zabbix` | Longhorn 10Gi (PostgreSQL) |
-| Longhorn UI | https://longhorn.wcrpc.lan | `longhorn-system` | — |
-| Kubernetes Dashboard | https://dashboard.wcrpc.lan | `kubernetes-dashboard` | — |
+| ArgoCD | https://argocd.wccosta.com.br | `platform-argocd` | — |
+| Grafana | https://grafana.wccosta.com.br | `monitoring` | Longhorn 5Gi |
+| Prometheus | https://prometheus.wccosta.com.br | `monitoring` | Longhorn 20Gi |
+| Zabbix | https://zabbix.wccosta.com.br | `zabbix` | Longhorn 10Gi (PostgreSQL) |
+| Longhorn UI | https://longhorn.wccosta.com.br | `longhorn-system` | — |
+| Kubernetes Dashboard | https://dashboard.wccosta.com.br | `kubernetes-dashboard` | — |
 | PowerDNS | — | `dns` | Longhorn 2Gi (SQLite) | desativado |
-| Ollama / Open WebUI | https://ai.wcrpc.lan | `ollama` | Longhorn 20Gi+ |
+| Ollama / Open WebUI | https://ai.wccosta.com.br | `ollama` | Longhorn 20Gi+ |
 
 ---
 
@@ -81,7 +81,7 @@ Cliente → 192.168.50.20:443 (NodePort NGINX / LoadBalancer)
         → Service ClusterIP
         → Pod
 
-DNS: *.wcrpc.lan → 192.168.50.20 (AdGuard Home no Proxmox)
+DNS: *.wccosta.com.br → 192.168.50.20 (AdGuard Home no Proxmox)
      Fallback: 1.1.1.1, 8.8.8.8
 
 Portas expostas:
@@ -178,11 +178,14 @@ K3s-CCoE/
 - **Backup externo Longhorn** — snapshots para S3/NFS fora do cluster
 - **Grafana dashboards no Git** — persistir como ConfigMaps para não perder após recriação
 
+### Concluído
+- **Let's Encrypt** — certificados públicos  via Azure DNS
+
 ### Médio Prazo
 - **Resource limits** — definir `requests` e `limits` para todos os pods
 - **Network Policies** — isolar namespaces (zabbix, monitoring, dns, etc.)
 - **Zabbix templates RKE2** — monitorar pods, PVCs e nodes via Zabbix
-- **Let's Encrypt** — migrar para certificados públicos válidos com DNS challenge
+
 
 ### Longo Prazo
 - **Segundo cluster** — expandir para multi-cluster com ArgoCD gerenciando ambos
@@ -352,5 +355,5 @@ deploy:
 1. **Verificar GPU:** `lspci | grep -i nvidia`
 2. **Instalar NVIDIA Operator:** via Helm
 3. **Deploy Ollama:** com nodeSelector para node com GPU
-4. **Expor via Ingress:** ai.wcrpc.lan
+4. **Expor via Ingress:** ai.wccosta.com.br
 5. **Integrar com apps:** via service `ollama:11434`

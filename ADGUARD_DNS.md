@@ -3,7 +3,7 @@
 ## Endereços
 
 - **UI / Admin:** http://192.168.50.25:3001/
-- **Servidor DNS:** `192.168.50.25:53` (usar este IP como DNS nos dispositivos/roteador)
+- **Servidor DNS:**  (usar este IP como DNS nos dispositivos/roteador)
 
 ## Decisão
 
@@ -11,46 +11,40 @@ O PowerDNS Authoritative + Recursor foi testado no cluster RKE2, mas devido à c
 
 ## Arquitetura
 
-```
-Internet / Rede Local
-        |
-    [AdGuard Home no Proxmox]
-        |
-   +----+----+
-   |         |
-upstream   rewrites wcrpc.lan
-1.1.1.1    192.168.50.20
-```
 
-O AdGuard Home responde por toda a rede local e faz rewrites dos domínios `*.wcrpc.lan` para o IP do ingress do cluster (RKE2).
+
+O AdGuard Home responde por toda a rede local e faz rewrites dos domínios  para os IPs internos dos serviços.
+
+> **Nota:** os domínios  ainda existem como legado, mas foram desativados para navegação com HTTPS devido aos avisos de certificado no Kaspersky/navegadores.
 
 ## Configuração no AdGuard Home
 
 ### Upstreams
 
-Em `Settings > DNS settings > Upstream DNS servers`, adicione:
+Em , adicione:
 
-```
-1.1.1.1
-8.8.8.8
-```
+
 
 ### DNS rewrites
 
-Em `Filters > DNS rewrites`, adicione cada registro:
+Em , adicione cada registro:
 
 | Domain | IP |
 |---|---|
-| `argocd.wcrpc.lan` | 192.168.50.20 |
-| `dashboard.wcrpc.lan` | 192.168.50.20 |
-| `grafana.wcrpc.lan` | 192.168.50.20 |
-| `longhorn.wcrpc.lan` | 192.168.50.20 |
-| `powerdns.wcrpc.lan` | 192.168.50.20 |
-| `prometheus.wcrpc.lan` | 192.168.50.20 |
-| `technitium.wcrpc.lan` | 192.168.50.20 |
-| `zabbix.wcrpc.lan` | 192.168.50.20 |
+|  | 192.168.50.20 |
+|  | 192.168.50.151 |
+|  | 192.168.50.250 |
+|  | 192.168.50.25 |
+|  | 192.168.50.20 |
+|  | 192.168.50.151 |
+|  | 192.168.50.20 |
+|  | 192.168.50.20 |
+|  | 192.168.50.20 |
+|  | 192.168.50.20 |
+|  | 192.168.50.250 |
+|  | 192.168.50.20 |
 
-> **Dica:** se o AdGuard Home suportar, pode substituir as entradas acima por um único wildcard `*.wcrpc.lan` apontando para `192.168.50.20`.
+> **Dica:** o wildcard  continua apontando para  para compatibilidade legada, mas os certificados Let's Encrypt cobrem os domínios .
 
 ## No cluster
 
@@ -58,19 +52,10 @@ O Technitium ainda pode ser desativado quando o AdGuard estiver plenamente confi
 
 ### Remover o PowerDNS manualmente
 
-Após o ArgoCD parar de gerenciar o PowerDNS, os recursos ainda ficarão no cluster. Remova via `kubectl`:
+Após o ArgoCD parar de gerenciar o PowerDNS, os recursos ainda ficarão no cluster. Remova via :
 
-```bash
-export PATH=$PATH:/var/lib/rancher/rke2/bin
-export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
 
-kubectl delete deployment powerdns-auth powerdns-recursor -n dns
-kubectl delete svc powerdns-auth powerdns-recursor -n dns
-kubectl delete ingress powerdns -n dns
-kubectl delete pvc powerdns-auth-data -n dns
-kubectl delete configmap powerdns-auth-schema -n dns
-```
 
 ### Status no ArgoCD
 
-O ArgoCD não gerencia mais o PowerDNS. O app `powerdns` pode ser deletado manualmente na UI do ArgoCD com cascade.
+O ArgoCD não gerencia mais o PowerDNS. O app  pode ser deletado manualmente na UI do ArgoCD com cascade.

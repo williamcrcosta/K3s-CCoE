@@ -35,14 +35,14 @@ spec:
             enabled: true
             ingressClassName: nginx
             hosts:
-            - host: zabbix.wcrpc.lan
+            - host: zabbix.wccosta.com.br
               paths:
               - path: /
                 pathType: Prefix
             tls:
             - hosts:
-              - zabbix.wcrpc.lan
-              secretName: wcrpc-tls
+              - zabbix.wccosta.com.br
+              secretName: wccosta-tls
   destination:
     server: https://kubernetes.default.svc
     namespace: zabbix
