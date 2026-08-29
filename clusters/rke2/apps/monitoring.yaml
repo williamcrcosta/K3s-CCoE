@@ -20,6 +20,7 @@ spec:
             storageClassName: longhorn
           plugins:
           - alexanderzobnin-zabbix-app
+          - marcusolsson-dynamictext-panel
           ingress:
             enabled: true
             ingressClassName: nginx
