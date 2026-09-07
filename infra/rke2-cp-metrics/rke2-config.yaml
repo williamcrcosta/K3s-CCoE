@@ -1,0 +1,7 @@
+# Configuração RKE2 para expor métricas do control-plane para Prometheus
+# Copiar para /etc/rancher/rke2/config.yaml e reiniciar rke2-server
+etcd-expose-metrics: true
+kube-controller-manager-arg:
+  - "--bind-address=0.0.0.0"
+kube-scheduler-arg:
+  - "--bind-address=0.0.0.0"
