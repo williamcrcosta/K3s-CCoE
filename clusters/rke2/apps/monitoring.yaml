@@ -20,6 +20,7 @@ spec:
             storageClassName: longhorn
           plugins:
           - alexanderzobnin-zabbix-app
+          - marcusolsson-dynamictext-panel
           ingress:
             enabled: true
             ingressClassName: nginx
@@ -87,7 +88,8 @@ spec:
                 chat_id: 561566814
                 message: |
                   {{ range .Alerts }}
-                  *Alert:* {{ .Annotations.summary | default .Labels.alertname }}
+                  *Alert:* {{ .Labels.alertname }}
+                  *Summary:* {{ .Annotations.summary }}
                   *Severity:* {{ .Labels.severity }}
                   *Namespace:* {{ .Labels.namespace }}
                   *Description:* {{ .Annotations.description }}
