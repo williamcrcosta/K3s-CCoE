@@ -18,6 +18,12 @@ spec:
             enabled: true
             storageClass: longhorn
             storageSize: 10Gi
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 100m
+            limits:
+              memory: 2Gi
         zabbixImageTag: ubuntu-7.0.29
         zabbixWeb:
           enabled: true
