@@ -688,4 +688,130 @@ curl -s "http://192.168.50.250:9221/metrics" | grep pve_node_up
 # No Prometheus:
 kubectl exec -n monitoring prometheus-monitoring-kube-prometheus-prometheus-0 -c prometheus -- \
   wget -qO- 'http://localhost:9090/api/v1/query?query=pve_node_up'
+
+---
+
+## Cenario 11 - Grafana em CrashLoopBackOff por volume Longhorn read-only
+
+> **Ocorrencia:** 2026-09-15 - Grafana entrou em CrashLoopBackOff com `disk I/O error: read-only file system` no SQLite.
+
+### Sintomas
+
+- Pod `monitoring-grafana` com `RESTARTS` alto
+- Logs: `Error: ✗ disk I/O error: read-only file system`
+- `dmesg` no worker: `EXT4-fs (sdg): Remounting filesystem read-only` e `Detected aborted journal`
+- Volume Longhorn fica `attached`, mas o container morre
+
+### Causa raiz
+
+O filesystem `ext4` do volume Longhorn do Grafana foi corrompido (`aborted journal`), provavelmente por desconexao nao limpa. O kernel remonta o volume como read-only para proteger os dados. O Grafana, usando SQLite em `/var/lib/grafana/grafana.db`, nao consegue escrever e morre.
+
+### Procedimento de recuperacao
+
+1. **Verificar os logs do Grafana:**
+```bash
+kubectl logs -n monitoring <POD_GRAFANA> -c grafana --previous
+```
+
+2. **Verificar dmesg no worker:**
+```bash
+dmesg -T | grep -i "remount\|I/O error\|ext4.*error"
+```
+
+3. **Pausar o auto-sync do ArgoCD (para evitar que ele reponha o Grafana):**
+```bash
+kubectl -n platform-argocd patch application monitoring --type=json -p '[{"op": "remove", "path": "/spec/syncPolicy"}]'
+```
+
+4. **Escalar o Grafana para 0:**
+```bash
+kubectl scale deployment monitoring-grafana -n monitoring --replicas=0
+```
+
+5. **Esperar o volume ficar detached e anexar ao worker:**
+```bash
+kubectl -n longhorn-system patch volume <VOLUME_NAME> --type=merge -p '{"spec":{"nodeID":"rke2-worker-01"}}'
+```
+
+6. **No worker, corrigir o filesystem:**
+```bash
+ssh rke2-worker-01
+fsck -y /dev/longhorn/<VOLUME_NAME>
+```
+
+7. **Desanexar o volume e subir o Grafana:**
+```bash
+kubectl -n longhorn-system patch volume <VOLUME_NAME> --type=merge -p '{"spec":{"nodeID":""}}'
+kubectl scale deployment monitoring-grafana -n monitoring --replicas=1
+```
+
+### Prevencao
+
+- Migrar o Grafana de SQLite para banco de dados externo (PostgreSQL)
+- Monitorar volumes Longhorn com alertas
+- Manter backups testados dos volumes
+
+---
+
+## Cenario 12 - Banco de dados compartilhado em VM (rke2-pgdb)
+
+> **Evolucao:** 2026-09-15 - Criacao de uma VM dedicada com PostgreSQL 16 para centralizar dados do Grafana, Zabbix e futuros apps.
+
+### Arquitetura
+
+| Recurso | Valor |
+|---|---|
+| Hostname | `rke2-pgdb` |
+| IP | `192.168.50.30` |
+| Proxmox VM ID | `502` |
+| SO | Rocky Linux 9.8 |
+| Banco | PostgreSQL 16 |
+| vCPUs | 2 |
+| RAM | 4 GB |
+| Disco | 50 GB |
+| Databases | `grafana`, `zabbix`, `keycloak` |
+| Backup | `/opt/postgres-backup/` diario via cron |
+
+### Criacao da VM (referencia)
+
+```bash
+qm create 502 \
+  --name db-shared \
+  --memory 4096 \
+  --cores 2 \
+  --sockets 1 \
+  --cpu host \
+  --bios ovmf \
+  --machine q35 \
+  --scsihw virtio-scsi-single \
+  --net0 virtio,bridge=vmbr0,firewall=0 \
+  --scsi0 local-lvm:50 \
+  --efidisk0 local-lvm:4 \
+  --ostype l26 \
+  --onboot 1
+
+qm set 502 --ide2 local:iso/Rocky-9.8-x86_64-minimal.iso,media=cdrom
+qm set 502 --boot "order=ide2;scsi0"
+qm start 502
+```
+
+### Acesso ao banco
+
+```bash
+psql -h 192.168.50.30 -U grafana -d grafana
+psql -h 192.168.50.30 -U zabbix -d zabbix
+psql -h 192.168.50.30 -U keycloak -d keycloak
+```
+
+### Backup manual
+
+```bash
+pg_dump -h 192.168.50.30 -U grafana -d grafana > grafana-backup.sql
+pg_dump -h 192.168.50.30 -U zabbix -d zabbix > zabbix-backup.sql
+pg_dump -h 192.168.50.30 -U keycloak -d keycloak > keycloak-backup.sql
+```
+
+### Status
+
+> **Em andamento:** conexao do Grafana e Zabbix com o PostgreSQL ainda sera configurada via ArgoCD. Verificar git log para atualizacoes.
 ```
