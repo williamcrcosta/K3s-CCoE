@@ -96,6 +96,8 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 
 | Data | Componente | De | Para |
 |---|---|---|---|
+| 2026-09-15 | Grafana DB | SQLite em PVC Longhorn | **PostgreSQL 16** na VM `rke2-pgdb` |
+| 2026-09-15 | Banco compartilhado | — | VM `rke2-pgdb` com PostgreSQL 16 para Grafana/Zabbix/Keycloak |
 | 2026-08-26 | Certificados TLS | wcrpc-ca self-signed | **Let's Encrypt wccosta.com.br** (Azure DNS) |
 | 2026-08-26 | DNS interno | *.wcrpc.lan | ***.wccosta.com.br** no AdGuard |
 | 2026-05-20 | K3s | v1.34.3+k3s1 | **v1.36.0+k3s1** |

@@ -11,15 +11,19 @@ Internet
     │
     └── Rede Local: 192.168.50.0/24
             │
-            ├── rke2-cp-01      192.168.50.20  (Control Plane)
+            ├── rke2-cp-01      192.168.50.20  (Control Plane / RKE2 server)
             │     ├── OS: Rocky Linux 9.8 (Blue Onyx)
             │     ├── RKE2: v1.35.6+rke2r1
             │     └── Runtime: containerd
             │
-            └── rke2-worker-01  192.168.50.21  (Worker)
+            ├── rke2-worker-01  192.168.50.21  (Worker / RKE2 agent)
+            │     ├── OS: Rocky Linux 9.8 (Blue Onyx)
+            │     ├── RKE2: v1.35.6+rke2r1
+            │     └── Runtime: containerd
+            │
+            └── rke2-pgdb       192.168.50.30  (VM dedicada de banco de dados)
                   ├── OS: Rocky Linux 9.8 (Blue Onyx)
-                  ├── RKE2: v1.35.6+rke2r1
-                  └── Runtime: containerd
+                  └── PostgreSQL 16
 ```
 
 > **Histórico:** este cluster foi migrado de K3s (Ubuntu 24.04, IPs `192.168.159.128/129`) para RKE2. Ver `RKE2_MIGRATION.md` (plano) e `RKE2_MIGRATION_STATUS.md` (status real).
@@ -46,9 +50,9 @@ Internet
 | App | URL | Namespace | Storage |
 |---|---|---|---|
 | ArgoCD | https://argocd.wccosta.com.br | `platform-argocd` | — |
-| Grafana | https://grafana.wccosta.com.br | `monitoring` | Longhorn 5Gi |
-| Prometheus | https://prometheus.wccosta.com.br | `monitoring` | Longhorn 20Gi |
-| Zabbix | https://zabbix.wccosta.com.br | `zabbix` | Longhorn 10Gi (PostgreSQL) |
+| Grafana | https://grafana.wccosta.com.br | `monitoring` | PostgreSQL 16 em `rke2-pgdb` (PVC `monitoring-grafana` legado de 5Gi ainda existe, mas não é mais usado para o banco) |
+| Prometheus | https://prometheus.wccosta.com.br | `monitoring` | Longhorn 20Gi (TSDB) |
+| Zabbix | https://zabbix.wccosta.com.br | `zabbix` | Longhorn 10Gi (PostgreSQL — pendente migração para `rke2-pgdb`) |
 | Longhorn UI | https://longhorn.wccosta.com.br | `longhorn-system` | — |
 | Kubernetes Dashboard | https://dashboard.wccosta.com.br | `kubernetes-dashboard` | — |
 | PowerDNS | — | `dns` | Longhorn 2Gi (SQLite) | desativado |
@@ -60,15 +64,47 @@ Internet
 
 ```
 Longhorn (distribuído entre os 2 nodes)
-├── technitium-data          2Gi   (DNS config)
-├── monitoring-grafana       5Gi   (Grafana DB)
+├── monitoring-grafana       5Gi   (PVC legado do Grafana — não usado para banco)
 ├── prometheus-db            20Gi  (Prometheus TSDB)
-├── postgresql-data-zabbix   10Gi  (Zabbix PostgreSQL)
+├── postgresql-data-zabbix   10Gi  (Zabbix PostgreSQL — pendente migração para VM)
 ├── ollama-models            20Gi  (Modelos Ollama)
 └── ollama-webui-data         5Gi  (Open WebUI)
 
 Replicação: 2 réplicas por volume (rke2-cp-01 + rke2-worker-01)
 StorageClass default: longhorn
+```
+
+## Arquitetura de Banco de Dados
+
+```
+rke2-pgdb (192.168.50.30)
+├── PostgreSQL 16
+│     ├── grafana    ← Grafana 12.3.3 (migrado de SQLite/Longhorn)
+│     ├── zabbix     ← reservado (pendente migração)
+│     └── keycloak   ← reservado (futuro)
+│
+└── Backup diário em /opt/postgres-backup/ (pg_dump + cron)
+```
+
+### Banco compartilhado
+
+> **Evolução:** 2026-09-15. Em resposta ao incidente de Grafana em CrashLoopBackOff por volume Longhorn read-only, foi criada uma VM dedicada (`rke2-pgdb`) com PostgreSQL 16 para centralizar os bancos de dados de aplicações stateful. Cada app usa database e usuário separados.
+
+### PostgreSQL na VM vs pod
+
+| Aspecto | Antes | Depois |
+|---|---|---|
+| Grafana | SQLite em PVC Longhorn (`monitoring-grafana`) | PostgreSQL em `rke2-pgdb` |
+| Zabbix | PostgreSQL em pod + PVC Longhorn | PostgreSQL em `rke2-pgdb` (pendente) |
+| Prometheus | TSDB em PVC Longhorn | continua em PVC Longhorn |
+| Resiliência | depende do estado do volume/pod | persistência fora do ciclo de vida dos pods |
+
+### Acesso
+
+```bash
+psql -h 192.168.50.30 -U grafana -d grafana
+psql -h 192.168.50.30 -U zabbix -d zabbix
+psql -h 192.168.50.30 -U keycloak -d keycloak
 ```
 
 ---
@@ -174,12 +210,15 @@ K3s-CCoE/
 ## Evoluções Futuras
 
 ### Curto Prazo
+- **Zabbix no PostgreSQL VM** — migrar o Zabbix do pod PostgreSQL/Longhorn para `rke2-pgdb`
+- **TLS no PostgreSQL** — conexões cifradas entre apps e `rke2-pgdb`
 - **AlertManager** — notificações via Telegram para alertas críticos
 - **Backup externo Longhorn** — snapshots para S3/NFS fora do cluster
-- **Grafana dashboards no Git** — persistir como ConfigMaps para não perder após recriação
+- **Backup externo PostgreSQL** — dumps periódicos para fora da VM
 
 ### Concluído
-- **Let's Encrypt** — certificados públicos  via Azure DNS
+- **Let's Encrypt** — certificados públicos via Azure DNS
+- **Banco de dados compartilhado (Grafana)** — Grafana migrado de SQLite/Longhorn para PostgreSQL 16 em `rke2-pgdb`
 
 ### Médio Prazo
 - **Resource limits** — definir `requests` e `limits` para todos os pods
