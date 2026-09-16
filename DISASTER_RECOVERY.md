@@ -803,6 +803,112 @@ psql -h 192.168.50.30 -U zabbix -d zabbix
 psql -h 192.168.50.30 -U keycloak -d keycloak
 ```
 
+### Monitoramento da VM de banco
+
+| Serviço | Porta | Objetivo |
+|---|---|---|
+| `qemu-guest-agent` | — | Integração com Proxmox |
+| `zabbix-agent2` | 10050 | SO e PostgreSQL para Zabbix |
+| `node_exporter` | 9100 | Métricas de SO para Prometheus |
+| `postgres_exporter` | 9187 | Métricas detalhadas do PostgreSQL para Prometheus |
+
+Comandos de instalação na VM:
+
+```bash
+# qemu-guest-agent
+dnf install -y qemu-guest-agent
+systemctl enable --now qemu-guest-agent
+
+# Zabbix Agent 2 + plugin PostgreSQL
+rpm -Uvh https://repo.zabbix.com/zabbix/7.0/rhel/9/x86_64/zabbix-release-7.0-2.el9.noarch.rpm
+dnf install -y zabbix-agent2 zabbix-agent2-plugin-postgresql
+
+cat > /etc/zabbix/zabbix_agent2.conf << 'ZCONF'
+PidFile=/run/zabbix/zabbix_agent2.pid
+LogFile=/var/log/zabbix/zabbix_agent2.log
+LogFileSize=0
+Server=192.168.50.20,192.168.50.0/24,10.42.0.0/16
+ServerActive=192.168.50.20:30051
+Hostname=rke2-pgdb
+HostMetadata=Linux VM PostgreSQL rke2-pgdb
+Include=/etc/zabbix/zabbix_agent2.d/*.conf
+Include=/etc/zabbix/zabbix_agent2.d/plugins.d/*.conf
+ZCONF
+
+cat > /etc/zabbix/zabbix_agent2.d/plugins.d/postgresql.sessions.conf << 'PCONF'
+Plugins.PostgreSQL.Sessions.local.Uri=tcp://127.0.0.1:5432
+Plugins.PostgreSQL.Sessions.local.User=zbx_monitor
+Plugins.PostgreSQL.Sessions.local.Password=SENHA_ZBX_MONITOR
+Plugins.PostgreSQL.Sessions.local.Database=postgres
+PCONF
+
+systemctl enable --now zabbix-agent2
+
+# Node Exporter
+cd /tmp
+wget https://github.com/prometheus/node_exporter/releases/download/v1.9.1/node_exporter-1.9.1.linux-amd64.tar.gz
+tar -xzf node_exporter-1.9.1.linux-amd64.tar.gz
+cp node_exporter-1.9.1.linux-amd64/node_exporter /usr/local/bin/
+useradd --no-create-home --shell /bin/false node_exporter
+
+cat > /etc/systemd/system/node_exporter.service << 'NCONF'
+[Unit]
+Description=Prometheus Node Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+ExecStart=/usr/local/bin/node_exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+NCONF
+
+systemctl daemon-reload
+systemctl enable --now node_exporter
+
+# PostgreSQL Exporter
+sudo -u postgres psql -c "CREATE USER postgres_exporter WITH PASSWORD 'SENHA_EXPORTER';"
+sudo -u postgres psql -c "GRANT pg_monitor TO postgres_exporter;"
+
+cd /tmp
+wget https://github.com/prometheus-community/postgres_exporter/releases/download/v0.16.0/postgres_exporter-0.16.0.linux-amd64.tar.gz
+tar -xzf postgres_exporter-0.16.0.linux-amd64.tar.gz
+cp postgres_exporter-0.16.0.linux-amd64/postgres_exporter /usr/local/bin/
+useradd --no-create-home --shell /bin/false postgres_exporter
+
+cat > /etc/default/postgres_exporter << 'PECONF'
+DATA_SOURCE_NAME=postgresql://postgres_exporter:SENHA_EXPORTER@127.0.0.1:5432/postgres?sslmode=disable
+PECONF
+
+cat > /etc/systemd/system/postgres_exporter.service << 'PEUNIT'
+[Unit]
+Description=Prometheus PostgreSQL Exporter
+After=network.target
+
+[Service]
+User=postgres_exporter
+Group=postgres_exporter
+EnvironmentFile=/etc/default/postgres_exporter
+ExecStart=/usr/local/bin/postgres_exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+PEUNIT
+
+systemctl daemon-reload
+systemctl enable --now postgres_exporter
+
+# Firewall
+firewall-cmd --permanent --add-port=10050/tcp
+firewall-cmd --permanent --add-port=9100/tcp
+firewall-cmd --permanent --add-port=9187/tcp
+firewall-cmd --reload
+```
+
 ### Backup manual
 
 ```bash

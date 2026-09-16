@@ -201,8 +201,21 @@ K3s-CCoE/
 - **Prometheus** — coleta métricas de todos os nodes e pods via kube-prometheus-stack 82.2.0
 - **Grafana** — dashboards automáticos: Kubernetes, Nodes, Pods, Storage
 - **Zabbix** — monitoração tradicional dos nodes (CPU, RAM, disco, rede)
-  - Agent instalado em `rke2-cp-01` e `rke2-worker-01`
+  - Agent instalado em `rke2-cp-01`, `rke2-worker-01` e `rke2-pgdb`
   - 394+ hosts monitorados, 17.000+ items ativos
+
+### Monitoramento da VM de banco (`rke2-pgdb`)
+
+| Agente | Porta | Função |
+|---|---|---|
+| `qemu-guest-agent` | — | Integração com Proxmox |
+| `zabbix-agent2` | 10050 | Sistema operacional + PostgreSQL (template `PostgreSQL by Zabbix agent 2`) |
+| `node_exporter` | 9100 | Métricas de SO para Prometheus |
+| `postgres_exporter` | 9187 | Métricas detalhadas do PostgreSQL para Prometheus |
+
+Scrapes no Prometheus (em `clusters/homelab/apps/monitoring.yaml`):
+- `node-rke2-pgdb` → `192.168.50.30:9100`
+- `postgres-rke2-pgdb` → `192.168.50.30:9187`
 
 ---
 
