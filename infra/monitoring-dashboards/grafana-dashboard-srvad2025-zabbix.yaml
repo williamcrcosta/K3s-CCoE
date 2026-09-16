@@ -11,21 +11,21 @@ data:
     : \"-- Grafana --\"},\n        \"enable\": true,\n        \"hide\": true,\n  \
     \      \"iconColor\": \"rgba(0, 211, 255, 1)\",\n        \"name\": \"Annotations\
     \ & Alerts\",\n        \"type\": \"dashboard\"\n      }\n    ]\n  },\n  \"description\"\
-    : \"Windows Server SRVAD2025 via Zabbix\",\n  \"editable\": true,\n  \"id\": null,\n\
-    \  \"links\": [],\n  \"panels\": [\n    {\n      \"datasource\": {\"type\": \"\
-    alexanderzobnin-zabbix-datasource\", \"uid\": \"cfsmm9zv71ts0f\"},\n      \"fieldConfig\"\
-    : {\n        \"defaults\": {\n          \"color\": {\"mode\": \"thresholds\"},\n\
-    \          \"mappings\": [],\n          \"max\": 100,\n          \"min\": 0,\n\
-    \          \"thresholds\": {\"mode\": \"absolute\", \"steps\": [{\"color\": \"\
-    green\", \"value\": null}, {\"color\": \"yellow\", \"value\": 70}, {\"color\"\
-    : \"red\", \"value\": 90}]},\n          \"unit\": \"percent\"\n        },\n  \
-    \      \"overrides\": []\n      },\n      \"gridPos\": {\"h\": 4, \"w\": 6, \"\
-    x\": 0, \"y\": 0},\n      \"id\": 1,\n      \"options\": {\"colorMode\": \"value\"\
-    , \"graphMode\": \"area\", \"justifyMode\": \"auto\", \"orientation\": \"auto\"\
-    , \"reduceOptions\": {\"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\"\
-    : false}, \"showPercentChange\": false, \"textMode\": \"auto\", \"wideLayout\"\
-    : true},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\": [\n       \
-    \ {\n          \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    : \"SRVAD2025 - Windows Server observability via Zabbix\",\n  \"editable\": true,\n\
+    \  \"id\": null,\n  \"links\": [],\n  \"panels\": [\n    {\n      \"datasource\"\
+    : {\"type\": \"alexanderzobnin-zabbix-datasource\", \"uid\": \"cfsmm9zv71ts0f\"\
+    },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\"\
+    mode\": \"thresholds\"},\n          \"mappings\": [],\n          \"max\": 100,\n\
+    \          \"min\": 0,\n          \"thresholds\": {\"mode\": \"absolute\", \"\
+    steps\": [{\"color\": \"green\", \"value\": null}, {\"color\": \"yellow\", \"\
+    value\": 70}, {\"color\": \"red\", \"value\": 90}]},\n          \"unit\": \"percent\"\
+    \n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\"h\":\
+    \ 4, \"w\": 5, \"x\": 0, \"y\": 0},\n      \"id\": 1,\n      \"options\": {\"\
+    colorMode\": \"value\", \"graphMode\": \"area\", \"justifyMode\": \"auto\", \"\
+    orientation\": \"auto\", \"reduceOptions\": {\"calcs\": [\"lastNotNull\"], \"\
+    fields\": \"\", \"values\": false}, \"showPercentChange\": false, \"textMode\"\
+    : \"auto\", \"wideLayout\": true},\n      \"pluginVersion\": \"12.3.3\",\n   \
+    \   \"targets\": [\n        {\n          \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
     , \"uid\": \"cfsmm9zv71ts0f\"},\n          \"queryType\": \"0\",\n          \"\
     group\": {\"filter\": \"Windows servers\"},\n          \"host\": {\"filter\":\
     \ \"SRVAD2025\"},\n          \"item\": {\"filter\": \"CPU utilization\"},\n  \
@@ -38,7 +38,7 @@ data:
     : {\"mode\": \"absolute\", \"steps\": [{\"color\": \"green\", \"value\": null},\
     \ {\"color\": \"yellow\", \"value\": 70}, {\"color\": \"red\", \"value\": 90}]},\n\
     \          \"unit\": \"percent\"\n        },\n        \"overrides\": []\n    \
-    \  },\n      \"gridPos\": {\"h\": 4, \"w\": 6, \"x\": 6, \"y\": 0},\n      \"\
+    \  },\n      \"gridPos\": {\"h\": 4, \"w\": 5, \"x\": 5, \"y\": 0},\n      \"\
     id\": 2,\n      \"options\": {\"colorMode\": \"value\", \"graphMode\": \"area\"\
     , \"justifyMode\": \"auto\", \"orientation\": \"auto\", \"reduceOptions\": {\"\
     calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false}, \"showPercentChange\"\
@@ -52,35 +52,71 @@ data:
     : \"Memory Utilization\",\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\"\
     : {\"type\": \"alexanderzobnin-zabbix-datasource\", \"uid\": \"cfsmm9zv71ts0f\"\
     },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\"\
-    mode\": \"thresholds\"},\n          \"mappings\": [],\n          \"thresholds\"\
-    : {\"mode\": \"absolute\", \"steps\": [{\"color\": \"green\", \"value\": null}]},\n\
-    \          \"unit\": \"dtdurations\"\n        },\n        \"overrides\": []\n\
-    \      },\n      \"gridPos\": {\"h\": 4, \"w\": 6, \"x\": 12, \"y\": 0},\n   \
-    \   \"id\": 3,\n      \"options\": {\"colorMode\": \"value\", \"graphMode\": \"\
-    none\", \"justifyMode\": \"auto\", \"orientation\": \"auto\", \"reduceOptions\"\
-    : {\"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false}, \"showPercentChange\"\
-    : false, \"textMode\": \"auto\", \"wideLayout\": true},\n      \"pluginVersion\"\
-    : \"12.3.3\",\n      \"targets\": [\n        {\n          \"datasource\": {\"\
-    type\": \"alexanderzobnin-zabbix-datasource\", \"uid\": \"cfsmm9zv71ts0f\"},\n\
-    \          \"queryType\": \"0\",\n          \"group\": {\"filter\": \"Windows\
-    \ servers\"},\n          \"host\": {\"filter\": \"SRVAD2025\"},\n          \"\
-    item\": {\"filter\": \"Uptime\"},\n          \"resultFormat\": \"time_series\"\
-    ,\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"Uptime\"\
-    ,\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\": {\"type\": \"\
-    alexanderzobnin-zabbix-datasource\", \"uid\": \"cfsmm9zv71ts0f\"},\n      \"fieldConfig\"\
-    : {\n        \"defaults\": {\n          \"color\": {\"mode\": \"palette-classic\"\
-    },\n          \"custom\": {\"axisBorderShow\": false, \"axisColorMode\": \"text\"\
-    , \"axisLabel\": \"\", \"axisPlacement\": \"auto\", \"barAlignment\": 0, \"drawStyle\"\
-    : \"line\", \"fillOpacity\": 10, \"gradientMode\": \"none\", \"hideFrom\": {\"\
-    legend\": false, \"tooltip\": false, \"viz\": false}, \"insertNulls\": false,\
-    \ \"lineInterpolation\": \"linear\", \"lineWidth\": 1, \"pointSize\": 5, \"scaleDistribution\"\
-    : {\"type\": \"linear\"}, \"showPoints\": \"auto\", \"spanNulls\": false, \"stacking\"\
-    : {\"group\": \"A\", \"mode\": \"none\"}, \"thresholdsStyle\": {\"mode\": \"off\"\
-    }},\n          \"mappings\": [],\n          \"thresholds\": {\"mode\": \"absolute\"\
+    mode\": \"thresholds\"},\n          \"mappings\": [],\n          \"max\": 100,\n\
+    \          \"min\": 0,\n          \"thresholds\": {\"mode\": \"absolute\", \"\
+    steps\": [{\"color\": \"green\", \"value\": null}, {\"color\": \"yellow\", \"\
+    value\": 80}, {\"color\": \"red\", \"value\": 95}]},\n          \"unit\": \"percent\"\
+    \n        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\"h\":\
+    \ 4, \"w\": 5, \"x\": 10, \"y\": 0},\n      \"id\": 3,\n      \"options\": {\"\
+    colorMode\": \"value\", \"graphMode\": \"area\", \"justifyMode\": \"auto\", \"\
+    orientation\": \"auto\", \"reduceOptions\": {\"calcs\": [\"lastNotNull\"], \"\
+    fields\": \"\", \"values\": false}, \"showPercentChange\": false, \"textMode\"\
+    : \"auto\", \"wideLayout\": true},\n      \"pluginVersion\": \"12.3.3\",\n   \
+    \   \"targets\": [\n        {\n          \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n          \"queryType\": \"0\",\n          \"\
+    group\": {\"filter\": \"Windows servers\"},\n          \"host\": {\"filter\":\
+    \ \"SRVAD2025\"},\n          \"item\": {\"filter\": \"FS [(C:)]: Space: Used,\
+    \ in %\"},\n          \"resultFormat\": \"time_series\",\n          \"refId\"\
+    : \"A\"\n        }\n      ],\n      \"title\": \"C: Disk Used %\",\n      \"type\"\
+    : \"stat\"\n    },\n    {\n      \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"color\": {\"mode\": \"thresholds\"},\n          \"mappings\"\
+    : [],\n          \"thresholds\": {\"mode\": \"absolute\", \"steps\": [{\"color\"\
+    : \"green\", \"value\": null}]},\n          \"unit\": \"dtdurations\"\n      \
+    \  },\n        \"overrides\": []\n      },\n      \"gridPos\": {\"h\": 4, \"w\"\
+    : 4, \"x\": 15, \"y\": 0},\n      \"id\": 4,\n      \"options\": {\"colorMode\"\
+    : \"value\", \"graphMode\": \"none\", \"justifyMode\": \"auto\", \"orientation\"\
+    : \"auto\", \"reduceOptions\": {\"calcs\": [\"lastNotNull\"], \"fields\": \"\"\
+    , \"values\": false}, \"showPercentChange\": false, \"textMode\": \"auto\", \"\
+    wideLayout\": true},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n          \"queryType\": \"0\",\n          \"\
+    group\": {\"filter\": \"Windows servers\"},\n          \"host\": {\"filter\":\
+    \ \"SRVAD2025\"},\n          \"item\": {\"filter\": \"Uptime\"},\n          \"\
+    resultFormat\": \"time_series\",\n          \"refId\": \"A\"\n        }\n    \
+    \  ],\n      \"title\": \"Uptime\",\n      \"type\": \"stat\"\n    },\n    {\n\
+    \      \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\", \"uid\"\
+    : \"cfsmm9zv71ts0f\"},\n      \"fieldConfig\": {\n        \"defaults\": {\n  \
+    \        \"color\": {\"mode\": \"thresholds\"},\n          \"mappings\": [],\n\
+    \          \"thresholds\": {\"mode\": \"absolute\", \"steps\": [{\"color\": \"\
+    green\", \"value\": null}]},\n          \"unit\": \"bytes\"\n        },\n    \
+    \    \"overrides\": []\n      },\n      \"gridPos\": {\"h\": 4, \"w\": 5, \"x\"\
+    : 19, \"y\": 0},\n      \"id\": 5,\n      \"options\": {\"colorMode\": \"value\"\
+    , \"graphMode\": \"none\", \"justifyMode\": \"auto\", \"orientation\": \"auto\"\
+    , \"reduceOptions\": {\"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\"\
+    : false}, \"showPercentChange\": false, \"textMode\": \"auto\", \"wideLayout\"\
+    : true},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\": [\n       \
+    \ {\n          \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n          \"queryType\": \"0\",\n          \"\
+    group\": {\"filter\": \"Windows servers\"},\n          \"host\": {\"filter\":\
+    \ \"SRVAD2025\"},\n          \"item\": {\"filter\": \"Total memory\"},\n     \
+    \     \"resultFormat\": \"time_series\",\n          \"refId\": \"A\"\n       \
+    \ }\n      ],\n      \"title\": \"Total Memory\",\n      \"type\": \"stat\"\n\
+    \    },\n    {\n      \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"color\": {\"mode\": \"palette-classic\"},\n          \"custom\"\
+    : {\"axisBorderShow\": false, \"axisColorMode\": \"text\", \"axisLabel\": \"\"\
+    , \"axisPlacement\": \"auto\", \"barAlignment\": 0, \"drawStyle\": \"line\", \"\
+    fillOpacity\": 10, \"gradientMode\": \"none\", \"hideFrom\": {\"legend\": false,\
+    \ \"tooltip\": false, \"viz\": false}, \"insertNulls\": false, \"lineInterpolation\"\
+    : \"linear\", \"lineWidth\": 1, \"pointSize\": 5, \"scaleDistribution\": {\"type\"\
+    : \"linear\"}, \"showPoints\": \"auto\", \"spanNulls\": false, \"stacking\": {\"\
+    group\": \"A\", \"mode\": \"none\"}, \"thresholdsStyle\": {\"mode\": \"off\"}},\n\
+    \          \"mappings\": [],\n          \"thresholds\": {\"mode\": \"absolute\"\
     , \"steps\": [{\"color\": \"green\", \"value\": null}, {\"color\": \"red\", \"\
     value\": 90}]},\n          \"unit\": \"percent\"\n        },\n        \"overrides\"\
-    : []\n      },\n      \"gridPos\": {\"h\": 8, \"w\": 24, \"x\": 0, \"y\": 4},\n\
-    \      \"id\": 4,\n      \"options\": {\"legend\": {\"calcs\": [], \"displayMode\"\
+    : []\n      },\n      \"gridPos\": {\"h\": 8, \"w\": 12, \"x\": 0, \"y\": 4},\n\
+    \      \"id\": 6,\n      \"options\": {\"legend\": {\"calcs\": [], \"displayMode\"\
     : \"list\", \"placement\": \"bottom\", \"showLegend\": true}, \"tooltip\": {\"\
     mode\": \"single\", \"sort\": \"none\"}},\n      \"pluginVersion\": \"12.3.3\"\
     ,\n      \"targets\": [\n        {\n          \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
@@ -94,8 +130,82 @@ data:
     \ \"SRVAD2025\"},\n          \"item\": {\"filter\": \"Memory utilization\"},\n\
     \          \"resultFormat\": \"time_series\",\n          \"refId\": \"B\"\n  \
     \      }\n      ],\n      \"title\": \"CPU and Memory Utilization\",\n      \"\
-    type\": \"timeseries\"\n    }\n  ],\n  \"refresh\": \"30s\",\n  \"schemaVersion\"\
-    : 39,\n  \"tags\": [\"zabbix\", \"windows\", \"SRVAD2025\"],\n  \"templating\"\
-    : {\"list\": []},\n  \"time\": {\"from\": \"now-1h\", \"to\": \"now\"},\n  \"\
-    timezone\": \"America/Sao_Paulo\",\n  \"title\": \"SRVAD2025 - Zabbix\",\n  \"\
-    uid\": \"srvad2025-zabbix\",\n  \"version\": 2\n}\n"
+    type\": \"timeseries\"\n    },\n    {\n      \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"color\": {\"mode\": \"palette-classic\"},\n          \"custom\"\
+    : {\"axisBorderShow\": false, \"axisColorMode\": \"text\", \"axisLabel\": \"\"\
+    , \"axisPlacement\": \"auto\", \"barAlignment\": 0, \"drawStyle\": \"line\", \"\
+    fillOpacity\": 10, \"gradientMode\": \"none\", \"hideFrom\": {\"legend\": false,\
+    \ \"tooltip\": false, \"viz\": false}, \"insertNulls\": false, \"lineInterpolation\"\
+    : \"linear\", \"lineWidth\": 1, \"pointSize\": 5, \"scaleDistribution\": {\"type\"\
+    : \"linear\"}, \"showPoints\": \"auto\", \"spanNulls\": false, \"stacking\": {\"\
+    group\": \"A\", \"mode\": \"none\"}, \"thresholdsStyle\": {\"mode\": \"off\"}},\n\
+    \          \"mappings\": [],\n          \"thresholds\": {\"mode\": \"absolute\"\
+    , \"steps\": [{\"color\": \"green\", \"value\": null}]},\n          \"unit\":\
+    \ \"bps\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
+    : {\"h\": 8, \"w\": 12, \"x\": 12, \"y\": 4},\n      \"id\": 7,\n      \"options\"\
+    : {\"legend\": {\"calcs\": [], \"displayMode\": \"list\", \"placement\": \"bottom\"\
+    , \"showLegend\": true}, \"tooltip\": {\"mode\": \"single\", \"sort\": \"none\"\
+    }},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\": [\n        {\n \
+    \         \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\", \"\
+    uid\": \"cfsmm9zv71ts0f\"},\n          \"queryType\": \"0\",\n          \"group\"\
+    : {\"filter\": \"Windows servers\"},\n          \"host\": {\"filter\": \"SRVAD2025\"\
+    },\n          \"item\": {\"filter\": \"Interface Red Hat VirtIO Ethernet Adapter(Ethernet):\
+    \ Bits received\"},\n          \"resultFormat\": \"time_series\",\n          \"\
+    refId\": \"A\"\n        },\n        {\n          \"datasource\": {\"type\": \"\
+    alexanderzobnin-zabbix-datasource\", \"uid\": \"cfsmm9zv71ts0f\"},\n         \
+    \ \"queryType\": \"0\",\n          \"group\": {\"filter\": \"Windows servers\"\
+    },\n          \"host\": {\"filter\": \"SRVAD2025\"},\n          \"item\": {\"\
+    filter\": \"Interface Red Hat VirtIO Ethernet Adapter(Ethernet): Bits sent\"},\n\
+    \          \"resultFormat\": \"time_series\",\n          \"refId\": \"B\"\n  \
+    \      }\n      ],\n      \"title\": \"Network Traffic\",\n      \"type\": \"\
+    timeseries\"\n    },\n    {\n      \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"color\": {\"mode\": \"palette-classic\"},\n          \"custom\"\
+    : {\"axisBorderShow\": false, \"axisColorMode\": \"text\", \"axisLabel\": \"\"\
+    , \"axisPlacement\": \"auto\", \"barAlignment\": 0, \"drawStyle\": \"line\", \"\
+    fillOpacity\": 10, \"gradientMode\": \"none\", \"hideFrom\": {\"legend\": false,\
+    \ \"tooltip\": false, \"viz\": false}, \"insertNulls\": false, \"lineInterpolation\"\
+    : \"linear\", \"lineWidth\": 1, \"pointSize\": 5, \"scaleDistribution\": {\"type\"\
+    : \"linear\"}, \"showPoints\": \"auto\", \"spanNulls\": false, \"stacking\": {\"\
+    group\": \"A\", \"mode\": \"none\"}, \"thresholdsStyle\": {\"mode\": \"off\"}},\n\
+    \          \"mappings\": [],\n          \"thresholds\": {\"mode\": \"absolute\"\
+    , \"steps\": [{\"color\": \"green\", \"value\": null}, {\"color\": \"red\", \"\
+    value\": 10}]},\n          \"unit\": \"short\"\n        },\n        \"overrides\"\
+    : []\n      },\n      \"gridPos\": {\"h\": 8, \"w\": 12, \"x\": 0, \"y\": 12},\n\
+    \      \"id\": 8,\n      \"options\": {\"legend\": {\"calcs\": [], \"displayMode\"\
+    : \"list\", \"placement\": \"bottom\", \"showLegend\": true}, \"tooltip\": {\"\
+    mode\": \"single\", \"sort\": \"none\"}},\n      \"pluginVersion\": \"12.3.3\"\
+    ,\n      \"targets\": [\n        {\n          \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n          \"queryType\": \"0\",\n          \"\
+    group\": {\"filter\": \"Windows servers\"},\n          \"host\": {\"filter\":\
+    \ \"SRVAD2025\"},\n          \"item\": {\"filter\": \"0 C:: Disk read rate\"},\n\
+    \          \"resultFormat\": \"time_series\",\n          \"refId\": \"A\"\n  \
+    \      },\n        {\n          \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n          \"queryType\": \"0\",\n          \"\
+    group\": {\"filter\": \"Windows servers\"},\n          \"host\": {\"filter\":\
+    \ \"SRVAD2025\"},\n          \"item\": {\"filter\": \"0 C:: Disk write rate\"\
+    },\n          \"resultFormat\": \"time_series\",\n          \"refId\": \"B\"\n\
+    \        }\n      ],\n      \"title\": \"Disk I/O C:\",\n      \"type\": \"timeseries\"\
+    \n    },\n    {\n      \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"color\": {\"mode\": \"palette-classic\"},\n          \"custom\"\
+    : {\"align\": \"auto\", \"cellOptions\": {\"type\": \"color-background\"}, \"\
+    inspect\": false},\n          \"mappings\": [],\n          \"thresholds\": {\"\
+    mode\": \"absolute\", \"steps\": [{\"color\": \"green\", \"value\": null}]},\n\
+    \          \"unit\": \"short\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\"h\": 8, \"w\": 12, \"x\": 12, \"y\": 12},\n      \"id\"\
+    : 9,\n      \"options\": {\"cellHeight\": \"sm\", \"footer\": {\"countRows\":\
+    \ false, \"fields\": \"\", \"reducer\": [\"sum\"], \"show\": false}, \"showHeader\"\
+    : true, \"sortBy\": []},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": {\"type\": \"alexanderzobnin-zabbix-datasource\"\
+    , \"uid\": \"cfsmm9zv71ts0f\"},\n          \"queryType\": \"0\",\n          \"\
+    group\": {\"filter\": \"Windows servers\"},\n          \"host\": {\"filter\":\
+    \ \"SRVAD2025\"},\n          \"item\": {\"filter\": \"/FS/\"},\n          \"resultFormat\"\
+    : \"table\",\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\"\
+    : \"Filesystems\",\n      \"type\": \"table\"\n    }\n  ],\n  \"refresh\": \"\
+    30s\",\n  \"schemaVersion\": 39,\n  \"tags\": [\"zabbix\", \"windows\", \"SRVAD2025\"\
+    , \"observability\"],\n  \"templating\": {\"list\": []},\n  \"time\": {\"from\"\
+    : \"now-1h\", \"to\": \"now\"},\n  \"timezone\": \"America/Sao_Paulo\",\n  \"\
+    title\": \"SRVAD2025 - Zabbix Observability\",\n  \"uid\": \"srvad2025-zabbix\"\
+    ,\n  \"version\": 3\n}\n"
