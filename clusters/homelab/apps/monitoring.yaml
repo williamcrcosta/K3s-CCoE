@@ -28,7 +28,6 @@ spec:
             type: Recreate
           persistence:
             enabled: false
-            enabled: false
           plugins:
           - alexanderzobnin-zabbix-app
           - marcusolsson-dynamictext-panel
