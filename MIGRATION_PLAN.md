@@ -96,6 +96,7 @@ eliminando recursos aplicados manualmente (`kubectl apply`).
 
 | Data | Componente | De | Para |
 |---|---|---|---|
+| 2026-09-16 | Zabbix DB | PostgreSQL em PVC Longhorn | **PostgreSQL 16** na VM `rke2-pgdb` (439 hosts) |
 | 2026-09-15 | Grafana DB | SQLite em PVC Longhorn | **PostgreSQL 16** na VM `rke2-pgdb` |
 | 2026-09-15 | Banco compartilhado | — | VM `rke2-pgdb` com PostgreSQL 16 para Grafana/Zabbix/Keycloak |
 | 2026-08-26 | Certificados TLS | wcrpc-ca self-signed | **Let's Encrypt wccosta.com.br** (Azure DNS) |

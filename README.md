@@ -52,7 +52,7 @@ Internet
 | ArgoCD | https://argocd.wccosta.com.br | `platform-argocd` | — |
 | Grafana | https://grafana.wccosta.com.br | `monitoring` | PostgreSQL 16 em `rke2-pgdb`; sem persistência local (PVC legado de 5Gi decomissionado) |
 | Prometheus | https://prometheus.wccosta.com.br | `monitoring` | Longhorn 20Gi (TSDB) |
-| Zabbix | https://zabbix.wccosta.com.br | `zabbix` | Longhorn 10Gi (PostgreSQL — pendente migração para `rke2-pgdb`) |
+| Zabbix | https://zabbix.wccosta.com.br | `zabbix` | PostgreSQL 16 em `rke2-pgdb` (sem PVC Longhorn) |
 | Longhorn UI | https://longhorn.wccosta.com.br | `longhorn-system` | — |
 | Kubernetes Dashboard | https://dashboard.wccosta.com.br | `kubernetes-dashboard` | — |
 | PowerDNS | — | `dns` | Longhorn 2Gi (SQLite) | desativado |
@@ -65,7 +65,7 @@ Internet
 ```
 Longhorn (distribuído entre os 2 nodes)
 ├── prometheus-db            20Gi  (Prometheus TSDB)
-├── postgresql-data-zabbix   10Gi  (Zabbix PostgreSQL — pendente migração para VM)
+├── postgresql-data-zabbix   10Gi  (PVC legado — aguardando backup/remoção)
 ├── ollama-models            20Gi  (Modelos Ollama)
 └── ollama-webui-data         5Gi  (Open WebUI)
 
@@ -79,7 +79,7 @@ StorageClass default: longhorn
 rke2-pgdb (192.168.50.30)
 ├── PostgreSQL 16
 │     ├── grafana    ← Grafana 12.3.3 (migrado de SQLite/Longhorn)
-│     ├── zabbix     ← reservado (pendente migração)
+│     ├── zabbix     ← Zabbix 7.0.29 (migrado do pod PostgreSQL/Longhorn)
 │     └── keycloak   ← reservado (futuro)
 │
 └── Backup diário em /opt/postgres-backup/ (pg_dump + cron)
@@ -94,7 +94,7 @@ rke2-pgdb (192.168.50.30)
 | Aspecto | Antes | Depois |
 |---|---|---|
 | Grafana | SQLite em PVC Longhorn (`monitoring-grafana`) | PostgreSQL em `rke2-pgdb` |
-| Zabbix | PostgreSQL em pod + PVC Longhorn | PostgreSQL em `rke2-pgdb` (pendente) |
+| Zabbix | PostgreSQL em pod + PVC Longhorn | PostgreSQL em `rke2-pgdb` |
 | Prometheus | TSDB em PVC Longhorn | continua em PVC Longhorn |
 | Resiliência | depende do estado do volume/pod | persistência fora do ciclo de vida dos pods |
 
@@ -202,7 +202,7 @@ K3s-CCoE/
 - **Grafana** — dashboards automáticos: Kubernetes, Nodes, Pods, Storage
 - **Zabbix** — monitoração tradicional dos nodes (CPU, RAM, disco, rede)
   - Agent instalado em `rke2-cp-01`, `rke2-worker-01` e `rke2-pgdb`
-  - 394+ hosts monitorados, 17.000+ items ativos
+  - 439 hosts monitorados, 21.980+ items ativos
 
 ### Monitoramento da VM de banco (`rke2-pgdb`)
 
@@ -234,7 +234,6 @@ Os ConfigMaps carregam automaticamente no Grafana via sidecar (`grafana_dashboar
 ## Evoluções Futuras
 
 ### Curto Prazo
-- **Zabbix no PostgreSQL VM** — migrar o Zabbix do pod PostgreSQL/Longhorn para `rke2-pgdb`
 - **TLS no PostgreSQL** — conexões cifradas entre apps e `rke2-pgdb`
 - **AlertManager** — notificações via Telegram para alertas críticos
 - **Backup externo Longhorn** — snapshots para S3/NFS fora do cluster
@@ -242,7 +241,7 @@ Os ConfigMaps carregam automaticamente no Grafana via sidecar (`grafana_dashboar
 
 ### Concluído
 - **Let's Encrypt** — certificados públicos via Azure DNS
-- **Banco de dados compartilhado (Grafana)** — Grafana migrado de SQLite/Longhorn para PostgreSQL 16 em `rke2-pgdb`
+- **Banco de dados compartilhado (Grafana/Zabbix)** — Grafana e Zabbix migrados para PostgreSQL 16 em `rke2-pgdb`
 
 ### Médio Prazo
 - **Resource limits** — definir `requests` e `limits` para todos os pods
