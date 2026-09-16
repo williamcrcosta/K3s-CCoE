@@ -1,15 +1,13 @@
 postgresql:
-  persistence:
-    enabled: true
-    storageClass: longhorn
-    storageSize: 10Gi
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: 100m
-    limits:
-      memory: 2Gi
-zabbixImageTag: ubuntu-7.0.27
+  enabled: false
+postgresAccess:
+  existingSecretName: "zabbix-db-access"
+  secretHostKey: "host"
+  secretPortKey: "port"
+  secretUserKey: "user"
+  secretPasswordKey: "password"
+  secretDBKey: "dbname"
+zabbixImageTag: ubuntu-7.0.29
 zabbixWeb:
   zabbixServerHost: zabbix-zabbix-server
   zabbixServerPort: 10051
