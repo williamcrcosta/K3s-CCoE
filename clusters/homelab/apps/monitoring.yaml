@@ -64,6 +64,11 @@ spec:
                   - targets:
                       - 192.168.50.30:9187
                 metrics_path: /metrics
+              - job_name: windows-vm
+                static_configs:
+                  - targets:
+                      - 10.100.20.10:9182
+                metrics_path: /metrics
             storageSpec:
               volumeClaimTemplate:
                 spec:

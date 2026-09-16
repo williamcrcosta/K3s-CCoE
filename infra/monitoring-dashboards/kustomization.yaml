@@ -4,3 +4,4 @@ resources:
   - grafana-dashboard-proxmox-pve-exporter.yaml
   - grafana-dashboard-node-exporter.yaml
   - grafana-dashboard-postgresql-rke2-pgdb.yaml
+  - grafana-dashboard-windows-server-status.yaml
