@@ -6,17 +6,304 @@ metadata:
   labels:
     grafana_dashboard: '1'
 data:
-  postgresql-rke2-pgdb.json: '{"annotations":{"list":[{"builtIn":1,"datasource":{"type":"grafana","uid":"--
-    Grafana --"},"enable":true,"hide":true,"iconColor":"rgba(0, 211, 255, 1)","name":"Annotations
-    & Alerts","type":"dashboard"}]},"description":"PostgreSQL monitoring for rke2-pgdb
-    VM","editable":true,"gnetId":null,"graphTooltip":0,"id":null,"links":[],"panels":[{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"red","value":0},{"color":"green","value":1}]},"unit":"none"},"overrides":[]},"gridPos":{"h":4,"w":4,"x":0,"y":0},"id":1,"options":{"colorMode":"value","graphMode":"area","justifyMode":"auto","orientation":"auto","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"textMode":"auto","wideLayout":true},"pluginVersion":"12.3.3","targets":[{"datasource":{"type":"prometheus","uid":"prometheus"},"expr":"pg_up{job=\"postgres-rke2-pgdb\"}","refId":"A"}],"title":"PostgreSQL
-    Up","type":"stat"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"none"},"overrides":[]},"gridPos":{"h":4,"w":5,"x":4,"y":0},"id":2,"options":{"colorMode":"value","graphMode":"none","justifyMode":"auto","orientation":"auto","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"textMode":"auto","wideLayout":true},"pluginVersion":"12.3.3","targets":[{"datasource":{"type":"prometheus","uid":"prometheus"},"expr":"pg_static{job=\"postgres-rke2-pgdb\"}","refId":"A","legendFormat":"{{short_version}}"}],"title":"PostgreSQL
-    Version","type":"stat"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisBorderShow":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"drawStyle":"line","fillOpacity":10,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"insertNulls":false,"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"auto","spanNulls":false,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"short"},"overrides":[]},"gridPos":{"h":8,"w":12,"x":9,"y":0},"id":3,"options":{"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":true},"tooltip":{"mode":"single","sort":"none"}},"pluginVersion":"12.3.3","targets":[{"datasource":{"type":"prometheus","uid":"prometheus"},"expr":"pg_stat_activity_count{job=\"postgres-rke2-pgdb\"}","refId":"A","legendFormat":"{{datname}}
-    - {{state}}"}],"title":"Active Connections","type":"timeseries"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"percentunit"},"overrides":[]},"gridPos":{"h":4,"w":5,"x":0,"y":4},"id":4,"options":{"colorMode":"value","graphMode":"gauge","justifyMode":"auto","orientation":"auto","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"textMode":"auto","wideLayout":true},"pluginVersion":"12.3.3","targets":[{"datasource":{"type":"prometheus","uid":"prometheus"},"expr":"rate(pg_stat_database_blks_hit{datname=\"grafana\",job=\"postgres-rke2-pgdb\"}[5m])
-    / (rate(pg_stat_database_blks_hit{datname=\"grafana\",job=\"postgres-rke2-pgdb\"}[5m])
-    + rate(pg_stat_database_blks_read{datname=\"grafana\",job=\"postgres-rke2-pgdb\"}[5m]))","refId":"A"}],"title":"Grafana
-    DB Cache Hit Ratio","type":"stat"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisBorderShow":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"drawStyle":"line","fillOpacity":10,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"insertNulls":false,"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"auto","spanNulls":false,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"short"},"overrides":[]},"gridPos":{"h":8,"w":12,"x":0,"y":8},"id":5,"options":{"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":true},"tooltip":{"mode":"single","sort":"none"}},"pluginVersion":"12.3.3","targets":[{"datasource":{"type":"prometheus","uid":"prometheus"},"expr":"rate(pg_stat_database_xact_commit{job=\"postgres-rke2-pgdb\"}[5m])","legendFormat":"{{datname}}
-    commit","refId":"A"},{"datasource":{"type":"prometheus","uid":"prometheus"},"expr":"rate(pg_stat_database_xact_rollback{job=\"postgres-rke2-pgdb\"}[5m])","legendFormat":"{{datname}}
-    rollback","refId":"B"}],"title":"Transactions/s","type":"timeseries"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"palette-classic"},"custom":{"axisBorderShow":false,"axisColorMode":"text","axisLabel":"","axisPlacement":"auto","barAlignment":0,"drawStyle":"line","fillOpacity":10,"gradientMode":"none","hideFrom":{"legend":false,"tooltip":false,"viz":false},"insertNulls":false,"lineInterpolation":"linear","lineWidth":1,"pointSize":5,"scaleDistribution":{"type":"linear"},"showPoints":"auto","spanNulls":false,"stacking":{"group":"A","mode":"none"},"thresholdsStyle":{"mode":"off"}},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null}]},"unit":"bytes"},"overrides":[]},"gridPos":{"h":8,"w":12,"x":12,"y":8},"id":6,"options":{"legend":{"calcs":[],"displayMode":"list","placement":"bottom","showLegend":true},"tooltip":{"mode":"single","sort":"none"}},"pluginVersion":"12.3.3","targets":[{"datasource":{"type":"prometheus","uid":"prometheus"},"expr":"pg_database_size_bytes{job=\"postgres-rke2-pgdb\"}","legendFormat":"{{datname}}","refId":"A"}],"title":"Database
-    Size","type":"timeseries"},{"datasource":{"type":"prometheus","uid":"prometheus"},"fieldConfig":{"defaults":{"color":{"mode":"thresholds"},"mappings":[],"thresholds":{"mode":"absolute","steps":[{"color":"green","value":null},{"color":"red","value":1}]},"unit":"short"},"overrides":[]},"gridPos":{"h":4,"w":4,"x":5,"y":4},"id":7,"options":{"colorMode":"value","graphMode":"area","justifyMode":"auto","orientation":"auto","reduceOptions":{"calcs":["lastNotNull"],"fields":"","values":false},"showPercentChange":false,"textMode":"auto","wideLayout":true},"pluginVersion":"12.3.3","targets":[{"datasource":{"type":"prometheus","uid":"prometheus"},"expr":"pg_stat_database_deadlocks{job=\"postgres-rke2-pgdb\"}","refId":"A"}],"title":"Deadlocks","type":"stat"}],"refresh":"30s","schemaVersion":39,"tags":["postgresql","rke2-pgdb"],"templating":{"list":[]},"time":{"from":"now-1h","to":"now"},"timezone":"America/Sao_Paulo","title":"PostgreSQL
-    - rke2-pgdb","uid":"postgresql-rke2-pgdb","version":1}'
+  postgresql-rke2-pgdb.json: "{\n  \"annotations\": {\n    \"list\": [\n      {\n\
+    \        \"builtIn\": 1,\n        \"datasource\": {\"type\": \"grafana\", \"uid\"\
+    : \"-- Grafana --\"},\n        \"enable\": true,\n        \"hide\": true,\n  \
+    \      \"iconColor\": \"rgba(0, 211, 255, 1)\",\n        \"name\": \"Annotations\
+    \ & Alerts\",\n        \"type\": \"dashboard\"\n      }\n    ]\n  },\n  \"description\"\
+    : \"PostgreSQL monitoring for rke2-pgdb VM\",\n  \"editable\": true,\n  \"gnetId\"\
+    : null,\n  \"graphTooltip\": 0,\n  \"id\": null,\n  \"links\": [],\n  \"panels\"\
+    : [\n    {\n      \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"\
+    },\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\"\
+    mode\": \"thresholds\"},\n          \"mappings\": [],\n          \"thresholds\"\
+    : {\"mode\": \"absolute\", \"steps\": [{\"color\": \"red\", \"value\": 0}, {\"\
+    color\": \"green\", \"value\": 1}]},\n          \"unit\": \"none\"\n        },\n\
+    \        \"overrides\": []\n      },\n      \"gridPos\": {\"h\": 3, \"w\": 3,\
+    \ \"x\": 0, \"y\": 0},\n      \"id\": 1,\n      \"options\": {\"colorMode\": \"\
+    background\", \"graphMode\": \"area\", \"justifyMode\": \"center\", \"orientation\"\
+    : \"auto\", \"reduceOptions\": {\"calcs\": [\"lastNotNull\"], \"fields\": \"\"\
+    , \"values\": false}, \"showPercentChange\": false, \"textMode\": \"value\", \"\
+    wideLayout\": true},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": {\"type\": \"prometheus\", \"uid\":\
+    \ \"prometheus\"},\n          \"expr\": \"pg_up{job=\\\"postgres-rke2-pgdb\\\"\
+    }\",\n          \"refId\": \"A\"\n        }\n      ],\n      \"title\": \"PostgreSQL\
+    \ Up\",\n      \"type\": \"stat\"\n    },\n    {\n      \"datasource\": {\"type\"\
+    : \"prometheus\", \"uid\": \"prometheus\"},\n      \"fieldConfig\": {\n      \
+    \  \"defaults\": {\n          \"color\": {\"mode\": \"thresholds\"},\n       \
+    \   \"mappings\": [],\n          \"thresholds\": {\"mode\": \"absolute\", \"steps\"\
+    : [{\"color\": \"green\", \"value\": null}]},\n          \"unit\": \"none\"\n\
+    \        },\n        \"overrides\": []\n      },\n      \"gridPos\": {\"h\": 3,\
+    \ \"w\": 3, \"x\": 3, \"y\": 0},\n      \"id\": 2,\n      \"options\": {\"colorMode\"\
+    : \"value\", \"graphMode\": \"none\", \"justifyMode\": \"auto\", \"orientation\"\
+    : \"auto\", \"reduceOptions\": {\"calcs\": [\"lastNotNull\"], \"fields\": \"\"\
+    , \"values\": false}, \"showPercentChange\": false, \"textMode\": \"auto\", \"\
+    wideLayout\": true},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": {\"type\": \"prometheus\", \"uid\":\
+    \ \"prometheus\"},\n          \"expr\": \"pg_static{job=\\\"postgres-rke2-pgdb\\\
+    \"}\",\n          \"legendFormat\": \"{{short_version}}\",\n          \"refId\"\
+    : \"A\"\n        }\n      ],\n      \"title\": \"Version\",\n      \"type\": \"\
+    stat\"\n    },\n    {\n      \"datasource\": {\"type\": \"prometheus\", \"uid\"\
+    : \"prometheus\"},\n      \"fieldConfig\": {\n        \"defaults\": {\n      \
+    \    \"color\": {\"mode\": \"thresholds\"},\n          \"mappings\": [],\n   \
+    \       \"thresholds\": {\"mode\": \"absolute\", \"steps\": [{\"color\": \"green\"\
+    , \"value\": null}]},\n          \"unit\": \"short\"\n        },\n        \"overrides\"\
+    : []\n      },\n      \"gridPos\": {\"h\": 3, \"w\": 3, \"x\": 6, \"y\": 0},\n\
+    \      \"id\": 3,\n      \"options\": {\"colorMode\": \"value\", \"graphMode\"\
+    : \"area\", \"justifyMode\": \"auto\", \"orientation\": \"auto\", \"reduceOptions\"\
+    : {\"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false}, \"showPercentChange\"\
+    : false, \"textMode\": \"auto\", \"wideLayout\": true},\n      \"pluginVersion\"\
+    : \"12.3.3\",\n      \"targets\": [\n        {\n          \"datasource\": {\"\
+    type\": \"prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"count(pg_database_size_bytes{job=\\\
+    \"postgres-rke2-pgdb\\\"})\",\n          \"refId\": \"A\"\n        }\n      ],\n\
+    \      \"title\": \"Databases\",\n      \"type\": \"stat\"\n    },\n    {\n  \
+    \    \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n  \
+    \    \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\"mode\"\
+    : \"thresholds\"},\n          \"mappings\": [],\n          \"thresholds\": {\"\
+    mode\": \"absolute\", \"steps\": [{\"color\": \"green\", \"value\": null}, {\"\
+    color\": \"yellow\", \"value\": 80}, {\"color\": \"red\", \"value\": 95}]},\n\
+    \          \"unit\": \"percent\"\n        },\n        \"overrides\": []\n    \
+    \  },\n      \"gridPos\": {\"h\": 3, \"w\": 3, \"x\": 9, \"y\": 0},\n      \"\
+    id\": 4,\n      \"options\": {\"colorMode\": \"value\", \"graphMode\": \"gauge\"\
+    , \"justifyMode\": \"auto\", \"orientation\": \"auto\", \"reduceOptions\": {\"\
+    calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\": false}, \"showPercentChange\"\
+    : false, \"textMode\": \"auto\", \"wideLayout\": true},\n      \"pluginVersion\"\
+    : \"12.3.3\",\n      \"targets\": [\n        {\n          \"datasource\": {\"\
+    type\": \"prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"rate(pg_stat_database_blks_hit{datname=\\\
+    \"grafana\\\",job=\\\"postgres-rke2-pgdb\\\"}[5m]) / (rate(pg_stat_database_blks_hit{datname=\\\
+    \"grafana\\\",job=\\\"postgres-rke2-pgdb\\\"}[5m]) + rate(pg_stat_database_blks_read{datname=\\\
+    \"grafana\\\",job=\\\"postgres-rke2-pgdb\\\"}[5m]))\",\n          \"refId\": \"\
+    A\"\n        }\n      ],\n      \"title\": \"Grafana Cache\",\n      \"type\"\
+    : \"stat\"\n    },\n    {\n      \"datasource\": {\"type\": \"prometheus\", \"\
+    uid\": \"prometheus\"},\n      \"fieldConfig\": {\n        \"defaults\": {\n \
+    \         \"color\": {\"mode\": \"thresholds\"},\n          \"mappings\": [],\n\
+    \          \"thresholds\": {\"mode\": \"absolute\", \"steps\": [{\"color\": \"\
+    green\", \"value\": null}]},\n          \"unit\": \"short\"\n        },\n    \
+    \    \"overrides\": []\n      },\n      \"gridPos\": {\"h\": 3, \"w\": 3, \"x\"\
+    : 12, \"y\": 0},\n      \"id\": 5,\n      \"options\": {\"colorMode\": \"value\"\
+    , \"graphMode\": \"area\", \"justifyMode\": \"auto\", \"orientation\": \"auto\"\
+    , \"reduceOptions\": {\"calcs\": [\"lastNotNull\"], \"fields\": \"\", \"values\"\
+    : false}, \"showPercentChange\": false, \"textMode\": \"auto\", \"wideLayout\"\
+    : true},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\": [\n       \
+    \ {\n          \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"\
+    },\n          \"expr\": \"sum(pg_stat_activity_count{job=\\\"postgres-rke2-pgdb\\\
+    \",state=\\\"active\\\"})\",\n          \"refId\": \"A\"\n        }\n      ],\n\
+    \      \"title\": \"Active Conn\",\n      \"type\": \"stat\"\n    },\n    {\n\
+    \      \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\"mode\"\
+    : \"thresholds\"},\n          \"mappings\": [],\n          \"thresholds\": {\"\
+    mode\": \"absolute\", \"steps\": [{\"color\": \"green\", \"value\": null}, {\"\
+    color\": \"red\", \"value\": 1}]},\n          \"unit\": \"short\"\n        },\n\
+    \        \"overrides\": []\n      },\n      \"gridPos\": {\"h\": 3, \"w\": 3,\
+    \ \"x\": 15, \"y\": 0},\n      \"id\": 6,\n      \"options\": {\"colorMode\":\
+    \ \"value\", \"graphMode\": \"area\", \"justifyMode\": \"auto\", \"orientation\"\
+    : \"auto\", \"reduceOptions\": {\"calcs\": [\"lastNotNull\"], \"fields\": \"\"\
+    , \"values\": false}, \"showPercentChange\": false, \"textMode\": \"auto\", \"\
+    wideLayout\": true},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": {\"type\": \"prometheus\", \"uid\":\
+    \ \"prometheus\"},\n          \"expr\": \"sum by (datname) (pg_stat_database_deadlocks{job=\\\
+    \"postgres-rke2-pgdb\\\"})\",\n          \"refId\": \"A\"\n        }\n      ],\n\
+    \      \"title\": \"Deadlocks\",\n      \"type\": \"stat\"\n    },\n    {\n  \
+    \    \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n  \
+    \    \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\"mode\"\
+    : \"thresholds\"},\n          \"mappings\": [],\n          \"thresholds\": {\"\
+    mode\": \"absolute\", \"steps\": [{\"color\": \"green\", \"value\": null}]},\n\
+    \          \"unit\": \"bytes\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\"h\": 3, \"w\": 3, \"x\": 18, \"y\": 0},\n      \"id\":\
+    \ 7,\n      \"options\": {\"colorMode\": \"value\", \"graphMode\": \"area\", \"\
+    justifyMode\": \"auto\", \"orientation\": \"auto\", \"reduceOptions\": {\"calcs\"\
+    : [\"lastNotNull\"], \"fields\": \"\", \"values\": false}, \"showPercentChange\"\
+    : false, \"textMode\": \"auto\", \"wideLayout\": true},\n      \"pluginVersion\"\
+    : \"12.3.3\",\n      \"targets\": [\n        {\n          \"datasource\": {\"\
+    type\": \"prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"sum(pg_database_size_bytes{job=\\\
+    \"postgres-rke2-pgdb\\\"})\",\n          \"refId\": \"A\"\n        }\n      ],\n\
+    \      \"title\": \"Total Size\",\n      \"type\": \"stat\"\n    },\n    {\n \
+    \     \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n \
+    \     \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\"mode\"\
+    : \"thresholds\"},\n          \"mappings\": [],\n          \"thresholds\": {\"\
+    mode\": \"absolute\", \"steps\": [{\"color\": \"green\", \"value\": null}]},\n\
+    \          \"unit\": \"bytes\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\"h\": 3, \"w\": 3, \"x\": 21, \"y\": 0},\n      \"id\":\
+    \ 8,\n      \"options\": {\"colorMode\": \"value\", \"graphMode\": \"area\", \"\
+    justifyMode\": \"auto\", \"orientation\": \"auto\", \"reduceOptions\": {\"calcs\"\
+    : [\"lastNotNull\"], \"fields\": \"\", \"values\": false}, \"showPercentChange\"\
+    : false, \"textMode\": \"auto\", \"wideLayout\": true},\n      \"pluginVersion\"\
+    : \"12.3.3\",\n      \"targets\": [\n        {\n          \"datasource\": {\"\
+    type\": \"prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"pg_wal_size_bytes{job=\\\
+    \"postgres-rke2-pgdb\\\"}\",\n          \"refId\": \"A\"\n        }\n      ],\n\
+    \      \"title\": \"WAL Size\",\n      \"type\": \"stat\"\n    },\n    {\n   \
+    \   \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n   \
+    \   \"fieldConfig\": {\n        \"defaults\": {\n          \"color\": {\"mode\"\
+    : \"palette-classic\"},\n          \"custom\": {\"axisBorderShow\": false, \"\
+    axisColorMode\": \"text\", \"axisLabel\": \"\", \"axisPlacement\": \"auto\", \"\
+    barAlignment\": 0, \"drawStyle\": \"line\", \"fillOpacity\": 15, \"gradientMode\"\
+    : \"none\", \"hideFrom\": {\"legend\": false, \"tooltip\": false, \"viz\": false},\
+    \ \"insertNulls\": false, \"lineInterpolation\": \"smooth\", \"lineWidth\": 2,\
+    \ \"pointSize\": 5, \"scaleDistribution\": {\"type\": \"linear\"}, \"showPoints\"\
+    : \"auto\", \"spanNulls\": false, \"stacking\": {\"group\": \"A\", \"mode\": \"\
+    none\"}, \"thresholdsStyle\": {\"mode\": \"off\"}},\n          \"mappings\": [],\n\
+    \          \"thresholds\": {\"mode\": \"absolute\", \"steps\": [{\"color\": \"\
+    green\", \"value\": null}]},\n          \"unit\": \"short\"\n        },\n    \
+    \    \"overrides\": []\n      },\n      \"gridPos\": {\"h\": 8, \"w\": 12, \"\
+    x\": 0, \"y\": 3},\n      \"id\": 9,\n      \"options\": {\"legend\": {\"calcs\"\
+    : [], \"displayMode\": \"list\", \"placement\": \"bottom\", \"showLegend\": true},\
+    \ \"tooltip\": {\"mode\": \"single\", \"sort\": \"none\"}},\n      \"pluginVersion\"\
+    : \"12.3.3\",\n      \"targets\": [\n        {\n          \"datasource\": {\"\
+    type\": \"prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"sum by\
+    \ (datname,state) (pg_stat_activity_count{job=\\\"postgres-rke2-pgdb\\\"})\",\n\
+    \          \"legendFormat\": \"{{datname}} - {{state}}\",\n          \"refId\"\
+    : \"A\"\n        }\n      ],\n      \"title\": \"Connections by Database and State\"\
+    ,\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": {\"type\"\
+    : \"prometheus\", \"uid\": \"prometheus\"},\n      \"fieldConfig\": {\n      \
+    \  \"defaults\": {\n          \"color\": {\"mode\": \"palette-classic\"},\n  \
+    \        \"custom\": {\"axisBorderShow\": false, \"axisColorMode\": \"text\",\
+    \ \"axisLabel\": \"\", \"axisPlacement\": \"auto\", \"barAlignment\": 0, \"drawStyle\"\
+    : \"line\", \"fillOpacity\": 15, \"gradientMode\": \"none\", \"hideFrom\": {\"\
+    legend\": false, \"tooltip\": false, \"viz\": false}, \"insertNulls\": false,\
+    \ \"lineInterpolation\": \"smooth\", \"lineWidth\": 2, \"pointSize\": 5, \"scaleDistribution\"\
+    : {\"type\": \"linear\"}, \"showPoints\": \"auto\", \"spanNulls\": false, \"stacking\"\
+    : {\"group\": \"A\", \"mode\": \"none\"}, \"thresholdsStyle\": {\"mode\": \"off\"\
+    }},\n          \"mappings\": [],\n          \"thresholds\": {\"mode\": \"absolute\"\
+    , \"steps\": [{\"color\": \"green\", \"value\": null}]},\n          \"unit\":\
+    \ \"short\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
+    : {\"h\": 8, \"w\": 12, \"x\": 12, \"y\": 3},\n      \"id\": 10,\n      \"options\"\
+    : {\"legend\": {\"calcs\": [], \"displayMode\": \"list\", \"placement\": \"bottom\"\
+    , \"showLegend\": true}, \"tooltip\": {\"mode\": \"single\", \"sort\": \"none\"\
+    }},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\": [\n        {\n \
+    \         \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n\
+    \          \"expr\": \"rate(pg_stat_database_xact_commit{job=\\\"postgres-rke2-pgdb\\\
+    \"}[5m])\",\n          \"legendFormat\": \"{{datname}} commit\",\n          \"\
+    refId\": \"A\"\n        },\n        {\n          \"datasource\": {\"type\": \"\
+    prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"rate(pg_stat_database_xact_rollback{job=\\\
+    \"postgres-rke2-pgdb\\\"}[5m])\",\n          \"legendFormat\": \"{{datname}} rollback\"\
+    ,\n          \"refId\": \"B\"\n        }\n      ],\n      \"title\": \"Transactions/s\"\
+    ,\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\": {\"type\"\
+    : \"prometheus\", \"uid\": \"prometheus\"},\n      \"fieldConfig\": {\n      \
+    \  \"defaults\": {\n          \"color\": {\"mode\": \"palette-classic\"},\n  \
+    \        \"custom\": {\"axisBorderShow\": false, \"axisColorMode\": \"text\",\
+    \ \"axisLabel\": \"\", \"axisPlacement\": \"auto\", \"barAlignment\": 0, \"drawStyle\"\
+    : \"line\", \"fillOpacity\": 15, \"gradientMode\": \"none\", \"hideFrom\": {\"\
+    legend\": false, \"tooltip\": false, \"viz\": false}, \"insertNulls\": false,\
+    \ \"lineInterpolation\": \"smooth\", \"lineWidth\": 2, \"pointSize\": 5, \"scaleDistribution\"\
+    : {\"type\": \"linear\"}, \"showPoints\": \"auto\", \"spanNulls\": false, \"stacking\"\
+    : {\"group\": \"A\", \"mode\": \"none\"}, \"thresholdsStyle\": {\"mode\": \"off\"\
+    }},\n          \"mappings\": [],\n          \"thresholds\": {\"mode\": \"absolute\"\
+    , \"steps\": [{\"color\": \"green\", \"value\": null}]},\n          \"unit\":\
+    \ \"bytes\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
+    : {\"h\": 8, \"w\": 12, \"x\": 0, \"y\": 11},\n      \"id\": 11,\n      \"options\"\
+    : {\"legend\": {\"calcs\": [], \"displayMode\": \"list\", \"placement\": \"bottom\"\
+    , \"showLegend\": true}, \"tooltip\": {\"mode\": \"single\", \"sort\": \"none\"\
+    }},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\": [\n        {\n \
+    \         \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n\
+    \          \"expr\": \"pg_database_size_bytes{job=\\\"postgres-rke2-pgdb\\\"}\"\
+    ,\n          \"legendFormat\": \"{{datname}}\",\n          \"refId\": \"A\"\n\
+    \        }\n      ],\n      \"title\": \"Database Size\",\n      \"type\": \"\
+    timeseries\"\n    },\n    {\n      \"datasource\": {\"type\": \"prometheus\",\
+    \ \"uid\": \"prometheus\"},\n      \"fieldConfig\": {\n        \"defaults\": {\n\
+    \          \"color\": {\"mode\": \"palette-classic\"},\n          \"custom\":\
+    \ {\"axisBorderShow\": false, \"axisColorMode\": \"text\", \"axisLabel\": \"\"\
+    , \"axisPlacement\": \"auto\", \"barAlignment\": 0, \"drawStyle\": \"line\", \"\
+    fillOpacity\": 15, \"gradientMode\": \"none\", \"hideFrom\": {\"legend\": false,\
+    \ \"tooltip\": false, \"viz\": false}, \"insertNulls\": false, \"lineInterpolation\"\
+    : \"smooth\", \"lineWidth\": 2, \"pointSize\": 5, \"scaleDistribution\": {\"type\"\
+    : \"linear\"}, \"showPoints\": \"auto\", \"spanNulls\": false, \"stacking\": {\"\
+    group\": \"A\", \"mode\": \"none\"}, \"thresholdsStyle\": {\"mode\": \"off\"}},\n\
+    \          \"mappings\": [],\n          \"thresholds\": {\"mode\": \"absolute\"\
+    , \"steps\": [{\"color\": \"green\", \"value\": null}]},\n          \"unit\":\
+    \ \"short\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
+    : {\"h\": 8, \"w\": 12, \"x\": 12, \"y\": 11},\n      \"id\": 12,\n      \"options\"\
+    : {\"legend\": {\"calcs\": [], \"displayMode\": \"list\", \"placement\": \"bottom\"\
+    , \"showLegend\": true}, \"tooltip\": {\"mode\": \"single\", \"sort\": \"none\"\
+    }},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\": [\n        {\n \
+    \         \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n\
+    \          \"expr\": \"rate(pg_stat_database_blks_hit{job=\\\"postgres-rke2-pgdb\\\
+    \"}[5m])\",\n          \"legendFormat\": \"{{datname}} hit\",\n          \"refId\"\
+    : \"A\"\n        },\n        {\n          \"datasource\": {\"type\": \"prometheus\"\
+    , \"uid\": \"prometheus\"},\n          \"expr\": \"rate(pg_stat_database_blks_read{job=\\\
+    \"postgres-rke2-pgdb\\\"}[5m])\",\n          \"legendFormat\": \"{{datname}} read\"\
+    ,\n          \"refId\": \"B\"\n        }\n      ],\n      \"title\": \"Cache Hit\
+    \ vs Disk Read\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\"\
+    : {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"color\": {\"mode\": \"palette-classic\"\
+    },\n          \"custom\": {\"axisBorderShow\": false, \"axisColorMode\": \"text\"\
+    , \"axisLabel\": \"\", \"axisPlacement\": \"auto\", \"barAlignment\": 0, \"drawStyle\"\
+    : \"line\", \"fillOpacity\": 15, \"gradientMode\": \"none\", \"hideFrom\": {\"\
+    legend\": false, \"tooltip\": false, \"viz\": false}, \"insertNulls\": false,\
+    \ \"lineInterpolation\": \"smooth\", \"lineWidth\": 2, \"pointSize\": 5, \"scaleDistribution\"\
+    : {\"type\": \"linear\"}, \"showPoints\": \"auto\", \"spanNulls\": false, \"stacking\"\
+    : {\"group\": \"A\", \"mode\": \"none\"}, \"thresholdsStyle\": {\"mode\": \"off\"\
+    }},\n          \"mappings\": [],\n          \"thresholds\": {\"mode\": \"absolute\"\
+    , \"steps\": [{\"color\": \"green\", \"value\": null}]},\n          \"unit\":\
+    \ \"short\"\n        },\n        \"overrides\": []\n      },\n      \"gridPos\"\
+    : {\"h\": 8, \"w\": 12, \"x\": 0, \"y\": 19},\n      \"id\": 13,\n      \"options\"\
+    : {\"legend\": {\"calcs\": [], \"displayMode\": \"list\", \"placement\": \"bottom\"\
+    , \"showLegend\": true}, \"tooltip\": {\"mode\": \"single\", \"sort\": \"none\"\
+    }},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\": [\n        {\n \
+    \         \"datasource\": {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n\
+    \          \"expr\": \"rate(pg_stat_database_tup_returned{job=\\\"postgres-rke2-pgdb\\\
+    \"}[5m])\",\n          \"legendFormat\": \"{{datname}} returned\",\n         \
+    \ \"refId\": \"A\"\n        },\n        {\n          \"datasource\": {\"type\"\
+    : \"prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"rate(pg_stat_database_tup_fetched{job=\\\
+    \"postgres-rke2-pgdb\\\"}[5m])\",\n          \"legendFormat\": \"{{datname}} fetched\"\
+    ,\n          \"refId\": \"B\"\n        },\n        {\n          \"datasource\"\
+    : {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"\
+    rate(pg_stat_database_tup_inserted{job=\\\"postgres-rke2-pgdb\\\"}[5m])\",\n \
+    \         \"legendFormat\": \"{{datname}} inserted\",\n          \"refId\": \"\
+    C\"\n        },\n        {\n          \"datasource\": {\"type\": \"prometheus\"\
+    , \"uid\": \"prometheus\"},\n          \"expr\": \"rate(pg_stat_database_tup_updated{job=\\\
+    \"postgres-rke2-pgdb\\\"}[5m])\",\n          \"legendFormat\": \"{{datname}} updated\"\
+    ,\n          \"refId\": \"D\"\n        },\n        {\n          \"datasource\"\
+    : {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"\
+    rate(pg_stat_database_tup_deleted{job=\\\"postgres-rke2-pgdb\\\"}[5m])\",\n  \
+    \        \"legendFormat\": \"{{datname}} deleted\",\n          \"refId\": \"E\"\
+    \n        }\n      ],\n      \"title\": \"Tuples/sec\",\n      \"type\": \"timeseries\"\
+    \n    },\n    {\n      \"datasource\": {\"type\": \"prometheus\", \"uid\": \"\
+    prometheus\"},\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"\
+    color\": {\"mode\": \"palette-classic\"},\n          \"custom\": {\"axisBorderShow\"\
+    : false, \"axisColorMode\": \"text\", \"axisLabel\": \"\", \"axisPlacement\":\
+    \ \"auto\", \"barAlignment\": 0, \"drawStyle\": \"line\", \"fillOpacity\": 15,\
+    \ \"gradientMode\": \"none\", \"hideFrom\": {\"legend\": false, \"tooltip\": false,\
+    \ \"viz\": false}, \"insertNulls\": false, \"lineInterpolation\": \"smooth\",\
+    \ \"lineWidth\": 2, \"pointSize\": 5, \"scaleDistribution\": {\"type\": \"linear\"\
+    }, \"showPoints\": \"auto\", \"spanNulls\": false, \"stacking\": {\"group\": \"\
+    A\", \"mode\": \"none\"}, \"thresholdsStyle\": {\"mode\": \"off\"}},\n       \
+    \   \"mappings\": [],\n          \"thresholds\": {\"mode\": \"absolute\", \"steps\"\
+    : [{\"color\": \"green\", \"value\": null}, {\"color\": \"red\", \"value\": 1}]},\n\
+    \          \"unit\": \"short\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\"h\": 8, \"w\": 12, \"x\": 12, \"y\": 19},\n      \"id\"\
+    : 14,\n      \"options\": {\"legend\": {\"calcs\": [], \"displayMode\": \"list\"\
+    , \"placement\": \"bottom\", \"showLegend\": true}, \"tooltip\": {\"mode\": \"\
+    single\", \"sort\": \"none\"}},\n      \"pluginVersion\": \"12.3.3\",\n      \"\
+    targets\": [\n        {\n          \"datasource\": {\"type\": \"prometheus\",\
+    \ \"uid\": \"prometheus\"},\n          \"expr\": \"pg_stat_database_deadlocks{job=\\\
+    \"postgres-rke2-pgdb\\\"}\",\n          \"legendFormat\": \"{{datname}}\",\n \
+    \         \"refId\": \"A\"\n        },\n        {\n          \"datasource\": {\"\
+    type\": \"prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"rate(pg_stat_database_conflicts{job=\\\
+    \"postgres-rke2-pgdb\\\"}[5m])\",\n          \"legendFormat\": \"{{datname}} conflicts\"\
+    ,\n          \"refId\": \"B\"\n        }\n      ],\n      \"title\": \"Deadlocks\
+    \ and Conflicts\",\n      \"type\": \"timeseries\"\n    },\n    {\n      \"datasource\"\
+    : {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"color\": {\"mode\": \"palette-classic\"\
+    },\n          \"custom\": {\"align\": \"auto\", \"cellOptions\": {\"type\": \"\
+    auto\"}, \"inspect\": false},\n          \"mappings\": [],\n          \"thresholds\"\
+    : {\"mode\": \"absolute\", \"steps\": [{\"color\": \"green\", \"value\": null}]},\n\
+    \          \"unit\": \"short\"\n        },\n        \"overrides\": []\n      },\n\
+    \      \"gridPos\": {\"h\": 8, \"w\": 24, \"x\": 0, \"y\": 27},\n      \"id\"\
+    : 15,\n      \"options\": {\"cellHeight\": \"sm\", \"footer\": {\"countRows\"\
+    : false, \"fields\": \"\", \"reducer\": [\"sum\"], \"show\": false}, \"showHeader\"\
+    : true, \"sortBy\": []},\n      \"pluginVersion\": \"12.3.3\",\n      \"targets\"\
+    : [\n        {\n          \"datasource\": {\"type\": \"prometheus\", \"uid\":\
+    \ \"prometheus\"},\n          \"expr\": \"pg_settings_max_connections{job=\\\"\
+    postgres-rke2-pgdb\\\"}\",\n          \"format\": \"table\",\n          \"instant\"\
+    : true,\n          \"refId\": \"A\"\n        },\n        {\n          \"datasource\"\
+    : {\"type\": \"prometheus\", \"uid\": \"prometheus\"},\n          \"expr\": \"\
+    pg_settings_shared_buffers_bytes{job=\\\"postgres-rke2-pgdb\\\"}\",\n        \
+    \  \"format\": \"table\",\n          \"instant\": true,\n          \"refId\":\
+    \ \"B\"\n        },\n        {\n          \"datasource\": {\"type\": \"prometheus\"\
+    , \"uid\": \"prometheus\"},\n          \"expr\": \"pg_settings_effective_cache_size_bytes{job=\\\
+    \"postgres-rke2-pgdb\\\"}\",\n          \"format\": \"table\",\n          \"instant\"\
+    : true,\n          \"refId\": \"C\"\n        }\n      ],\n      \"title\": \"\
+    PostgreSQL Settings\",\n      \"type\": \"table\"\n    }\n  ],\n  \"refresh\"\
+    : \"30s\",\n  \"schemaVersion\": 39,\n  \"tags\": [\"postgresql\", \"rke2-pgdb\"\
+    ],\n  \"templating\": {\"list\": []},\n  \"time\": {\"from\": \"now-1h\", \"to\"\
+    : \"now\"},\n  \"timezone\": \"America/Sao_Paulo\",\n  \"title\": \"PostgreSQL\
+    \ - rke2-pgdb\",\n  \"uid\": \"postgresql-rke2-pgdb\",\n  \"version\": 2\n}\n"
