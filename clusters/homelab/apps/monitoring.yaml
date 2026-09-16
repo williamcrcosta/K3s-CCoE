@@ -12,6 +12,14 @@ spec:
     helm:
       values: |
         grafana:
+          env:
+            GF_DATABASE_TYPE: postgres
+            GF_DATABASE_HOST: 192.168.50.30:5432
+            GF_DATABASE_NAME: grafana
+            GF_DATABASE_USER: grafana
+            GF_DATABASE_SSL_MODE: disable
+          envFromSecrets:
+            - name: grafana-db-credentials
           admin:
             existingSecret: grafana-admin-credentials
             userKey: admin-user
