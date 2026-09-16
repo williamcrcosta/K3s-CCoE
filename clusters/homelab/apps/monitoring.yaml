@@ -54,6 +54,11 @@ spec:
                   - targets:
                       - 192.168.50.250:9100
                 metrics_path: /metrics
+              - job_name: node-rke2-pgdb
+                static_configs:
+                  - targets:
+                      - 192.168.50.30:9100
+                metrics_path: /metrics
             storageSpec:
               volumeClaimTemplate:
                 spec:
