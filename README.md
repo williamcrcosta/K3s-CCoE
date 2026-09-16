@@ -217,6 +217,18 @@ Scrapes no Prometheus (em `clusters/homelab/apps/monitoring.yaml`):
 - `node-rke2-pgdb` → `192.168.50.30:9100`
 - `postgres-rke2-pgdb` → `192.168.50.30:9187`
 
+### Dashboards provisionados via GitOps
+
+Local: `infra/monitoring-dashboards/`
+
+| Dashboard | ConfigMap | UID | Origem |
+|---|---|---|---|
+| Proxmox PVE Exporter | `grafana-dashboard-proxmox-pve-exporter` | — | Customizado |
+| Node Exporter Full | `grafana-dashboard-node-exporter` | `node-exporter` | Grafana.com ID 1860 |
+| PostgreSQL - rke2-pgdb | `grafana-dashboard-postgresql-rke2-pgdb` | `postgresql-rke2-pgdb` | Customizado para a VM |
+
+Os ConfigMaps carregam automaticamente no Grafana via sidecar (`grafana_dashboard: "1"`).
+
 ---
 
 ## Evoluções Futuras
