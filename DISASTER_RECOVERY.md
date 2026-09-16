@@ -813,5 +813,105 @@ pg_dump -h 192.168.50.30 -U keycloak -d keycloak > keycloak-backup.sql
 
 ### Status
 
-> **Em andamento:** conexao do Grafana e Zabbix com o PostgreSQL ainda sera configurada via ArgoCD. Verificar git log para atualizacoes.
+> **Concluído:** Grafana conectado ao PostgreSQL em `rke2-pgdb` via ArgoCD. Migração do SQLite (`grafana.db`) para PostgreSQL concluída com sucesso. Zabbix ainda pendente.
+
+### Migração Grafana SQLite → PostgreSQL
+
+1. **Copiar o banco SQLite do pod Grafana:**
+```bash
+POD=$(kubectl get pod -n monitoring -l app.kubernetes.io/name=grafana -o jsonpath='{.items[0].metadata.name}')
+kubectl cp -n monitoring -c grafana $POD:/var/lib/grafana/grafana.db /tmp/grafana.db
+scp /tmp/grafana.db root@192.168.50.30:/tmp/
 ```
+
+2. **Executar a migração com `pgloader` na VM `rke2-pgdb`:**
+```bash
+PGPASSWORD='SENHA_GRAFANA' pgloader sqlite:///tmp/grafana.db postgresql://grafana@localhost/grafana
+```
+
+3. **Problemas conhecidos do `pgloader` e correções:**
+- O `pgloader` converte colunas booleanas do SQLite para `bigint`, gerando erros como:
+  - `pq: operator does not exist: bigint = boolean`
+  - `pq: invalid input syntax for type bigint: "false"`
+- Colunas afetadas com nomes `is_*`, `has_*`, `enabled`, `disabled`, `active`, etc. devem ser convertidas para `boolean`.
+- As colunas `alert_configuration.default`, `alert_configuration_history.default` e `alert_configuration_history.last_applied` são **timestamps** (`bigint`) e **não** devem ser convertidas para `boolean`.
+- Script de correção de colunas booleanas:
+```sql
+DO $$
+DECLARE
+    r record;
+    def text;
+BEGIN
+    FOR r IN
+        SELECT table_name, column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND data_type = 'bigint'
+          AND (
+              column_name LIKE 'is_%'
+              OR column_name LIKE 'has_%'
+              OR column_name IN (
+                  'enabled','disabled','active','deleted','verified','visible',
+                  'external','pinned','hidden','reminder','silenced','prunable',
+                  'revoked','readonly','read_only','with_credentials','basic_auth',
+                  'auth_token_seen','email_sent','time_selection_enabled',
+                  'annotations_enabled','provisioning','provisioned','is_deleted'
+              )
+          )
+    LOOP
+        SELECT column_default INTO def
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = r.table_name
+          AND column_name = r.column_name;
+
+        IF def IS NOT NULL THEN
+            EXECUTE format('ALTER TABLE %I.%I ALTER COLUMN %I DROP DEFAULT;',
+                'public', r.table_name, r.column_name);
+        END IF;
+
+        EXECUTE format('ALTER TABLE %I.%I ALTER COLUMN %I TYPE boolean USING (%I::int::boolean);',
+            'public', r.table_name, r.column_name, r.column_name);
+
+        EXECUTE format('ALTER TABLE %I.%I ALTER COLUMN %I SET DEFAULT false;',
+            'public', r.table_name, r.column_name);
+    END LOOP;
+END $$;
+```
+- Reverter colunas de timestamp corrigidas indevidamente:
+```sql
+ALTER TABLE alert_configuration ALTER COLUMN "default" DROP DEFAULT;
+ALTER TABLE alert_configuration ALTER COLUMN "default" TYPE bigint USING (CASE WHEN "default" THEN 1 ELSE 0 END);
+ALTER TABLE alert_configuration ALTER COLUMN "default" SET DEFAULT 0;
+
+ALTER TABLE alert_configuration_history ALTER COLUMN "default" DROP DEFAULT;
+ALTER TABLE alert_configuration_history ALTER COLUMN "default" TYPE bigint USING (CASE WHEN "default" THEN 1 ELSE 0 END);
+ALTER TABLE alert_configuration_history ALTER COLUMN "default" SET DEFAULT 0;
+
+ALTER TABLE alert_configuration_history ALTER COLUMN last_applied DROP DEFAULT;
+ALTER TABLE alert_configuration_history ALTER COLUMN last_applied TYPE bigint USING (CASE WHEN last_applied THEN 1 ELSE 0 END);
+ALTER TABLE alert_configuration_history ALTER COLUMN last_applied SET DEFAULT 0;
+```
+
+4. **Backup do banco após ajustes:**
+```bash
+sudo -u postgres pg_dump -Fc grafana > /opt/postgres-backup/grafana-after-schema-fix-$(date +%F-%H%M%S).dump
+```
+
+### Verificação final
+
+```bash
+# Status do ArgoCD
+kubectl get application -n platform-argocd monitoring
+# Expected: Synced / Healthy
+
+# Status do pod
+kubectl get pod -n monitoring -l app.kubernetes.io/name=grafana
+# Expected: 3/3 Running
+
+# Healthcheck da API do Grafana
+POD=$(kubectl get pod -n monitoring -l app.kubernetes.io/name=grafana -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n monitoring $POD -c grafana -- wget -qO- http://localhost:3000/api/health
+# Expected: {"database":"ok","version":"12.3.3"}
+```
+
