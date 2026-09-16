@@ -50,7 +50,7 @@ Internet
 | App | URL | Namespace | Storage |
 |---|---|---|---|
 | ArgoCD | https://argocd.wccosta.com.br | `platform-argocd` | — |
-| Grafana | https://grafana.wccosta.com.br | `monitoring` | PostgreSQL 16 em `rke2-pgdb` (PVC `monitoring-grafana` legado de 5Gi ainda existe, mas não é mais usado para o banco) |
+| Grafana | https://grafana.wccosta.com.br | `monitoring` | PostgreSQL 16 em `rke2-pgdb`; sem persistência local (PVC legado de 5Gi decomissionado) |
 | Prometheus | https://prometheus.wccosta.com.br | `monitoring` | Longhorn 20Gi (TSDB) |
 | Zabbix | https://zabbix.wccosta.com.br | `zabbix` | Longhorn 10Gi (PostgreSQL — pendente migração para `rke2-pgdb`) |
 | Longhorn UI | https://longhorn.wccosta.com.br | `longhorn-system` | — |
@@ -64,7 +64,6 @@ Internet
 
 ```
 Longhorn (distribuído entre os 2 nodes)
-├── monitoring-grafana       5Gi   (PVC legado do Grafana — não usado para banco)
 ├── prometheus-db            20Gi  (Prometheus TSDB)
 ├── postgresql-data-zabbix   10Gi  (Zabbix PostgreSQL — pendente migração para VM)
 ├── ollama-models            20Gi  (Modelos Ollama)
