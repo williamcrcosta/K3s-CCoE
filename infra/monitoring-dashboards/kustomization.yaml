@@ -5,3 +5,4 @@ resources:
   - grafana-dashboard-node-exporter.yaml
   - grafana-dashboard-postgresql-rke2-pgdb.yaml
   - grafana-dashboard-windows-server-status.yaml
+  - grafana-dashboard-srvad2025-zabbix.yaml
