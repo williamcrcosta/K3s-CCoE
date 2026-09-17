@@ -225,6 +225,9 @@ Local: `infra/monitoring-dashboards/`
 | Proxmox PVE Exporter | `grafana-dashboard-proxmox-pve-exporter` | — | Customizado |
 | Node Exporter Full | `grafana-dashboard-node-exporter` | `node-exporter` | Grafana.com ID 1860 |
 | PostgreSQL - rke2-pgdb | `grafana-dashboard-postgresql-rke2-pgdb` | `postgresql-rke2-pgdb` | Customizado para a VM |
+| Windows Server Status | `grafana-dashboard-windows-server-status` | `windows-server-status` | Grafana.com ID 16523 |
+| Windows Server - Advanced | `grafana-dashboard-windows-server-advanced` | `windows-server-advanced` | Customizado |
+| SRVAD2025 - Zabbix | `grafana-dashboard-srvad2025-zabbix` | `srvad2025-zabbix` | Customizado |
 
 Os ConfigMaps carregam automaticamente no Grafana via sidecar (`grafana_dashboard: "1"`).
 
