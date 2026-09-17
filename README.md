@@ -65,7 +65,6 @@ Internet
 ```
 Longhorn (distribuído entre os 2 nodes)
 ├── prometheus-db            20Gi  (Prometheus TSDB)
-├── postgresql-data-zabbix   10Gi  (PVC legado — aguardando backup/remoção)
 ├── ollama-models            20Gi  (Modelos Ollama)
 └── ollama-webui-data         5Gi  (Open WebUI)
 
