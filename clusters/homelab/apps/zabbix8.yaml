@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: zabbix8
+  namespace: platform-argocd
+  annotations:
+    argocd.argoproj.io/compare-options: ServerSideDiff=false
+spec:
+  project: platform
+  source:
+    repoURL: https://zabbix-community.github.io/helm-zabbix
+    chart: zabbix
+    targetRevision: 7.1.0
+    helm:
+      values: |
+        postgresql:
+          enabled: false
+        postgresAccess:
+          existingSecretName: "zabbix8-db-access"
+          secretHostKey: "host"
+          secretPortKey: "port"
+          secretUserKey: "user"
+          secretPasswordKey: "password"
+          secretDBKey: "dbname"
+        zabbixImageTag: ubuntu-trunk
+        zabbixWeb:
+          enabled: true
+          zabbixServerHost: zabbix8-zabbix-server
+          zabbixServerPort: 10051
+          extraEnv:
+            - name: ZBX_SERVER_HOST
+              value: zabbix8-zabbix-server
+            - name: ZBX_SERVER_PORT
+              value: "10051"
+          service:
+            nodePort: 30083
+            type: NodePort
+          ingress:
+            enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: zabbix8
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jqPathExpressions:
+        - .spec.persistentVolumeClaimRetentionPolicy
+        - .spec.podManagementPolicy
+        - .spec.revisionHistoryLimit
+        - .spec.updateStrategy
+        - .spec.volumeClaimTemplates
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true
