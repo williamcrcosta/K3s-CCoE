@@ -202,7 +202,7 @@ kubectl wait --for=condition=available deployment/argocd-server \
 #### 4. Aplicar Root App (App of Apps)
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/williamcrcosta/K3s-CCoE/main/clusters/rke2/root.yml
+kubectl apply -f https://raw.githubusercontent.com/williamcrcosta/K3s-CCoE/main/clusters/homelab/root.yml
 ```
 
 O ArgoCD vai:
@@ -542,7 +542,7 @@ grafana:
 ```
 
 > `infra/monitoring-secrets/` tem seu proprio `kustomization.yaml` e e referenciado como
-> diretorio em `clusters/homelab/kustomization.yaml` e `clusters/rke2/kustomization.yaml`.
+> diretorio em `clusters/homelab/kustomization.yaml`.
 > **Nao** referencie arquivos individuais fora do diretorio raiz do kustomize - o Kustomize
 > bloqueia isso por seguranca (`accumulating resources ... security; file is not in or below`).
 > Sempre crie um subdiretorio com seu proprio `kustomization.yaml`.

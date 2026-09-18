@@ -135,9 +135,9 @@ GitHub (williamcrcosta/K3s-CCoE)
     │
     └── ArgoCD (App of Apps pattern)
             │
-            ├── clusters/rke2/root.yml          ← Root App (RKE2)
-            ├── clusters/rke2/kustomization.yaml
-            └── clusters/rke2/apps/
+            ├── clusters/homelab/root.yml       ← Root App
+            ├── clusters/homelab/kustomization.yaml
+            └── clusters/homelab/apps/
                     ├── argocd.yaml
                     ├── cert-manager.yaml
                     ├── longhorn.yaml
@@ -149,7 +149,7 @@ GitHub (williamcrcosta/K3s-CCoE)
                     └── ollama.yaml
 ```
 
-> **Nota:** o app `root-homelab` existente no cluster foi redirecionado para `clusters/rke2`. A pasta `clusters/homelab/` permanece como histórico do K3s.
+> **Nota:** o app `root-homelab` no cluster aponta para `clusters/homelab`. A estrutura `clusters/rke2/` usada durante a migração foi consolidada em `clusters/homelab/` e removida em 2026-09-17.
 
 ### Fluxo de Deploy
 
@@ -314,7 +314,7 @@ data:
   server.side.diff.enabled: "false"
 ```
 
-**Fix 2 — ignorar campos k8s-injected no app em `clusters/rke2/apps/zabbix.yaml`:**
+**Fix 2 — ignorar campos k8s-injected no app em `clusters/homelab/apps/zabbix.yaml`:**
 ```yaml
 ignoreDifferences:
   - group: apps

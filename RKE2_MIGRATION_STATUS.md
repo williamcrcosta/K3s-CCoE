@@ -1,6 +1,8 @@
 # Migração K3s → RKE2 — Status e Evoluções
 
 > Documento de acompanhamento da migração real do cluster homelab, listando melhorias implementadas, inconsistências encontradas no repo e próximos passos. **Nenhum arquivo antigo foi apagado.**
+>
+> **Atualização 2026-09-17:** a estrutura `clusters/rke2/` mencionada neste documento foi consolidada de volta em `clusters/homelab/` e removida do repo. O app `root-homelab` no cluster aponta para `clusters/homelab`. Este documento permanece como registro histórico da migração.
 
 ---
 
