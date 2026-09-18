@@ -24,9 +24,11 @@ rke2-pgdb (192.168.50.30) — PostgreSQL 16
 
 ## Melhorias Planejadas — Do Menor ao Maior Risco
 
+> **Versões verificadas em 2026-09-17** contra os repos Helm/GitHub. O chart do Zabbix já está na última versão (`7.1.0`); a imagem do server está um patch atrás (`7.0.29` → `7.0.30` LTS).
+
 ### 1. Resource Limits nos Deployments — Risco Baixo
 
-**Problema:** ~30 containers sem `limits`/`requests` definidos.
+**Problema:** 65 de 75 containers sem `limits`/`requests` definidos (verificado 2026-09-17).
 
 **Benefício:** prevenção de OOM e CPU throttling.
 
@@ -47,27 +49,17 @@ resources:
 
 ---
 
-### 2. AlertManager — Notificações Telegram — Risco Baixo
+### 2. AlertManager — Notificações Telegram — ✅ Concluído
 
-**Problema:** alertas só visíveis no Prometheus.
+**Status:** implementado (2026-09). Receiver `telegram` configurado no `kube-prometheus-stack` e secret `alertmanager-telegram` criado no namespace `monitoring`.
 
-**Benefício:** notificações em tempo real para alertas críticos.
-
-**Ação:** configurar `alertmanager.config` no `kube-prometheus-stack` com Telegram.
-
-**Impacto:** nenhum. Já está parcialmente configurado, só precisa do `bot_token` e `chat_id`.
+**Pendente:** validar entrega de alertas e converter o secret em SealedSecret para GitOps completo (ver `infra/monitoring/alertmanager-telegram.md`).
 
 ---
 
-### 3. Dashboard Zabbix no Grafana — Risco Baixo
+### 3. Dashboard Zabbix no Grafana — ✅ Concluído
 
-**Problema:** dashboard `SRVAD2025 - Zabbix` é muito básico.
-
-**Benefício:** melhor observabilidade da VM Windows.
-
-**Ação:** adicionar painéis de disco, rede, serviços, triggers.
-
-**Impacto:** nenhum.
+**Status:** implementado (2026-09). Dashboards `SRVAD2025 - Zabbix` e `Windows Server Advanced` em `infra/monitoring-dashboards/`.
 
 ---
 
@@ -136,7 +128,7 @@ recurringJobs:
 ### 7. Atualizar kube-prometheus-stack — Risco Médio
 
 **Versão atual:** `82.2.0`  
-**Última:** `88.6.2`
+**Última:** `91.4.1`
 
 **Benefício:** bugfixes, novos dashboards, Grafana 12.11.
 
@@ -162,7 +154,7 @@ recurringJobs:
 ### 9. Atualizar ArgoCD — Risco Alto
 
 **Versão atual:** `v3.3.1`  
-**Última:** `v3.5.2`
+**Última:** `v3.5.3`
 
 **Benefício:** novas features, security fixes.
 
@@ -175,7 +167,7 @@ recurringJobs:
 ### 10. Atualizar cert-manager — Risco Alto
 
 **Versão atual:** `v1.14.5` **EOL**  
-**Última:** `v1.21.1`
+**Última:** `v1.21.2`
 
 **Benefício:** ACME ARI, security fixes, novas features.
 
@@ -200,8 +192,8 @@ recurringJobs:
 | Ordem | Item | Esforço | Benefício |
 |---|---|---|---|
 | 1 | Resource limits | 30min | Prevenção de falhas |
-| 2 | AlertManager | 1h | Notificações críticas |
-| 3 | Dashboard Zabbix | 30min | Melhor visibilidade |
+| ~~2~~ | ~~AlertManager~~ ✅ | ~~1h~~ | ~~Notificações críticas~~ |
+| ~~3~~ | ~~Dashboard Zabbix~~ ✅ | ~~30min~~ | ~~Melhor visibilidade~~ |
 | 4 | Backup PostgreSQL | 1h | Proteção de dados |
 | 5 | Backup Longhorn | 2h | DR completo |
 | 6 | TLS PostgreSQL | 1h | Segurança |
