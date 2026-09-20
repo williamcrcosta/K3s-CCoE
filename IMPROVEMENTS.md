@@ -93,13 +93,13 @@ spec:
 
 ---
 
-### 5. Backup Externo Longhorn — Risco Médio
+### 5. Backup Externo Longhorn — ✅ Concluído (2026-09-20)
 
 **Problema:** volumes Longhorn só existem no cluster.
 
 **Benefício:** disaster recovery completo.
 
-**Ação:** configurar `recurringJobs` para S3/NFS no Longhorn.
+**Resolvido:** backup target configurado para NFS do Proxmox (`nfs://192.168.50.250:/var/lib/vz/longhorn-backup`). Backup `prometheus-pre-upgrade-172` concluído. Próximo passo opcional: `recurringJobs` automáticos.
 
 ```yaml
 # Configuração no Longhorn UI ou manifesto
@@ -138,16 +138,11 @@ recurringJobs:
 
 ---
 
-### 8. Atualizar Longhorn — Risco Alto
+### 8. Atualizar Longhorn — ✅ Concluído (2026-09-20)
 
-**Versão atual:** `v1.7.2`  
-**Última:** `v1.12.1`
+**Versão atual:** `v1.12.1` (de `v1.7.2`)
 
-**Benefício:** V2 Data Engine, melhorias de resiliência.
-
-**Ação:** atualizar chart no ArgoCD.
-
-**Impacto:** upgrade de storage é sempre arriscado. Requer backup de todos os volumes antes.
+**Resolvido:** upgrade em hops `1.7.2 → 1.8.2 → 1.9.2 → 1.10.2 → 1.11.3 → 1.12.1`. O hop 1.10 exigiu aplicar CRDs manualmente + `ignoreDifferences` em `/spec/conversion` (ver Adendo 3 do Cenário 13 em `DISASTER_RECOVERY.md`).
 
 ---
 
@@ -195,10 +190,10 @@ recurringJobs:
 | ~~2~~ | ~~AlertManager~~ ✅ | ~~1h~~ | ~~Notificações críticas~~ |
 | ~~3~~ | ~~Dashboard Zabbix~~ ✅ | ~~30min~~ | ~~Melhor visibilidade~~ |
 | 4 | Backup PostgreSQL | 1h | Proteção de dados |
-| 5 | Backup Longhorn | 2h | DR completo |
+| ~~5~~ | ~~Backup Longhorn~~ ✅ | ~~2h~~ | ~~DR completo~~ |
 | 6 | TLS PostgreSQL | 1h | Segurança |
 | 7 | kube-prometheus-stack | 2h | Updates + segurança |
-| 8 | Longhorn | 4h | Storage moderno |
+| ~~8~~ | ~~Longhorn~~ ✅ | ~~4h~~ | ~~Storage moderno~~ |
 | 9 | ArgoCD | 2h | Updates + segurança |
 | 10 | cert-manager | 3h | EOL resolvido |
 | 11 | Multi-cluster | dias | DR real |
