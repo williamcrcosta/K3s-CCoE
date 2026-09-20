@@ -22,7 +22,7 @@ spec:
           secretUserKey: "user"
           secretPasswordKey: "password"
           secretDBKey: "dbname"
-        zabbixImageTag: ubuntu-7.0.29
+        zabbixImageTag: ubuntu-7.0.30
         zabbixWeb:
           enabled: true
           zabbixServerHost: zabbix-zabbix-server
