@@ -16,7 +16,7 @@
 ```text
 rke2-pgdb (192.168.50.30) — PostgreSQL 16
 ├── grafana     ← Grafana 13.2.2
-├── zabbix      ← Zabbix 7.0.29
+├── zabbix      ← Zabbix 7.0.30
 └── keycloak    ← reservado
 ```
 
@@ -24,7 +24,7 @@ rke2-pgdb (192.168.50.30) — PostgreSQL 16
 
 ## Melhorias Planejadas — Do Menor ao Maior Risco
 
-> **Versões verificadas em 2026-09-17** contra os repos Helm/GitHub. O chart do Zabbix já está na última versão (`7.1.0`); a imagem do server está um patch atrás (`7.0.29` → `7.0.30` LTS).
+> **Versões verificadas em 2026-09-20.** Zabbix no último patch LTS (`7.0.30`, chart `7.1.0`); Longhorn, cert-manager, kube-prometheus-stack e ArgoCD atualizados.
 
 ### 1. Resource Limits nos Deployments — Risco Baixo
 
