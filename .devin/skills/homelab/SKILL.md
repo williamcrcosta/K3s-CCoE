@@ -42,7 +42,7 @@ Execuções nesta sessão rodam **no CP** (root). Worker acessível via `ssh roo
 | Longhorn | `longhorn-system` | 1.12.1 | ver seção Storage |
 | cert-manager | `cert-manager` | v1.14.5 | upgrade pendente (EOL) |
 | Zabbix 7 (prod) | `zabbix` | chart 7.1.0, img ubuntu-7.0.x | NodePort **30082**, ingress `zabbix.wccosta.com.br`, PG externo |
-| Zabbix 8 (PoC) | `zabbix8` | chart 7.1.0, img **ubuntu-trunk** (nightly 8.0) | NodePort **30083**, sem ingress/TLS, banco `zabbix8` — descartável |
+
 | sealed-secrets | — | — | SealedSecrets para credenciais (kubeseal local) |
 | kubernetes-dashboard | `kubernetes-dashboard` | — | |
 
@@ -56,7 +56,7 @@ Execuções nesta sessão rodam **no CP** (root). Worker acessível via `ssh roo
 
 ## Bancos (rke2-pgdb, PG 16)
 
-- Databases: `grafana`, `zabbix`, `zabbix8` (PoC), `keycloak` (reservado)
+- Databases: `grafana`, `zabbix`, `keycloak` (reservado); `zabbix8` removido (PoC desfeito 2026-09-20 — pode sobrar DB órfão pra dropar)
 - `pg_hba.conf`: regras por user/db `host <db> <user> 192.168.50.0/24 scram-sha-256` — **novo user precisa de linha nova + `SELECT pg_reload_conf()`**
 - Criação padrão: `CREATE USER x WITH PASSWORD '...'; CREATE DATABASE x OWNER x;` + linha pg_hba
 - Credenciais vão pro cluster via **SealedSecret** (`kubeseal`), nunca plaintext no repo
@@ -64,7 +64,7 @@ Execuções nesta sessão rodam **no CP** (root). Worker acessível via `ssh roo
 ## DNS / acesso externo
 
 - Domínio `wccosta.com.br` — rewrites manuais no AdGuard (novo host precisa de registro lá)
-- NodePorts ativos: 30082 (zabbix7), 30083 (zabbix8)
+- NodePorts ativos: 30082 (zabbix7)
 - TLS via cert-manager (`wccosta-tls`/`wcrpc-tls`)
 
 ## Regras de segurança / operação
@@ -76,7 +76,7 @@ Execuções nesta sessão rodam **no CP** (root). Worker acessível via `ssh roo
 5. PDBs do Longhorn travam drain normal — `--disable-eviction` se necessário
 6. fstab de discos de dados: sempre `UUID=` + `nofail`; NFS: `nofail,_netdev`
 7. Reboot do CP derruba Zabbix server (roda no CP) + API do cluster; apps do worker sobrevivem
-8. `ubuntu-trunk` (zabbix8) é nightly — se quebrar, fixar digest
+8. PoC zabbix8 removido — imagem `ubuntu-trunk` quebrou por drift de DB version (07050175 vs required 07050094)
 
 ## Verificação rápida
 
