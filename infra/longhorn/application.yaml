@@ -45,5 +45,5 @@ spec:
       kind: CustomResourceDefinition
       jsonPointers:
         - /status
-        - /spec/conversion/webhook/clientConfig/caBundle
+        - /spec/conversion
         - /spec/preserveUnknownFields
