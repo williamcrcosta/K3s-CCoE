@@ -159,16 +159,11 @@ recurringJobs:
 
 ---
 
-### 10. Atualizar cert-manager — Risco Alto
+### 10. Atualizar cert-manager — ✅ Concluído (2026-09-20)
 
-**Versão atual:** `v1.14.5` **EOL**  
-**Última:** `v1.21.2`
+**Versão atual:** `v1.21.2` (de `v1.14.5`, que estava EOL)
 
-**Benefício:** ACME ARI, security fixes, novas features.
-
-**Ação:** atualizar chart + CRDs.
-
-**Impacto:** breaking changes de RBAC e métricas. Requer atenção.
+**Resolvido:** upgrade em hops minor-a-minor `1.14.5 → 1.15.5 → 1.16.5 → 1.17.4 → 1.18.6 → 1.19.6 → 1.20.4 → 1.21.2` via GitOps. CRDs sobem com o chart (`installCRDs: true`). Todos os certs/issuers seguem Ready.
 
 ---
 
@@ -195,5 +190,5 @@ recurringJobs:
 | 7 | kube-prometheus-stack | 2h | Updates + segurança |
 | ~~8~~ | ~~Longhorn~~ ✅ | ~~4h~~ | ~~Storage moderno~~ |
 | 9 | ArgoCD | 2h | Updates + segurança |
-| 10 | cert-manager | 3h | EOL resolvido |
+| ~~10~~ | ~~cert-manager~~ ✅ | ~~3h~~ | ~~EOL resolvido~~ |
 | 11 | Multi-cluster | dias | DR real |
