@@ -39,7 +39,7 @@ Execuções nesta sessão rodam **no CP** (root). Worker acessível via `ssh roo
 | App | Namespace | Versão | Notas |
 |---|---|---|---|
 | kube-prometheus-stack | `monitoring` | chart 82.2.0 | Prometheus PVC Longhorn 20Gi; Grafana usa PG externo |
-| Longhorn | `longhorn-system` | 1.7.2 | ver seção Storage |
+| Longhorn | `longhorn-system` | 1.9.2 | ver seção Storage |
 | cert-manager | `cert-manager` | v1.14.5 | upgrade pendente (EOL) |
 | Zabbix 7 (prod) | `zabbix` | chart 7.1.0, img ubuntu-7.0.x | NodePort **30082**, ingress `zabbix.wccosta.com.br`, PG externo |
 | Zabbix 8 (PoC) | `zabbix8` | chart 7.1.0, img **ubuntu-trunk** (nightly 8.0) | NodePort **30083**, sem ingress/TLS, banco `zabbix8` — descartável |
@@ -92,7 +92,7 @@ kubectl get nodes.longhorn.io -n longhorn-system -o yaml   # scheduling/disks
 ## Pendências conhecidas (roadmap em IMPROVEMENTS.md)
 
 - 65/75 containers sem resource limits
-- Upgrades pendentes: kube-prometheus-stack →91.x, Longhorn →1.12.x, cert-manager →v1.21.x, ArgoCD →v3.5.x
+- Upgrades pendentes: kube-prometheus-stack →91.x, Longhorn →1.10+ (1.9.2 ok; 1.10 bloqueia em strict decode de Backup CRs), cert-manager →v1.21.x, ArgoCD →v3.5.x
 - Backup externo Longhorn + PG; TLS no PG
 - Tags flutuantes (`latest`, `main`) em algumas images
 - `infra/sealed-secrets/application.yaml` aponta pra repo Helm morto

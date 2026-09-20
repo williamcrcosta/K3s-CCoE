@@ -1125,3 +1125,19 @@ kubectl exec -n longhorn-system $IM -- cp -a \
 
 - `nofail` evita emergency mode, mas mascara falha de mount — apos editar fstab, **validar com `mount -a` + `findmnt`** e conferir o UUID contra `blkid`/`ls -l /dev/disk/by-uuid/` antes de rebootar
 - UUID em fstab deve ser copiado de `blkid`/`by-uuid`, nunca transcrito a mao
+
+### Adendo 2 — upgrade Longhorn 1.9->1.10 bloqueado (strict decoding)
+
+Ao subir o chart para 1.10.2, os managers entraram em CrashLoopBackOff:
+
+```
+Upgrade failed: upgrade resources failed: Volume in version "v1beta2"
+cannot be handled as a Volume: strict decoding error:
+unknown field "spec.backupBlockSize", unknown field "spec.replicaRebuildingBandwidthLimit"
+```
+
+**Diagnostico:** os campos existem apenas nos Backup CRs (`spec.backupBlockSize`, escrito pelo manager 1.9.x; `replicaRebuildingBandwidthLimit` nao visivel via API). Remover o campo via `kubectl patch` nao bastou — o erro persistia. O objeto exato que carrega `replicaRebuildingBandwidthLimit` nao foi localizado via API nem no etcd sob `/registry/longhorn.io/`.
+
+**Workaround aplicado:** remocao do campo nos 4 Backup CRs exigiu deletar temporariamente `longhorn-webhook-mutator`/`longhorn-webhook-validator` (webhooks sem endpoints com managers caidos). Como o erro persistiu, foi feito **revert do chart para 1.9.2** (estavel). Webhooks foram recriados pelo ArgoCD self-heal.
+
+**Para retomar:** investigar qual objeto carrega os campos fantasma (talvez bytes v1beta1 remanescentes no etcd ou objeto com pruning). Alternativa: deletar os Backup CRs (isso apaga os dados no backupstore — exportar/copiar o NFS antes se quiser preservar). Ate la, ficar em 1.9.2.
