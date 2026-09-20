@@ -1140,4 +1140,33 @@ unknown field "spec.backupBlockSize", unknown field "spec.replicaRebuildingBandw
 
 **Workaround aplicado:** remocao do campo nos 4 Backup CRs exigiu deletar temporariamente `longhorn-webhook-mutator`/`longhorn-webhook-validator` (webhooks sem endpoints com managers caidos). Como o erro persistiu, foi feito **revert do chart para 1.9.2** (estavel). Webhooks foram recriados pelo ArgoCD self-heal.
 
-**Para retomar:** investigar qual objeto carrega os campos fantasma (talvez bytes v1beta1 remanescentes no etcd ou objeto com pruning). Alternativa: deletar os Backup CRs (isso apaga os dados no backupstore — exportar/copiar o NFS antes se quiser preservar). Ate la, ficar em 1.9.2.
+### Adendo 3 — RESOLVIDO: causa raiz = schema de CRD nao aplicado (longhorn/longhorn#12812)
+
+O erro de strict decoding vinha do **kube-apiserver**, nao do objeto armazenado: o upgrade do manager faz `Update` com `FieldValidation: Strict`, e o CRD `volumes.longhorn.io` ainda tinha o **schema do 1.9.2** — sem `backupBlockSize`/`replicaRebuildingBandwidthLimit`. O apiserver rejeitava o update como "unknown field".
+
+**Por que o CRD ficou velho:** o apply do ArgoCD nos CRDs falhava silenciosamente com:
+
+```
+spec.conversion.strategy: Required value, spec.conversion.webhookClientConfig:
+Forbidden: should not be set when strategy is not set to Webhook
+```
+
+O `templates/crds.yaml` do chart **nao declara** `spec.conversion` — quem escreve e o longhorn-manager em runtime (strategy=Webhook + caBundle). Ao reconciliar, o ArgoCD gerava um patch que removia `strategy` mas mantinha `webhookClientConfig` (campo de outro field-manager) → patch invalido → **o apply inteiro do CRD era rejeitado, incluindo o schema novo**.
+
+**Fix aplicado (ordem importa):**
+
+1. Bump do chart para 1.10.2 no Git **antes** de aplicar os CRDs — se aplicar os CRDs com o app ainda em 1.9.2, o selfHeal do ArgoCD reverte o schema (foi o que aconteceu na primeira tentativa)
+2. Aplicar os CRDs do chart manualmente:
+
+```bash
+curl -sL https://github.com/longhorn/charts/releases/download/longhorn-1.10.2/longhorn-1.10.2.tgz | tar xz longhorn/templates/crds.yaml
+# crds.yaml e template Helm: o unico placeholder e `labels: {{- include "longhorn.labels" ...}}`;
+# substituir por `labels:` vazio (a linha seguinte ja traz `longhorn-manager: ""`), depois:
+kubectl apply --server-side --force-conflicts -f crds.yaml
+```
+
+3. Verificar o schema antes de mexer nos managers: `kubectl get crd volumes.longhorn.io -o jsonpath='{.spec.versions[?(@.name=="v1beta2")].schema}' | grep -c backupBlockSize` deve ser >0
+4. Deletar `longhorn-webhook-mutator` + `longhorn-webhook-validator` se os managers estiverem em crash (webhook sem endpoints bloqueia o proprio Update do upgrade; o manager recria os configs ao subir)
+5. `ignoreDifferences` do CRD ampliado para `/spec/conversion` inteiro (nao so `caBundle`) — commit `fa00b64`
+
+**Resultado:** 1.10.2 saudavel — managers 2/2, engine do volume atualizado para v1.10.2 (live upgrade), Prometheus 2/2, app Synced/Healthy. Limpeza extra: engine orfao `pvc-e0ee7559-...-e-0` (volume inexistente, imagem v1.6.2) removido com patch de finalizer.
