@@ -145,3 +145,23 @@ spec:
     kind: ClusterIssuer
   dnsNames:
     - zabbix.wccosta.com.br
+
+---
+# Cert TLS para PostgreSQL externo (rke2-pgdb, 192.168.50.30).
+# Clientes usam sslmode=verify-ca — cadeia LE publica, sem checagem de hostname.
+# ATENCAO: a cada renovacao (~60d) copiar tls.crt/tls.key do secret para o pgdb
+# — procedimento em DISASTER_RECOVERY.md.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: pgdb-tls
+  namespace: cert-manager
+spec:
+  secretName: pgdb-tls
+  privateKey:
+    rotationPolicy: Always
+  issuerRef:
+    name: letsencrypt-wccosta
+    kind: ClusterIssuer
+  dnsNames:
+    - pgdb.wccosta.com.br
