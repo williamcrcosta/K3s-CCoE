@@ -8,9 +8,12 @@ spec:
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
-    targetRevision: 82.2.0
+    targetRevision: 91.4.1
     helm:
       values: |
+        crds:
+          upgradeJob:
+            enabled: true
         grafana:
           resources:
             requests:
