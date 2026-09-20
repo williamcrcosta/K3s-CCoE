@@ -56,7 +56,7 @@ Execuções nesta sessão rodam **no CP** (root). Worker acessível via `ssh roo
 
 ## Bancos (rke2-pgdb, PG 16)
 
-- Databases: `grafana`, `zabbix`, `keycloak` (reservado); `zabbix8` removido (PoC desfeito 2026-09-20 — pode sobrar DB órfão pra dropar)
+- Databases: `grafana`, `zabbix`, `keycloak` (reservado); `zabbix8` removido (PoC desfeito 2026-09-20 — DB e pg_hba já limpos)
 - `pg_hba.conf`: regras por user/db `host <db> <user> 192.168.50.0/24 scram-sha-256` — **novo user precisa de linha nova + `SELECT pg_reload_conf()`**
 - Criação padrão: `CREATE USER x WITH PASSWORD '...'; CREATE DATABASE x OWNER x;` + linha pg_hba
 - Credenciais vão pro cluster via **SealedSecret** (`kubeseal`), nunca plaintext no repo
