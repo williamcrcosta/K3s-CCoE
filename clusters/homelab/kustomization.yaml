@@ -19,3 +19,4 @@ resources:
   - ../../infra/zabbix8
   - ../../infra/monitoring-secrets
   - ../../infra/monitoring-dashboards
+  - ../../infra/limitranges

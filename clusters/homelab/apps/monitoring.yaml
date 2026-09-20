@@ -12,6 +12,13 @@ spec:
     helm:
       values: |
         grafana:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
           env:
             GF_DATABASE_TYPE: postgres
             GF_DATABASE_HOST: 192.168.50.30:5432
@@ -43,6 +50,13 @@ spec:
         prometheus:
           prometheusSpec:
             retention: 30d
+            resources:
+              requests:
+                cpu: 250m
+                memory: 1Gi
+              limits:
+                cpu: "2"
+                memory: 3Gi
             additionalScrapeConfigs:
               - job_name: proxmox-pve
                 static_configs:

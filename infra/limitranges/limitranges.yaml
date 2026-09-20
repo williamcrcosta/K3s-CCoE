@@ -1,0 +1,107 @@
+# Default resource requests/limits for containers that don't specify them.
+# Applies only to pods created after the LimitRange — existing pods pick them
+# up on their next restart/reschedule.
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-resources
+  namespace: longhorn-system
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 256Mi
+      default:
+        cpu: "1"
+        memory: 2Gi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-resources
+  namespace: monitoring
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 50m
+        memory: 128Mi
+      default:
+        cpu: "1"
+        memory: 1Gi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-resources
+  namespace: platform-argocd
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 50m
+        memory: 128Mi
+      default:
+        cpu: 500m
+        memory: 512Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-resources
+  namespace: zabbix
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 256Mi
+      default:
+        cpu: "1"
+        memory: 1Gi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-resources
+  namespace: zabbix8
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 256Mi
+      default:
+        cpu: "1"
+        memory: 1Gi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-resources
+  namespace: cert-manager
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 25m
+        memory: 64Mi
+      default:
+        cpu: 500m
+        memory: 512Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-resources
+  namespace: kubernetes-dashboard
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 25m
+        memory: 64Mi
+      default:
+        cpu: 500m
+        memory: 256Mi
