@@ -1170,3 +1170,71 @@ kubectl apply --server-side --force-conflicts -f crds.yaml
 5. `ignoreDifferences` do CRD ampliado para `/spec/conversion` inteiro (nao so `caBundle`) — commit `fa00b64`
 
 **Resultado:** 1.10.2 saudavel — managers 2/2, engine do volume atualizado para v1.10.2 (live upgrade), Prometheus 2/2, app Synced/Healthy. Limpeza extra: engine orfao `pvc-e0ee7559-...-e-0` (volume inexistente, imagem v1.6.2) removido com patch de finalizer.
+
+---
+
+## Cenario 14 - Grafana em CrashLoopBackOff apos upgrade kube-prometheus-stack (drift de schema no PG)
+
+**Contexto (2026-09-20):** upgrade do chart `82.2.0 -> 91.4.1` (Grafana 12 -> 13.2.2). Operator, Prometheus, Alertmanager e CRDs subiram OK; o Grafana travava em `CrashLoopBackOff` na migration.
+
+### Sintomas (em sequencia — cada fix revelava o proximo)
+
+```
+1) migration failed (id = Expand user.uid length to 190):
+   pq: invalid input syntax for type bigint: "true" (22P02)
+
+2) migration failed (id = alter alert_rule_state id sequence to bigint for postgres):
+   pq: relation "alert_rule_state_id_seq" does not exist (42P01)
+
+3) running secret database migrations: ... (id = add active column to secret_keeper):
+   pq: invalid input syntax for type bigint: "true" (22P02)
+```
+
+### Causa raiz
+
+O database `grafana` no `rke2-pgdb` foi criado por **provisioning/pg_restore fora do processo de migrations do Grafana** — o schema tinha drift em relacao ao que as migrations esperam:
+
+- `migration_log.success`, `secret_migration_log.success`, `resource_migration_log.success`: `bigint` em vez de `boolean` → o driver novo envia `true` literal → `invalid input syntax for type bigint`
+- **38 tabelas** com coluna `id` `bigint` **sem sequence/default** (deveriam ser `SERIAL`/`<tabela>_id_seq`) → migrations `ALTER SEQUENCE <tabela>_id_seq AS BIGINT` falham com `relation does not exist`
+
+### Diagnostico
+
+```bash
+# pod psql efemero usando o secret existente (nao logar a senha)
+kubectl run psql-fix --rm -i --restart=Never -n monitoring --image=postgres:16-alpine \
+  --env="PGPASSWORD=$(kubectl get secret grafana-db-credentials -n monitoring \
+    -o jsonpath='{.data.GF_DATABASE_PASSWORD}' | base64 -d)" -- \
+  psql -h 192.168.50.30 -U grafana -d grafana -c "<SQL>"
+
+# tabelas com id sem sequence/default:
+SELECT table_name FROM information_schema.columns
+WHERE column_name='id' AND table_schema='public' AND column_default IS NULL
+  AND data_type IN ('bigint','integer');
+
+# colunas success com tipo errado:
+SELECT table_name FROM information_schema.columns
+WHERE column_name='success' AND table_schema='public';
+```
+
+### Fix aplicado
+
+```sql
+-- 1) colunas success -> boolean (valores 1/0 convertidos)
+ALTER TABLE migration_log           ALTER COLUMN success TYPE boolean USING (success <> 0);
+ALTER TABLE secret_migration_log    ALTER COLUMN success TYPE boolean USING (success <> 0);
+ALTER TABLE resource_migration_log  ALTER COLUMN success TYPE boolean USING (success <> 0);
+
+-- 2) recriar sequences faltantes (gerado por script para as 38 tabelas com id numerico)
+CREATE SEQUENCE IF NOT EXISTS "<tabela>_id_seq" OWNED BY "<tabela>".id;
+ALTER TABLE "<tabela>" ALTER COLUMN id SET DEFAULT nextval('<tabela>_id_seq');
+SELECT setval('<tabela>_id_seq', COALESCE((SELECT MAX(id) FROM "<tabela>"),0)+1, false);
+-- OBS: filtrar data_type IN ('bigint','integer') — sso_setting.id e text
+```
+
+Depois de cada bloco: `kubectl delete pod -n monitoring -l app.kubernetes.io/name=grafana` e observar o proximo erro no log.
+
+### Resultado
+
+Grafana `3/3 Running` em `grafana/grafana:13.2.2-distroless`, app `monitoring` Synced/Healthy no chart 91.4.1, dashboards/usuarios/datasources preservados (nenhum dado perdido — so DDL de schema).
+
+**Licao:** DB do Grafana criado por restore externo pode ter drift silencioso; antes de upgrade major do Grafana, validar `information_schema` contra o schema esperado (sequences + tipos das tabelas `*_migration_log`).

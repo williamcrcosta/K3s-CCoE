@@ -15,7 +15,7 @@
 
 ```text
 rke2-pgdb (192.168.50.30) — PostgreSQL 16
-├── grafana     ← Grafana 12.3.3
+├── grafana     ← Grafana 13.2.2
 ├── zabbix      ← Zabbix 7.0.29
 └── keycloak    ← reservado
 ```
@@ -125,16 +125,11 @@ recurringJobs:
 
 ---
 
-### 7. Atualizar kube-prometheus-stack — Risco Médio
+### 7. Atualizar kube-prometheus-stack — ✅ Concluído (2026-09-20)
 
-**Versão atual:** `82.2.0`  
-**Última:** `91.4.1`
+**Versão atual:** `91.4.1` (de `82.2.0`) — Grafana `13.2.2`, Prometheus `v3.14.0`, Alertmanager `v0.34.0`
 
-**Benefício:** bugfixes, novos dashboards, Grafana 12.11.
-
-**Ação:** atualizar `targetRevision` em `clusters/homelab/apps/monitoring.yaml`.
-
-**Impacto:** pode quebrar configurações de dashboards ou Prometheus. Requer backup e teste.
+**Resolvido:** salto direto habilitando `crds.upgradeJob.enabled` no chart (job PreSync aplica os CRDs do prometheus-operator antes do operator subir — resolve a classe de problema do Longhorn 1.10). O Grafana crashou por drift de schema no PG externo (criado por restore, sem sequences e com `success` bigint nas tabelas `*_migration_log`) — corrigido com DDL, ver Cenário 14 em `DISASTER_RECOVERY.md`.
 
 ---
 
@@ -187,7 +182,7 @@ recurringJobs:
 | 4 | Backup PostgreSQL | 1h | Proteção de dados |
 | ~~5~~ | ~~Backup Longhorn~~ ✅ | ~~2h~~ | ~~DR completo~~ |
 | 6 | TLS PostgreSQL | 1h | Segurança |
-| 7 | kube-prometheus-stack | 2h | Updates + segurança |
+| ~~7~~ | ~~kube-prometheus-stack~~ ✅ | ~~2h~~ | ~~Updates + segurança~~ |
 | ~~8~~ | ~~Longhorn~~ ✅ | ~~4h~~ | ~~Storage moderno~~ |
 | 9 | ArgoCD | 2h | Updates + segurança |
 | ~~10~~ | ~~cert-manager~~ ✅ | ~~3h~~ | ~~EOL resolvido~~ |

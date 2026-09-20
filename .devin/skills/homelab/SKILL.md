@@ -38,7 +38,7 @@ Execuções nesta sessão rodam **no CP** (root). Worker acessível via `ssh roo
 
 | App | Namespace | Versão | Notas |
 |---|---|---|---|
-| kube-prometheus-stack | `monitoring` | chart 82.2.0 | Prometheus PVC Longhorn 20Gi; Grafana usa PG externo |
+| kube-prometheus-stack | `monitoring` | chart 91.4.1 | Grafana 13.2.2, Prometheus v3.14.0; `crds.upgradeJob.enabled`; Prometheus PVC Longhorn 20Gi; Grafana usa PG externo |
 | Longhorn | `longhorn-system` | 1.12.1 | ver seção Storage |
 | cert-manager | `cert-manager` | v1.21.2 | — |
 | Zabbix 7 (prod) | `zabbix` | chart 7.1.0, img ubuntu-7.0.x | NodePort **30082**, ingress `zabbix.wccosta.com.br`, PG externo |
@@ -57,6 +57,7 @@ Execuções nesta sessão rodam **no CP** (root). Worker acessível via `ssh roo
 ## Bancos (rke2-pgdb, PG 16)
 
 - Databases: `grafana`, `zabbix`, `keycloak` (reservado); `zabbix8` removido (PoC desfeito 2026-09-20 — DB e pg_hba já limpos)
+- DB `grafana` tinha drift de schema (criado por restore externo): sequences e tipos de `*_migration_log` corrigidos no upgrade p/ Grafana 13.2.2 — ver Cenário 14 do `DISASTER_RECOVERY.md` antes de futuros upgrades major
 - `pg_hba.conf`: regras por user/db `host <db> <user> 192.168.50.0/24 scram-sha-256` — **novo user precisa de linha nova + `SELECT pg_reload_conf()`**
 - Criação padrão: `CREATE USER x WITH PASSWORD '...'; CREATE DATABASE x OWNER x;` + linha pg_hba
 - Credenciais vão pro cluster via **SealedSecret** (`kubeseal`), nunca plaintext no repo
@@ -92,7 +93,7 @@ kubectl get nodes.longhorn.io -n longhorn-system -o yaml   # scheduling/disks
 ## Pendências conhecidas (roadmap em IMPROVEMENTS.md)
 
 - 65/75 containers sem resource limits
-- Upgrades pendentes: kube-prometheus-stack →91.x, ArgoCD →v3.5.x
+- Upgrades pendentes: ArgoCD →v3.5.x (cert-manager 1.21.2 e kube-prometheus-stack 91.4.1 já feitos)
 - RecurringJobs de backup Longhorn (target NFS já configurado); TLS no PG
 - Tags flutuantes (`latest`, `main`) em algumas images
 - `infra/sealed-secrets/application.yaml` aponta pra repo Helm morto
