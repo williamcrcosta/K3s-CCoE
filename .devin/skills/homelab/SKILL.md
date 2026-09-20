@@ -12,7 +12,7 @@ Use este contexto para qualquer tarefa neste repo (`/root/K3s-CCoE`) ou no clust
 | Componente | Hostname | IP | Papel | Notas |
 |---|---|---|---|---|
 | Control plane | `rke2-cp-01` | 192.168.50.20 | etcd + apiserver + scheduler | VMID Proxmox 500, ~6Gi RAM, disco 50G (apertado) |
-| Worker | `rke2-worker-01` | 192.168.50.21 | workloads | VMID 501, disco SO 50G + **disco dedicado Longhorn 100G (sdb, UUID `d74bea7e-e2ee-4899-a2a8-ea5cc040eab9`)** |
+| Worker | `rke2-worker-01` | 192.168.50.21 | workloads | VMID 501, disco SO 50G + **disco dedicado Longhorn 100G (sdb, UUID `d74be7e2-b99e-4899-a2a8-ea5cc040eab9`)** |
 | PostgreSQL | `rke2-pgdb` | 192.168.50.30 | PG 16 compartilhado | sem SSH a partir do CP — usuario executa SQL manualmente |
 | Proxmox host | `pve` | 192.168.50.250 | hypervisor + NFS backup | exporta `/var/lib/vz/longhorn-backup` via NFS |
 

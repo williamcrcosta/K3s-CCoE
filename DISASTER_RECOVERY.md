@@ -1071,7 +1071,7 @@ Conteudo caracteristico de um disco Longhorn: `replicas/`, `engine-binaries/`, `
 ```bash
 # 1. fstab: device name -> UUID (imune a reordenacao) + nofail
 #    linha corrigida:
-UUID=d74bea7e-e2ee-4899-a2a8-ea5cc040eab9  /var/lib/longhorn  ext4  defaults,nofail  0 0
+UUID=d74be7e2-b99e-4899-a2a8-ea5cc040eab9  /var/lib/longhorn  ext4  defaults,nofail  0 0
 
 # 2. NFS: adicionar nofail para nunca derrubar o boot
 192.168.50.250:/var/lib/vz/longhorn-backup  /mnt/longhorn-backup  nfs  defaults,nofail,_netdev  0 0
@@ -1101,3 +1101,27 @@ kubectl get pods -A | grep -v "Running\|Completed"             # vazio
 - `_netdev` obrigatorio em mounts de rede (espera a rede)
 - Apos editar fstab: `systemctl daemon-reload` + `mount -a` para validar **antes** de rebootar
 - O skeleton de dirs do Longhorn em `/var/lib/longhorn` no rootfs pode enganar (`ls` mostra estrutura, mas `du`/`findmnt` revelam que nao e o disco real)
+
+### Adendo 2026-09-20 — recaida no reboot seguinte (UUID errado + engine binary ausente)
+
+No reboot posterior (update do host Proxmox), o worker voltou com o disco **nao montado**: o UUID gravado no fstab estava errado (`d74bea7e-...` em vez do real `d74be7e2-...`). Como a linha tinha `nofail`, o boot completou normalmente — **sem emergency mode, mas sem o sdb**.
+
+Cadeia do problema:
+
+1. `/var/lib/longhorn` caiu no rootfs -> Longhorn gerou `longhorn-disk.cfg` novo -> `DiskFilesystemChanged` (`record diskUUID doesn't match the one on the disk`)
+2. `mount /dev/sdb /var/lib/longhorn` manual -> disco reconhecido, mas `engine-binaries/longhornio-longhorn-engine-v1.7.2/` no sdb estava **vazio** (dir criado durante o boot quebrado)
+3. Replicas travaram em `error`: `stat engine-binaries/.../longhorn: no such file or directory`
+
+**Correcao do engine binary** (sem baixar nada — copiar do instance-manager, que contem o binario da sua versao):
+
+```bash
+IM=$(kubectl get pods -n longhorn-system -l longhorn.io/component=instance-manager -o jsonpath='{.items[?(@.spec.nodeName=="rke2-worker-01")].metadata.name}')
+kubectl exec -n longhorn-system $IM -- cp -a \
+  /engine-binaries/longhornio-longhorn-engine-v1.7.2/longhorn \
+  /host/var/lib/longhorn/engine-binaries/longhornio-longhorn-engine-v1.7.2/
+```
+
+**Licao adicional:**
+
+- `nofail` evita emergency mode, mas mascara falha de mount — apos editar fstab, **validar com `mount -a` + `findmnt`** e conferir o UUID contra `blkid`/`ls -l /dev/disk/by-uuid/` antes de rebootar
+- UUID em fstab deve ser copiado de `blkid`/`by-uuid`, nunca transcrito a mao
