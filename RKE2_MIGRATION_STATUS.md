@@ -275,3 +275,25 @@ Os itens abaixo foram identificados como inconsistentes e **já foram atualizado
 - O `zabbixWeb.enabled: true` é obrigatório nos Helm values
 - O `extraEnv` com `ZBX_SERVER_HOST` é obrigatório para o frontend conectar ao server
 - Ver `DISASTER_RECOVERY.md` cenários 6, 7 e 8 para detalhes
+
+---
+
+## 13. Incidente 2026-09-19 — Worker em emergency mode (fstab) + Update RKE2 1.35.8
+
+### O que aconteceu
+- Update de OS + RKE2 (`1.35.6` -> `1.35.8`, kernel `5.14.0-687.49.1`) no CP e worker, com vzdump + snapshot Proxmox + etcd snapshot antes
+- CP atualizou e rebootou sem problemas
+- Worker caiu em **emergency mode**: fstab montava `/dev/sda` em `/var/lib/longhorn`, mas o disco Longhorn (100G) era `sdb` (reordenacao de devices); mount NFS de backup tambem sem `nofail`
+
+### O que foi resolvido
+| Item | Status |
+|---|---|
+| fstab do worker | ✅ `/dev/sda` -> `UUID=d74bea7e-...` + `nofail`; NFS com `nofail,_netdev` |
+| Disco Longhorn `sdb` (100G, 53G de replicas) | ✅ Montado corretamente em `/var/lib/longhorn` |
+| Ambos os nodes | ✅ `v1.35.8+rke2r1`, kernel novo, `Ready` |
+| Volume Prometheus | ✅ `attached`/`healthy`, 2 replicas running |
+| ArgoCD (10 apps), Zabbix 7 e 8 | ✅ Synced/Healthy, HTTP 200 |
+
+### Licao aprendida
+- fstab de discos de dados deve usar `UUID=` + `nofail` — device names mudam ao reordenar discos no Proxmox
+- Detalhes completos: `DISASTER_RECOVERY.md` Cenario 13

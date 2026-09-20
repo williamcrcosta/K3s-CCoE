@@ -1021,3 +1021,83 @@ kubectl exec -n monitoring $POD -c grafana -- wget -qO- http://localhost:3000/ap
 # Expected: {"database":"ok","version":"12.3.3"}
 ```
 
+
+---
+
+## Cenario 13 - Worker em emergency mode apos reboot (fstab com device name errado)
+
+> **Ocorrencia:** 2026-09-19 - `rke2-worker-01` caiu em emergency mode no reboot apos `dnf update` (Rocky 9.8, kernel 5.14.0-687.49.1, RKE2 1.35.6 -> 1.35.8).
+
+### Sintomas
+
+- Boot parava com `[FAILED] Failed to mount /mnt/longhorn-backup` e `Dependency failed for Remote File Systems`
+- Console Proxmox: `You are in emergency mode. Give root password for maintenance`
+- No emergency shell, `mount -a` falhava com:
+  - `mount.nfs: Network is unreachable` (rede nao sobe no emergency mode - sintoma, nao causa)
+  - `/dev/sda: Can't open blockdev` / `already mounted or mount point busy`
+- `systemctl default` retornava ao emergency mode em loop
+
+### Causa raiz
+
+O `/etc/fstab` do worker tinha a linha:
+
+```fstab
+/dev/sda  /var/lib/longhorn  ext4  defaults  0 0
+```
+
+Mas `sda` e o **disco do SO** (LVM `rlm-root`). O disco dedicado do Longhorn (100G, ext4, ~53G de replicas) era `sdb` - a ordem dos devices mudou no Proxmox (nomes `/dev/sdX` nao sao estaveis entre boots/reconfiguracoes de hardware).
+
+Um mount **local** que falha sem `nofail` derruba o `local-fs.target` -> emergency mode. O mount NFS (`192.168.50.250:/var/lib/vz/longhorn-backup`) tambem nao tinha `nofail`, agravando o cenario.
+
+### Diagnostico
+
+```bash
+# no emergency shell
+lsblk                                   # sda = SO (50G), sdb = disco 100G sem mount
+blkid /dev/sdb                          # confirma filesystem + UUID
+mkdir -p /mnt/sdbcheck
+mount -o ro /dev/sdb /mnt/sdbcheck      # readonly, seguro
+ls -la /mnt/sdbcheck                    # replicas/, engine-binaries/, longhorn-disk.cfg
+du -sh /mnt/sdbcheck                    # ~53G = dados reais do Longhorn
+du -sh /var/lib/longhorn                # ~4K = so esqueleto de dirs no rootfs
+findmnt /var/lib/longhorn               # vazio = nao montado
+systemctl status var-lib-longhorn.mount # mostra a falha registrada
+```
+
+Conteudo caracteristico de um disco Longhorn: `replicas/`, `engine-binaries/`, `unix-domain-socket/`, `longhorn-disk.cfg`, `.lock`.
+
+### Correcao aplicada
+
+```bash
+# 1. fstab: device name -> UUID (imune a reordenacao) + nofail
+#    linha corrigida:
+UUID=d74bea7e-e2ee-4899-a2a8-ea5cc040eab9  /var/lib/longhorn  ext4  defaults,nofail  0 0
+
+# 2. NFS: adicionar nofail para nunca derrubar o boot
+192.168.50.250:/var/lib/vz/longhorn-backup  /mnt/longhorn-backup  nfs  defaults,nofail,_netdev  0 0
+
+# 3. recarregar, montar e sair do emergency
+systemctl daemon-reload
+umount /mnt/sdbcheck
+mount /dev/sdb /var/lib/longhorn
+findmnt /var/lib/longhorn               # confirmar /dev/sdb ext4 rw
+systemctl reset-failed var-lib-longhorn.mount
+systemctl default
+```
+
+### Verificacao pos-boot
+
+```bash
+kubectl get nodes                                              # worker Ready
+kubectl get volumes.longhorn.io -n longhorn-system             # attached/healthy
+kubectl get replicas.longhorn.io -n longhorn-system            # running
+kubectl get pods -A | grep -v "Running\|Completed"             # vazio
+```
+
+### Prevencao / licoes
+
+- **Sempre `UUID=` no fstab** para discos de dados - `/dev/sdX` muda ao reordenar/adicionar discos na VM (Proxmox)
+- **Sempre `nofail`** em mounts nao essenciais ao boot (disco secundario, NFS) - sem ele, qualquer falha de mount = emergency mode
+- `_netdev` obrigatorio em mounts de rede (espera a rede)
+- Apos editar fstab: `systemctl daemon-reload` + `mount -a` para validar **antes** de rebootar
+- O skeleton de dirs do Longhorn em `/var/lib/longhorn` no rootfs pode enganar (`ls` mostra estrutura, mas `du`/`findmnt` revelam que nao e o disco real)
