@@ -141,16 +141,11 @@ recurringJobs:
 
 ---
 
-### 9. Atualizar ArgoCD — Risco Alto
+### 9. Atualizar ArgoCD — ✅ Concluído (2026-09-20)
 
-**Versão atual:** `v3.3.1`  
-**Última:** `v3.5.3`
+**Versão atual:** `v3.5.3` (de `v3.3.1`)
 
-**Benefício:** novas features, security fixes.
-
-**Ação:** atualizar chart no ArgoCD.
-
-**Impacto:** pode quebrar Application definitions. Requer leitura de release notes.
+**Resolvido:** upgrade self-managed em hops `v3.3.1 → v3.4.9 → v3.5.3` — só bump da tag do `install.yaml` remoto em `infra/argocd/kustomization.yaml`; o próprio ArgoCD aplicou seus manifests novos. Breaking changes 3.4/3.5 não se aplicam (sem cluster generators, sem OCI repos HTTP, sem impersonation). Backup do estado salvo antes em `/tmp/argocd-backup` no CP.
 
 ---
 
@@ -184,6 +179,6 @@ recurringJobs:
 | 6 | TLS PostgreSQL | 1h | Segurança |
 | ~~7~~ | ~~kube-prometheus-stack~~ ✅ | ~~2h~~ | ~~Updates + segurança~~ |
 | ~~8~~ | ~~Longhorn~~ ✅ | ~~4h~~ | ~~Storage moderno~~ |
-| 9 | ArgoCD | 2h | Updates + segurança |
+| ~~9~~ | ~~ArgoCD~~ ✅ | ~~2h~~ | ~~Updates + segurança~~ |
 | ~~10~~ | ~~cert-manager~~ ✅ | ~~3h~~ | ~~EOL resolvido~~ |
 | 11 | Multi-cluster | dias | DR real |
