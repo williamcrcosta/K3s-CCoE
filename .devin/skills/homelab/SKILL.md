@@ -94,7 +94,7 @@ kubectl get nodes.longhorn.io -n longhorn-system -o yaml   # scheduling/disks
 
 - 65/75 containers sem resource limits
 - Upgrades de plataforma concluídos 2026-09-20: Longhorn 1.12.1, cert-manager 1.21.2, kube-prometheus-stack 91.4.1, ArgoCD v3.5.3 (self-managed via `infra/argocd/kustomization.yaml` — upgrade = bump da tag do install.yaml remoto)
-- RecurringJobs de backup Longhorn (target NFS já configurado); TLS no PG
+- TLS no PG: em standby — `Certificate pgdb-tls` já emitido via LE; pendente decidir distribuição pro pgdb (ver item 6 do IMPROVEMENTS.md: pull via API k8s vs ca-server/step-ca no Proxmox)
 - Tags flutuantes (`latest`, `main`) em algumas images
 - `infra/sealed-secrets/application.yaml` aponta pra repo Helm morto
 

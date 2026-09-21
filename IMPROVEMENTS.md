@@ -113,15 +113,26 @@ recurringJobs:
 
 ---
 
-### 6. TLS no PostgreSQL — Risco Médio
+### 6. TLS no PostgreSQL — ⏸ Em standby (análise feita 2026-09-20)
 
-**Problema:** conexões entre apps e `rke2-pgdb` não cifradas.
+**Problema:** conexões entre apps e `rke2-pgdb` (192.168.50.30) não cifradas.
 
-**Benefício:** segurança das credenciais em trânsito.
+**Estado atual:** `Certificate` `pgdb-tls` (`pgdb.wccosta.com.br`, issuer `letsencrypt-wccosta`) já commitado em `infra/cert-manager/certificates.yaml` — cert fica emitido no secret `cert-manager/pgdb-tls`, inerte até uso.
 
-**Ação:** habilitar TLS no PostgreSQL + certificados nos secrets.
+**Clientes a atualizar quando ativar:**
+- Grafana (`clusters/homelab/apps/monitoring.yaml`): `GF_DATABASE_SSL_MODE=verify-ca` + `GF_DATABASE_CA_CERT_PATH` — `verify-ca` valida a cadeia sem checar hostname, então o host pode seguir `192.168.50.30`
+- Zabbix (`clusters/homelab/apps/zabbix.yaml`): `extraEnv` no `zabbixServer` com `ZBX_DBTLSCONNECT=verify_ca`/`ZBX_DBTLSCAFILE`; web frontend com `ZBX_DB_ENCRYPTION=true` (verificar env vars exatas da imagem `zabbix-web-nginx-pgsql`)
+- PG: `ssl=on` + `ssl_cert_file`/`ssl_key_file` (reload recarrega certs, sem restart); `pg_hba` mantém `host` na transição → endurecer pra `hostssl` no fim
 
-**Impacto:** pode quebrar apps se mal configurado. Requer teste.
+**Questão em aberto — distribuição do cert para o pgdb (VM fora do cluster).** LE renova a cada ~60d, então precisa de automação. Opções analisadas:
+
+| Opção | Como funciona | Observação |
+|---|---|---|
+| **A) Pull via API do k8s** | SA + Role (`resourceNames: [pgdb-tls]`) + timer systemd no pgdb que faz GET no apiserver, grava cert/key e `pg_reload_conf()` | Escala p/ outras VMs; sem SSH extra |
+| **B) `ca-server` (container no Proxmox)** | Se for step-ca/ACME: `step ca certificate` ou certbot direto no pgdb — cert nasce no destino, renovação automática, sem cluster | **Verificar o que é o ca-server** (`step version`/`pct list` no PVE). Se for step-ca, é a melhor opção |
+| **C) CA interna no cluster** | `wcrpc-ca-issuer` já existe (CA `wcrpc.lan` até 2036) — emitir cert com IP SAN `192.168.50.30`, `duration` de anos | Cópia rara pro pgdb, mas CA precisa ser montado nos clientes |
+
+**Decisão pendente:** confirmar se `ca-server` é step-ca (opção B) — senão, opção A com cert LE já emitido.
 
 ---
 
