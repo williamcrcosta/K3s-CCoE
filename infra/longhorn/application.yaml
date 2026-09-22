@@ -17,6 +17,9 @@ spec:
 
         defaultSettings:
           replicaSoftAntiAffinity: "true"
+          guaranteedInstanceManagerCPU:
+            v1: 6
+            v2: 40
 
         csi:
           attacherReplicaCount: 1
