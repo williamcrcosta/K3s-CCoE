@@ -12,6 +12,8 @@ resources:
   - apps/zabbix.yaml
   - apps/kubernetes-dashboard.yaml
   - apps/sealed-secrets.yaml
+  - apps/loki.yaml
+  - apps/alloy.yaml
   #- apps/ollama.yaml
   - ../../infra/longhorn
   - ../../infra/zabbix

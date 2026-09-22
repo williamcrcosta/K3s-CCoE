@@ -41,6 +41,14 @@ spec:
           plugins:
           - alexanderzobnin-zabbix-app
           - marcusolsson-dynamictext-panel
+          additionalDataSources:
+          - name: Loki
+            type: loki
+            access: proxy
+            url: http://loki-gateway.monitoring.svc:80
+            isDefault: false
+            jsonData:
+              maxLines: 1000
           ingress:
             enabled: true
             ingressClassName: nginx

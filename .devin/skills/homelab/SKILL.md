@@ -42,9 +42,12 @@ Execuções nesta sessão rodam **no CP** (root). Worker acessível via `ssh roo
 | Longhorn | `longhorn-system` | 1.12.1 | ver seção Storage |
 | cert-manager | `cert-manager` | v1.21.2 | — |
 | Zabbix 7 (prod) | `zabbix` | chart 7.1.0, img ubuntu-7.0.x | NodePort **30082**, ingress `zabbix.wccosta.com.br`, PG externo |
-
-| sealed-secrets | — | — | SealedSecrets para credenciais (kubeseal local) |
+| sealed-secrets | `kube-system` | — | SealedSecrets para credenciais (kubeseal local) |
 | kubernetes-dashboard | `kubernetes-dashboard` | — | |
+| Loki | `monitoring` | chart 7.3.0 (Loki 3.6.12) | SingleBinary, storage filesystem PVC Longhorn 20Gi, retention 30d; push/query via `loki-gateway.monitoring.svc` |
+| Alloy | `monitoring` | chart 1.12.1 | DaemonSet nos 2 nodes, coleta logs de pods → Loki; datasource Loki já no Grafana |
+
+Apps com manifests prontos mas **desativados** (comentados em `clusters/homelab/kustomization.yaml`): `ollama` (ns `ollama`), `powerdns` + `technitium` (ns `dns`) — sources em `apps/` na raiz do repo. `clusters/homelab/apps/observability.yaml` e `clusters/homelab/apps/longhorn.yaml` são arquivos vazios (Longhorn é deployado via `infra/longhorn` no kustomization, não via Application).
 
 ## Storage — Longhorn
 
