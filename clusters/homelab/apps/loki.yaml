@@ -60,6 +60,10 @@ spec:
             limits:
               cpu: 200m
               memory: 128Mi
+        chunksCache:
+          enabled: false
+        resultsCache:
+          enabled: false
         lokiCanary:
           enabled: false
         test:
