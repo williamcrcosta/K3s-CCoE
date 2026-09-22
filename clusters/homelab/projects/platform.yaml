@@ -11,6 +11,7 @@ spec:
     - "https://charts.longhorn.io"
     - "https://prometheus-community.github.io/helm-charts"
     - "https://zabbix-community.github.io/helm-zabbix"
+    - "https://grafana.github.io/helm-charts"
     - "https://github.com/bitnami-labs/sealed-secrets.git"
   destinations:
     - namespace: "*"
