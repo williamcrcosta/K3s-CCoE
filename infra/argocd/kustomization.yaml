@@ -16,6 +16,10 @@ patches:
     target:
       kind: Deployment
       name: argocd-repo-server
+  - path: controller-patch.yaml
+    target:
+      kind: StatefulSet
+      name: argocd-application-controller
   - path: argocd-server-patch.yaml
     target:
       kind: Deployment
