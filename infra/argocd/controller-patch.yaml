@@ -7,3 +7,12 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: rke2-worker-01
+      containers:
+        - name: argocd-application-controller
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
