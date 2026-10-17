@@ -1,11 +1,11 @@
 # Incidente: Congelamento do etcd e indisponibilidade do plano de controle RKE2
 
-**Data do incidente:** 2026-10-11 (BRT / UTC-3)
+**Data do incidente:** 2026-10-11 (BRT / UTC-3); segunda degradação em 15–16/out durante restore Longhorn
 **Nó afetado:** `rke2-cp-01` (192.168.50.20) — control-plane + etcd
 **Duração da indisponibilidade:** ~4 dias (de 11/out até a recuperação em 15/out)
-**Causa raiz:** Latência crônica de I/fsync do etcd em ambiente com recursos escassos (VM 2 vCPUs / 7,5 GiB RAM / storage do hipervisor sobrecarregado)
-**Ação corretiva:** Restauração de snapshot do etcd via `rke2 server --cluster-reset --cluster-reset-restore-path`
-**Resultado:** Cluster recuperado e operacional
+**Causa raiz:** Latência de I/O/fsync do etcd causada pela saturação do thin pool LVM do Proxmox (**89,8% cheio**, ~0G livres no VG) + snapshots LVM antigos segurando blocos + SSD SATA único compartilhado por todas as VMs, em VM com recursos escassos (2 vCPUs / 7,5 GiB RAM, depois 15 GiB / 4 vCPUs)
+**Ação corretiva:** Restauração de snapshot do etcd via `rke2 server --cluster-reset --cluster-reset-restore-path`; liberação do thin pool (snapshots LVM + `discard=on` + `fstrim`); taint `NoSchedule` no CP
+**Resultado:** Cluster recuperado, Prometheus restaurado do backup Longhorn (363 blocos TSDB), thin pool em 46%
 
 ---
 
@@ -67,10 +67,10 @@ Não houve alteração manual no dia 11/out — **não foi uma mudança de confi
    Porque o `fsync` do WAL e o I/O do disco local estavam com latência alta: o `vmstat` mostrava ~30% de I/O wait, swap em uso e o disco XFS estava contendo ~30 GiB de dados, incluindo etcd + Longhorn + monitoramento.
 
 4. **Por que o disco estava lento?**
-   Porque a VM `rke2-cp-01` tem **2 vCPUs e 7,5 GiB de RAM** e está rodando componentes pesados no próprio control-plane (Longhorn, Alloy, Loki, Grafana, Zabbix, kube-apiserver, etcd), enquanto o hipervisor Proxmox registrava atrasos de `kvm-clock`/`hrtimer` (contenção de CPU e storage).
+   Porque o **thin pool LVM do Proxmox (`pve/data`) estava em 89,82%** sobre um único SSD SATA de 720GB compartilhado por todas as VMs — snapshots LVM antigos (`pre-update-2026-09-13`, `pre-dnf-update`) seguravam ~150G de blocos, e os discos das VMs não tinham `discard=on`, então espaço liberado dentro das VMs nunca voltava ao pool. Adicionalmente, a VM `rke2-cp-01` tinha só **2 vCPUs e 7,5 GiB de RAM** rodando etcd + apiserver + Longhorn + observabilidade, com swap em uso. (Verificado em 16/out: SMART do SSD saudável, zero erros SATA — o problema era saturação do pool, não disco defeituoso.)
 
-5. **Por que o control-plane estava com recursos insuficientes?**
-   Porque o cluster foi dimensionado como um homelab de baixo custo, sem separação de plano de controle de dados. Com o tempo, workloads de dados (Longhorn) e observabilidade (Prometheus/Loki/Grafana/Zabbix) foram adicionados ao mesmo nó, aumentando o consumo de CPU, memória e I/O até o etcd perder a capacidade de responder a tempo.
+5. **Por que o thin pool e o control-plane estavam nesse estado?**
+   Porque o cluster foi dimensionado como homelab de baixo custo, sem separação de plano de controle/dados, sem TRIM configurado e sem monitoramento do thin pool do hipervisor. Com o tempo, snapshots de manutenção ficaram esquecidos e workloads pesados foram adicionados ao CP até o etcd perder a capacidade de responder a tempo.
 
 ## 6. Ações de recuperação executadas
 
@@ -112,27 +112,77 @@ Não houve alteração manual no dia 11/out — **não foi uma mudança de confi
 
 - **Pods:** todos foram reiniciados pelo `rke2-killall.sh` + nova subida do `rke2-server`. Alguns levaram ~4 minutos para voltar.
 - **Certificados:** novos foram gerados na restauração; os antigos foram preservados em `/var/lib/rancher/rke2/server/tls-1792106213`.
+- **Prometheus:** buraco de ~18 dias de métricas (22/set–10/out o pod já estava quebrado com I/O error; 10/out–16/out durante a recuperação). Histórico anterior restaurado do backup (ver seção 8).
 
-## 8. Recomendações para evitar recaída
+## 8. Segunda degradação e restauração do Prometheus (15–16/out)
 
-1. **Isolar o control-plane:** remover workloads de dados (Longhorn) e observabilidade pesada (Loki, Grafana, Zabbix, Prometheus) do `rke2-cp-01`. O nó deve servir apenas etcd/apiserver/scheduler/controller-manager.
-2. **Aumentar recursos do VM:** subir para pelo menos **16 GiB de RAM** e mais vCPUs (4+). Eliminar dependência de swap.
-3. **Melhorar storage do etcd:** usar disco dedicado ou garantir IOPS/latência de `fsync` baixa no hipervisor; evitar compartilhamento com volumes de dados pesados.
-4. **Monitorar I/O:** criar alertas para `I/O wait`, `fsync latency`, `swap`, e `etcd` (apply/request duration, `ReadIndex` timeout).
+Durante a tentativa de restaurar o volume do Prometheus (`pvc-6d11925f`, que estava `faulted` por I/O errors) a partir do backup NFS, o etcd **voltou a congelar** — o download de ~20G saturou o mesmo thin pool e o CP com 2 vCPUs não sobreviveu à contenção (`st`/`wa` ~46%).
+
+Sequência executada:
+
+1. **Upgrade da VM** `rke2-cp-01`: 2 vCPUs/7,5 GiB → **4 vCPUs/15 GiB** (via Proxmox, VMID 500). Reboots controlados de worker e CP.
+2. **Restore Longhorn** do backup `backup-347ef2fbe9aa4605` (10/out 13:00 UTC, NFS `192.168.50.250:/var/lib/vz/longhorn-backup`) em volume separado `prometheus-restored`.
+3. **Cópia in-place:** como StatefulSet + ArgoCD recriavam a PVC vazia em loop, o caminho vencedor foi montar o volume restaurado read-only no CP (`/mnt/prom-src`) e copiar `prometheus-db/` para dentro do globalmount do volume vivo (`pvc-484de07c-...`).
+   - A 1ª cópia falhou com I/O errors (pool ainda saturado); re-executada com sucesso após liberação do pool.
+   - `wal/`, `chunks_head/`, `lock` e `queries.active` foram **descartados** — o backup continha segmentos de WAL não-sequenciais que impediam o boot do TSDB.
+   - 66 blocos com `meta.json` truncado (da cópia interrompida) foram re-copiados; 1 bloco (`01KTD07T...`) já vinha corrompido no backup e foi descartado.
+4. **Resultado:** `prometheus-0` `2/2 Running`, **363 blocos TSDB íntegros**, histórico consultável desde ~11/set.
+
+## 9. Causa raiz final — thin pool LVM saturado
+
+Diagnóstico no host `pve` (16/out) revelou a verdadeira causa da latência:
+
+- `pve/data` thin pool: **89,82%** (554,7G); VG sem espaço livre (`VFree 0`)
+- `vm-501-disk-1` (disco Longhorn do worker): **99,84%** provisionado — escrita no topo do thin pool degradava/corrompia I/O
+- 6 snapshots LVM de setembro (`pre-update-2026-09-13`, `pre-dnf-update`) segurando ~150G
+- Discos sem `discard=on` → espaço liberado nas VMs nunca retornava ao pool
+- SMART do SSD: saudável (0 reallocated/pending sectors); `dmesg` sem erros SATA
+
+**Correções aplicadas:**
+
+| Ação | Resultado |
+|---|---|
+| `qm delsnapshot` dos snapshots antigos (VMs 500/501) | pool 89,82% → 62,5% |
+| `discard=on` nos discos virtio-scsi + reboot das VMs | TRIM passa a funcionar |
+| `fstrim -av` em CP e worker | ~120G devolvidos ao pool |
+| `fstrim.timer` habilitado nas VMs | trim semanal automático |
+| Taint `NoSchedule` no CP | CP isolado de workloads |
+| Remoção de Loki/Alloy (GitOps + cluster) | memória/disco liberados |
+| Limpeza de backups Longhorn antigos no NFS | mantidos apenas o âncora 10/out + daily atual |
+| Estado final do pool | **46,39%** — `vm-501-disk-1` em 25,85% |
+
+## 10. Recomendações para evitar recaída
+
+**Já executadas (16–17/out):**
+
+- ✅ Isolar o CP: taint `node-role.kubernetes.io/control-plane=true:NoSchedule` aplicado em `rke2-cp-01` (workloads existentes migram ao reagendar; Prometheus já está no worker)
+- ✅ Aumentar recursos: VM 500 agora com 4 vCPUs / 15 GiB RAM
+- ✅ Desafogar o thin pool: snapshots LVM removidos, `discard=on` + `fstrim.timer` — pool em 46%
+- ✅ Remover observabilidade não usada (Loki/Alloy) do GitOps e do cluster
+
+**Pendentes:**
+
+1. **Monitorar o thin pool do Proxmox** — alertar quando `pve/data` passar de ~75–80%. É a métrica que teria previsto este incidente.
+2. **Alertas no cluster** para `apply request took too long`, `ReadIndex` timeout, `I/O wait > 20%`, swap em uso.
+3. **Storage dedicado pro etcd** (segundo disco físico/NVMe) ou storage mais rápido — o SSD SATA único continua sendo o ponto único de contenção.
+4. **Copiar snapshots do etcd para storage externo** (ex.: NFS `/mnt/longhorn-backup/etcd-snapshots/` ou rotina agendada) — hoje só existem no disco do CP.
 5. **Revisar `config.yaml`:** as entradas `etcd-expose-metrics`, `kube-controller-manager-arg` e `kube-scheduler-arg` geraram warnings de `Unknown flag` no `rke2`. Validar os nomes corretos para `v1.35.8+rke2r1` e corrigir.
-6. **Backup/restore periódico:** manter snapshots do etcd e testar restauração regularmente; considerar snapshots para storage externo.
-7. **Documentar runbooks:** manter o `DISASTER_RECOVERY.md` atualizado com este cenário (Cenário X: etcd congelado por I/O).
+6. **Redundância real do etcd** — CP único continua SPOF; médio prazo considerar 3 CPs.
+7. **Documentar runbooks:** adicionar ao `DISASTER_RECOVERY.md` os cenários "etcd congelado por I/O/thin pool cheio" e "restore de volume Longhorn via cópia in-place" (o caminho que funcionou quando PV/PVC e ArgoCD brigavam).
 
-## 9. Arquivos e referências relevantes
+## 11. Arquivos e referências relevantes
 
 - Log do etcd congelado: `/var/log/pods/kube-system_etcd-rke2-cp-01_08fdfe1c35d9b991a99aae7d68a21f00/etcd/6.log`
 - Mensagens do systemd/rke2: `/var/log/messages` (rotação `messages-20261011`)
-- Backup do etcd falho: `/var/lib/rancher/rke2/server/db/etcd.bak.1792106150`
-- Backup dos snapshots: `/var/lib/rancher/rke2/server/db/snapshots.bak.1792106150`
-- Certificados antigos (pós-restore): `/var/lib/rancher/rke2/server/tls-1792106213`
+- Backup do etcd falho: `/var/lib/rancher/rke2/server/db/etcd.bak.1792106150` (removível após validação)
+- Backup dos snapshots: `/var/lib/rancher/rke2/server/db/snapshots.bak.1792106150` (removível)
+- Certificados antigos (pós-restore): `/var/lib/rancher/rke2/server/tls-1792106213` (removível)
 - Configuração RKE2: `/etc/rancher/rke2/config.yaml`
+- Backup Longhorn âncora do restore: `backup-347ef2fbe9aa4605` (10/out 13:00 UTC) no NFS `192.168.50.250:/var/lib/vz/longhorn-backup`
+- Volume Prometheus atual: `pvc-484de07c-bcfe-48a0-9ddd-c215e43592e1` (20Gi, 2 réplicas no worker)
+- Comandos de diagnóstico do pool: `lvs pve -o lv_name,data_percent`, `vgs pve`, `smartctl -a /dev/sda`
 
 ---
 
 **Autor:** Devin
-**Data da documentação:** 2026-10-15
+**Data da documentação:** 2026-10-15 (atualizado 2026-10-17 com a causa raiz do thin pool e a restauração do Prometheus)
