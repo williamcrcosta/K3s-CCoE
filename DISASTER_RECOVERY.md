@@ -1238,3 +1238,149 @@ Depois de cada bloco: `kubectl delete pod -n monitoring -l app.kubernetes.io/nam
 Grafana `3/3 Running` em `grafana/grafana:13.2.2-distroless`, app `monitoring` Synced/Healthy no chart 91.4.1, dashboards/usuarios/datasources preservados (nenhum dado perdido — so DDL de schema).
 
 **Licao:** DB do Grafana criado por restore externo pode ter drift silencioso; antes de upgrade major do Grafana, validar `information_schema` contra o schema esperado (sequences + tipos das tabelas `*_migration_log`).
+
+## Cenario 15 - etcd congelado / rke2-server em loop (thin pool LVM do Proxmox saturado)
+
+**Contexto (2026-10-11):** o etcd do `rke2-cp-01` parou de responder — `rke2-server` entrava em loop infinito de restart (`activating (auto-restart)`, contador nos milhares), `kubectl` retornava `context deadline exceeded` para tudo. Detalhes completos em `docs/incidentes/2026-10-11-rke2-etcd-timeout.md`.
+
+### Sintomas
+
+```
+rke2-server.service: activating (auto-restart), restart counter crescendo
+kubectl get nodes -> context deadline exceeded
+etcdctl endpoint health -> 127.0.0.1:2379 is unhealthy
+journalctl: "apply request took too long", "leaderelection lost for rke2",
+            "failed to bootstrap cluster data: ... context deadline exceeded"
+vmstat: wa alto (30-96%); etcd vivo no gRPC mas reads de 6-19s
+```
+
+### Causa raiz
+
+**Nao e o etcd, nem o disco fisico — e o thin pool LVM do Proxmox.** `pve/data` em ~90% (VG com `VFree 0`) sobre um unico SSD SATA compartilhado por todas as VMs. Causadores tipicos:
+
+- Snapshots LVM antigos (`pre-update-*`, `pre-dnf-*`) segurando blocos do pool
+- Discos virtio-scsi **sem `discard=on`** -> espaco liberado nas VMs nunca volta ao pool; `Data%` dos LVs sobe ate ~100%
+- Qualquer escrita pesada (restore Longhorn, build de imagem) satura a fila do pool e os `fsync` do etcd estouram o timeout do bootstrap (~10s)
+
+### Diagnostico (no pve)
+
+```bash
+lvs pve -o lv_name,lv_size,data_percent,metadata_percent   # pool >85% = perigo
+vgs pve -o vg_size,vg_free                                  # VFree 0 = muito perigo
+smartctl -a /dev/sda                                        # descartar hardware
+dmesg | grep -iE 'I/O error|ata.*error'
+# dentro do CP:
+vmstat 2 5                                                  # wa alto
+journalctl -u rke2-server | grep 'took too long'
+```
+
+### Recuperacao do etcd (restore de snapshot — membro unico)
+
+```bash
+# 1. backup do estado falho
+cp -a /var/lib/rancher/rke2/server/db/etcd /var/lib/rancher/rke2/server/db/etcd.bak.$(date +%s)
+
+# 2. parada limpa
+systemctl stop rke2-server
+/usr/bin/rke2-killall.sh
+
+# 3. restore do snapshot mais recente
+rke2 server --cluster-reset \
+  --cluster-reset-restore-path /var/lib/rancher/rke2/server/db/snapshots/<snapshot>
+
+# 4. subir e validar
+systemctl start rke2-server
+kubectl get nodes
+```
+
+### Correcao do storage (previne recaida)
+
+```bash
+# no pve — liberar o pool
+qm listsnapshot <vmid>; qm delsnapshot <vmid> <nome>   # mata snapshots velhos
+qm set <vmid> --scsi0 <vol>,discard=on                 # exige reboot da VM
+pct fstrim <ctid>                                     # containers LXC
+# dentro das VMs, apos reboot:
+fstrim -av && systemctl enable --now fstrim.timer
+```
+
+**Atencao:** se o etcd congelar *durante* uma operacao de I/O pesada (ex.: restore Longhorn), parar a operacao primeiro — com pool saturado o etcd nao respira nem pra bootstrap. Matar `kube-apiserver` orfaos (`containerd-shim`) reduz a pressao.
+
+**Licao:** monitorar `data%` do thin pool — >75% investigar, >85% agir. `discard=on` + `fstrim.timer` sao obrigatorios em LVM-thin. A CPU/RAM da VM do CP amplifica o problema, mas a raiz aqui foi o pool.
+
+---
+
+## Cenario 16 - Restore de volume Longhorn que nao sobe (PV/PVC brigando com StatefulSet/ArgoCD)
+
+**Contexto (2026-10-16):** volume do Prometheus `faulted` por I/O errors. Restore direto do backup NFS falhava repetidamente: o StatefulSet recriava a PVC vazia antes do bind do PV restaurado, e o ArgoCD (`selfHeal`) revertia patches de scale/replicas. O caminho que funcionou foi **copiar os dados do volume restaurado para dentro do volume vivo**.
+
+### Quando usar
+
+- Restore normal (`kubectl create volume` from backup + PV/PVC) e bloqueado por reconcile de StatefulSet/ArgoCD
+- Volume original inutilizavel mas PVC ainda bound a um volume novo/vazio
+
+### Procedimento (copia in-place)
+
+```bash
+# 1. criar volume de restore Longhorn a partir do backup (via API/UI) — ex.: prometheus-restored
+# 2. anexar o volume restaurado no mesmo node onde o pod roda:
+kubectl patch volumes.longhorn.io <vol-restaurado> -n longhorn-system \
+  --type=merge -p '{"spec":{"nodeID":"<node>"}}'
+
+# 3. deletar o pod (libera o volume vivo pra escrita fora do container)
+kubectl delete pod <pod>-0 -n <ns>
+
+# 4. no node: montar restaurado read-only e copiar pro globalmount do volume vivo
+mkdir -p /mnt/restore-src
+mount -o ro /dev/longhorn/<vol-restaurado> /mnt/restore-src
+GM=/var/lib/kubelet/plugins/kubernetes.io/csi/driver.longhorn.io/<hash>/globalmount
+cp -a /mnt/restore-src/prometheus-db/. $GM/prometheus-db/
+
+# 5. Prometheus especifico: remover WAL/head quebrados do backup
+rm -rf $GM/prometheus-db/wal/* $GM/prometheus-db/chunks_head/* \
+       $GM/prometheus-db/lock $GM/prometheus-db/queries.active
+
+# 6. recriar pod e validar
+kubectl get pod <pod>-0 -n <ns> -w
+```
+
+### Armadilhas encontradas
+
+- **WAL misto**: copiar o `wal/` do backup por cima do wal novo gera `segments are not sequential` -> sempre limpar `wal/` + `chunks_head/` antes de subir
+- **Copia interrompida deixa arquivos truncados**: `meta.json` cortado nao e re-copiado por `cp -u` (mtime do destino e mais novo) — apagar o diretorio do bloco no destino e re-copiar
+- **PV com reclaim `Delete` nao pode ficar orfao** — usar `Retain` no PV temporario do restore
+- **Deletar a PVC sem parar o pod** trava em `Terminating` (kubelet segura o volume)
+
+### Resultado
+
+363 blocos TSDB restaurados (~13G), `prometheus-0` `2/2 Running`, historico consultavel desde ~11/set. 1 bloco corrompido no proprio backup (`meta.json` ausente na origem) foi descartado.
+
+**Licao:** sob GitOps com `selfHeal`, lutar contra o reconcile e perda de tempo — trabalhar *com* o estado desejado (deixar o STS criar a PVC, so trocar os dados dentro) e mais rapido e mais seguro.
+
+---
+
+## Rotina de backup etcd-snapshots (Proxmox)
+
+**Contexto (2026-10-17):** snapshots do etcd so existiam no disco do CP — se o disco morresse, perdia cluster + backup. Agora ha copia diaria no storage de backup do Proxmox.
+
+### Estrutura
+
+| Camada | Destino | Frequencia | Retencao |
+|---|---|---|---|
+| vzdump VMs 500/501/502 | CIFS `192.168.50.9/PVE-BACKUP` | diario 19:30-21:00 | keep-last=5 |
+| Snapshots etcd | `pve:/var/lib/vz/longhorn-backup/etcd-snapshots` | diario 13:30 (cron) | 30 arquivos (~15 dias) |
+| Longhorn backups | NFS `192.168.50.250:/var/lib/vz/longhorn-backup` | diario 13:00 UTC | 7 |
+| Snapshot nativo etcd | CP local | a cada 12h | 5 (rke2 default) |
+
+### Script (no `pve`: `/root/bin/etcd-snapshot-backup.sh`)
+
+Copia via `scp` os arquivos novos de `root@192.168.50.20:/var/lib/rancher/rke2/server/db/snapshots/` para `/var/lib/vz/longhorn-backup/etcd-snapshots/`, mantendo os 30 mais recentes (`etcd-snapshot-*`; `on-demand-*`/`pre-update-*` nunca sao podados). Cron: `30 13 * * *`.
+
+Pre-requisito: chave SSH do pve autorizada no CP (`ssh-copy-id root@192.168.50.20`).
+
+### Validar
+
+```bash
+ls -lh /var/lib/vz/longhorn-backup/etcd-snapshots/          # no pve
+journalctl -t etcd-snapshot-backup --since today            # log da rotina
+```
