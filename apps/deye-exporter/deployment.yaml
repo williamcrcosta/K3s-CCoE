@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deye-exporter
+  namespace: monitoring
+  labels:
+    app: deye-exporter
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: deye-exporter
+  template:
+    metadata:
+      labels:
+        app: deye-exporter
+    spec:
+      containers:
+        - name: deye-exporter
+          image: ghcr.io/williamcrcosta/deye-exporter:sha-557afc13505671ecb08b5b5471de4e37866a54c5
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: metrics
+              containerPort: 9808
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5
+          env:
+            - name: DEYE_SERIAL
+              valueFrom:
+                secretKeyRef:
+                  name: deye-exporter-secret
+                  key: serial
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 10001
