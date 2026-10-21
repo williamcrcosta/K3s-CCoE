@@ -1,0 +1,38 @@
+name: DEYE Exporter CI
+
+on:
+  push:
+    branches:
+      - feature/deye-solar-monitoring
+    paths:
+      - "apps/deye-exporter/**"
+      - ".github/workflows/deye-exporter.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Validate Python syntax
+        run: |
+          python -m compileall -q apps/deye-exporter
+
+      - name: Validate Dockerfile exists
+        run: |
+          test -f apps/deye-exporter/Dockerfile
+
+      - name: Validate Docker build
+        run: |
+          docker build -t deye-exporter:ci apps/deye-exporter
