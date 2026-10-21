@@ -9,6 +9,7 @@ resources:
   #- apps/technitium.yaml
   #- apps/powerdns.yaml
   - apps/monitoring.yaml
+  - apps/deye-exporter.yaml
   - apps/zabbix.yaml
   - apps/kubernetes-dashboard.yaml
   - apps/sealed-secrets.yaml
