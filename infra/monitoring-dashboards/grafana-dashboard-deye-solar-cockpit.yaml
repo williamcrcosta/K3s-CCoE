@@ -128,7 +128,7 @@ data:
           "gridPos": {
             "x": 0,
             "y": 3,
-            "w": 6,
+            "w": 4,
             "h": 4
           },
           "targets": [
@@ -183,9 +183,9 @@ data:
             "uid": "prometheus"
           },
           "gridPos": {
-            "x": 6,
+            "x": 4,
             "y": 3,
-            "w": 6,
+            "w": 4,
             "h": 4
           },
           "targets": [
@@ -241,6 +241,63 @@ data:
         },
         {
           "id": 5,
+          "title": "Pico de potência (24h)",
+          "type": "stat",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "gridPos": {
+            "x": 8,
+            "y": 3,
+            "w": 4,
+            "h": 4
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "max_over_time((sum(deye_pv1_power_watts{job=\"deye-exporter\"}) + sum(deye_pv2_power_watts{job=\"deye-exporter\"}))[24h:1m])",
+              "range": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [],
+              "overrides": [],
+              "color": {
+                "mode": "fixed",
+                "fixedColor": "orange"
+              },
+              "unit": "watt",
+              "decimals": 1
+            },
+            "overrides": []
+          },
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "description": "Maior potência instantânea registrada nas últimas 24h."
+        },
+        {
+          "id": 6,
           "title": "Energia histórica acumulada",
           "type": "stat",
           "datasource": {
@@ -250,7 +307,7 @@ data:
           "gridPos": {
             "x": 12,
             "y": 3,
-            "w": 6,
+            "w": 4,
             "h": 4
           },
           "targets": [
@@ -297,7 +354,7 @@ data:
           "description": "Leitura vitalícia do inversor (registrador interno)."
         },
         {
-          "id": 6,
+          "id": 7,
           "title": "Estado do inversor",
           "type": "stat",
           "datasource": {
@@ -305,9 +362,9 @@ data:
             "uid": "prometheus"
           },
           "gridPos": {
-            "x": 18,
+            "x": 16,
             "y": 3,
-            "w": 6,
+            "w": 4,
             "h": 4
           },
           "targets": [
@@ -373,7 +430,80 @@ data:
           "description": "1 = último polling Modbus bem-sucedido; 0 = falha de comunicação."
         },
         {
-          "id": 7,
+          "id": 8,
+          "title": "Última coleta há",
+          "type": "stat",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "gridPos": {
+            "x": 20,
+            "y": 3,
+            "w": 4,
+            "h": 4
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "time() - deye_last_success_timestamp_seconds{job=\"deye-exporter\"}",
+              "range": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [],
+              "overrides": [],
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 120
+                  },
+                  {
+                    "color": "red",
+                    "value": 300
+                  }
+                ]
+              },
+              "unit": "s",
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "description": "Segundos desde o último polling OK (métrica dedicada do exporter)."
+        },
+        {
+          "id": 9,
           "title": "⚡ Saída AC / Rede",
           "type": "row",
           "collapsed": false,
@@ -386,7 +516,7 @@ data:
           "panels": []
         },
         {
-          "id": 8,
+          "id": 10,
           "title": "Tensão AC",
           "type": "gauge",
           "datasource": {
@@ -458,7 +588,7 @@ data:
           }
         },
         {
-          "id": 9,
+          "id": 11,
           "title": "Corrente AC",
           "type": "gauge",
           "datasource": {
@@ -530,7 +660,7 @@ data:
           }
         },
         {
-          "id": 10,
+          "id": 12,
           "title": "Frequência AC",
           "type": "gauge",
           "datasource": {
@@ -611,7 +741,7 @@ data:
           "description": "Nominal 60 Hz. Faixa verde 59.8–60.3 Hz."
         },
         {
-          "id": 11,
+          "id": 13,
           "title": "Histórico de tensão AC",
           "type": "timeseries",
           "datasource": {
@@ -698,7 +828,7 @@ data:
           }
         },
         {
-          "id": 12,
+          "id": 14,
           "title": "Histórico de frequência AC",
           "type": "timeseries",
           "datasource": {
@@ -785,7 +915,7 @@ data:
           }
         },
         {
-          "id": 13,
+          "id": 15,
           "title": "📈 Produção Fotovoltaica",
           "type": "row",
           "collapsed": false,
@@ -798,7 +928,7 @@ data:
           "panels": []
         },
         {
-          "id": 14,
+          "id": 16,
           "title": "Curva de potência solar — PV1 + PV2",
           "type": "timeseries",
           "datasource": {
@@ -931,7 +1061,7 @@ data:
           "description": "Potência DC calculada (V × A) por string + soma."
         },
         {
-          "id": 15,
+          "id": 17,
           "title": "Energia produzida no dia (acumulado)",
           "type": "timeseries",
           "datasource": {
@@ -1019,20 +1149,147 @@ data:
           "description": "Rampa do contador diário do inversor; platô = fim da geração do dia."
         },
         {
-          "id": 16,
+          "id": 18,
+          "title": "Produção — janelas móveis de 24h (ao vivo)",
+          "type": "bargauge",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "gridPos": {
+            "x": 0,
+            "y": 37,
+            "w": 24,
+            "h": 5
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "increase(deye_energy_total_kwh{job=\"deye-exporter\"}[1d] offset 0d)",
+              "range": true,
+              "legendFormat": "últimas 24h"
+            },
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "increase(deye_energy_total_kwh{job=\"deye-exporter\"}[1d] offset 1d)",
+              "range": true,
+              "legendFormat": "-1d"
+            },
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "increase(deye_energy_total_kwh{job=\"deye-exporter\"}[1d] offset 2d)",
+              "range": true,
+              "legendFormat": "-2d"
+            },
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "increase(deye_energy_total_kwh{job=\"deye-exporter\"}[1d] offset 3d)",
+              "range": true,
+              "legendFormat": "-3d"
+            },
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "increase(deye_energy_total_kwh{job=\"deye-exporter\"}[1d] offset 4d)",
+              "range": true,
+              "legendFormat": "-4d"
+            },
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "increase(deye_energy_total_kwh{job=\"deye-exporter\"}[1d] offset 5d)",
+              "range": true,
+              "legendFormat": "-5d"
+            },
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "increase(deye_energy_total_kwh{job=\"deye-exporter\"}[1d] offset 6d)",
+              "range": true,
+              "legendFormat": "-6d"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [],
+              "overrides": [],
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "kwatth",
+              "decimals": 1
+            },
+            "overrides": []
+          },
+          "options": {
+            "displayMode": "gradient",
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true
+          },
+          "description": "Produção por janela móvel de 24h calculada do contador vitalício. Janelas anteriores à implantação do exporter ficam vazias e se preenchem com o tempo; para o histórico completo ver SOLARMAN."
+        },
+        {
+          "id": 19,
           "title": "🔌 Strings DC / MPPT",
           "type": "row",
           "collapsed": false,
           "gridPos": {
             "x": 0,
-            "y": 37,
+            "y": 42,
             "w": 24,
             "h": 1
           },
           "panels": []
         },
         {
-          "id": 17,
+          "id": 20,
           "title": "Potência por entrada",
           "type": "timeseries",
           "datasource": {
@@ -1041,7 +1298,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 38,
+            "y": 43,
             "w": 8,
             "h": 8
           },
@@ -1129,7 +1386,7 @@ data:
           }
         },
         {
-          "id": 18,
+          "id": 21,
           "title": "Tensão DC por entrada",
           "type": "timeseries",
           "datasource": {
@@ -1138,7 +1395,7 @@ data:
           },
           "gridPos": {
             "x": 8,
-            "y": 38,
+            "y": 43,
             "w": 8,
             "h": 8
           },
@@ -1226,7 +1483,7 @@ data:
           }
         },
         {
-          "id": 19,
+          "id": 22,
           "title": "Corrente DC por entrada",
           "type": "timeseries",
           "datasource": {
@@ -1235,7 +1492,7 @@ data:
           },
           "gridPos": {
             "x": 16,
-            "y": 38,
+            "y": 43,
             "w": 8,
             "h": 8
           },
@@ -1323,20 +1580,20 @@ data:
           }
         },
         {
-          "id": 20,
+          "id": 23,
           "title": "🛰️ Saúde da Coleta",
           "type": "row",
           "collapsed": false,
           "gridPos": {
             "x": 0,
-            "y": 46,
+            "y": 51,
             "w": 24,
             "h": 1
           },
           "panels": []
         },
         {
-          "id": 21,
+          "id": 24,
           "title": "Coleta ativa",
           "type": "stat",
           "datasource": {
@@ -1345,7 +1602,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 47,
+            "y": 52,
             "w": 8,
             "h": 4
           },
@@ -1412,7 +1669,7 @@ data:
           "description": "Target Prometheus do exporter (up)."
         },
         {
-          "id": 22,
+          "id": 25,
           "title": "Erros de comunicação — 1h",
           "type": "stat",
           "datasource": {
@@ -1421,7 +1678,7 @@ data:
           },
           "gridPos": {
             "x": 8,
-            "y": 47,
+            "y": 52,
             "w": 8,
             "h": 4
           },
@@ -1485,8 +1742,8 @@ data:
           "description": "Falhas de polling Modbus na última hora."
         },
         {
-          "id": 23,
-          "title": "Última coleta bem-sucedida",
+          "id": 26,
+          "title": "Disponibilidade da coleta — 24h",
           "type": "stat",
           "datasource": {
             "type": "prometheus",
@@ -1494,7 +1751,7 @@ data:
           },
           "gridPos": {
             "x": 16,
-            "y": 47,
+            "y": 52,
             "w": 8,
             "h": 4
           },
@@ -1505,7 +1762,7 @@ data:
                 "type": "prometheus",
                 "uid": "prometheus"
               },
-              "expr": "time() - deye_last_success_timestamp_seconds{job=\"deye-exporter\"}",
+              "expr": "avg_over_time(up{job=\"deye-exporter\"}[24h]) * 100",
               "range": true
             }
           ],
@@ -1520,21 +1777,21 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "red",
                     "value": null
                   },
                   {
                     "color": "yellow",
-                    "value": 120
+                    "value": 95
                   },
                   {
-                    "color": "red",
-                    "value": 300
+                    "color": "green",
+                    "value": 99
                   }
                 ]
               },
-              "unit": "s",
-              "decimals": 0
+              "unit": "percent",
+              "decimals": 1
             },
             "overrides": []
           },
@@ -1555,10 +1812,10 @@ data:
             "textMode": "auto",
             "wideLayout": true
           },
-          "description": "Segundos desde o último polling OK (métrica dedicada do exporter)."
+          "description": "Percentual do tempo com o target do exporter respondendo ao Prometheus."
         },
         {
-          "id": 24,
+          "id": 27,
           "title": "Disponibilidade do inversor",
           "type": "timeseries",
           "datasource": {
@@ -1567,7 +1824,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 51,
+            "y": 56,
             "w": 12,
             "h": 8
           },
@@ -1647,7 +1904,7 @@ data:
           "description": "1 = comunicando; quedas para 0 indicam falha de polling."
         },
         {
-          "id": 25,
+          "id": 28,
           "title": "Falhas de comunicação — eventos/5min",
           "type": "timeseries",
           "datasource": {
@@ -1656,7 +1913,7 @@ data:
           },
           "gridPos": {
             "x": 12,
-            "y": 51,
+            "y": 56,
             "w": 12,
             "h": 8
           },
@@ -1751,20 +2008,20 @@ data:
           }
         },
         {
-          "id": 26,
+          "id": 29,
           "title": "🗃️ Histórico SOLARMAN — PostgreSQL",
           "type": "row",
           "collapsed": false,
           "gridPos": {
             "x": 0,
-            "y": 59,
+            "y": 64,
             "w": 24,
             "h": 1
           },
           "panels": []
         },
         {
-          "id": 27,
+          "id": 30,
           "title": "Produção total importada",
           "type": "stat",
           "datasource": {
@@ -1773,7 +2030,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 60,
+            "y": 65,
             "w": 6,
             "h": 4
           },
@@ -1822,7 +2079,7 @@ data:
           "description": "Total apenas dos dias importados; não é a leitura vitalícia do inversor."
         },
         {
-          "id": 28,
+          "id": 31,
           "title": "Produção em 2025",
           "type": "stat",
           "datasource": {
@@ -1831,7 +2088,7 @@ data:
           },
           "gridPos": {
             "x": 6,
-            "y": 60,
+            "y": 65,
             "w": 6,
             "h": 4
           },
@@ -1879,7 +2136,7 @@ data:
           }
         },
         {
-          "id": 29,
+          "id": 32,
           "title": "Produção em 2026",
           "type": "stat",
           "datasource": {
@@ -1888,7 +2145,7 @@ data:
           },
           "gridPos": {
             "x": 12,
-            "y": 60,
+            "y": 65,
             "w": 6,
             "h": 4
           },
@@ -1937,7 +2194,7 @@ data:
           "description": "Dados de 2026 importados somente até 21/10/2026; não atualiza automaticamente."
         },
         {
-          "id": 30,
+          "id": 33,
           "title": "Defasagem da importação",
           "type": "stat",
           "datasource": {
@@ -1946,7 +2203,7 @@ data:
           },
           "gridPos": {
             "x": 18,
-            "y": 60,
+            "y": 65,
             "w": 6,
             "h": 4
           },
@@ -2011,7 +2268,7 @@ data:
           "description": "Dias desde a data mais recente no PostgreSQL. Importação é manual; não confundir com falha de coleta em tempo real."
         },
         {
-          "id": 31,
+          "id": 34,
           "title": "Produção diária (kWh)",
           "type": "timeseries",
           "datasource": {
@@ -2020,7 +2277,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 64,
+            "y": 69,
             "w": 24,
             "h": 9
           },
@@ -2116,7 +2373,7 @@ data:
           "timeFrom": "2y"
         },
         {
-          "id": 32,
+          "id": 35,
           "title": "Produção mensal (kWh)",
           "type": "timeseries",
           "datasource": {
@@ -2125,7 +2382,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 73,
+            "y": 78,
             "w": 12,
             "h": 8
           },
@@ -2221,7 +2478,7 @@ data:
           "timeFrom": "2y"
         },
         {
-          "id": 33,
+          "id": 36,
           "title": "Produção acumulada no intervalo",
           "type": "timeseries",
           "datasource": {
@@ -2230,7 +2487,7 @@ data:
           },
           "gridPos": {
             "x": 12,
-            "y": 73,
+            "y": 78,
             "w": 12,
             "h": 8
           },
@@ -2326,7 +2583,7 @@ data:
           "timeFrom": "2y"
         },
         {
-          "id": 34,
+          "id": 37,
           "title": "Comparativo mensal 2025 × 2026",
           "type": "barchart",
           "datasource": {
@@ -2335,7 +2592,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 81,
+            "y": 86,
             "w": 24,
             "h": 8
           },
@@ -2384,20 +2641,20 @@ data:
           }
         },
         {
-          "id": 35,
+          "id": 38,
           "title": "🧾 Qualidade e Cobertura do Histórico",
           "type": "row",
           "collapsed": false,
           "gridPos": {
             "x": 0,
-            "y": 89,
+            "y": 94,
             "w": 24,
             "h": 1
           },
           "panels": []
         },
         {
-          "id": 36,
+          "id": 39,
           "title": "Dias com registros",
           "type": "stat",
           "datasource": {
@@ -2406,7 +2663,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 90,
+            "y": 95,
             "w": 6,
             "h": 4
           },
@@ -2454,7 +2711,7 @@ data:
           }
         },
         {
-          "id": 37,
+          "id": 40,
           "title": "Maior produção diária",
           "type": "stat",
           "datasource": {
@@ -2463,7 +2720,7 @@ data:
           },
           "gridPos": {
             "x": 6,
-            "y": 90,
+            "y": 95,
             "w": 6,
             "h": 4
           },
@@ -2511,7 +2768,7 @@ data:
           }
         },
         {
-          "id": 38,
+          "id": 41,
           "title": "Média por dia registrado",
           "type": "stat",
           "datasource": {
@@ -2520,7 +2777,7 @@ data:
           },
           "gridPos": {
             "x": 12,
-            "y": 90,
+            "y": 95,
             "w": 6,
             "h": 4
           },
@@ -2569,7 +2826,7 @@ data:
           "description": "Média dos dias com registro, não de todos os dias do calendário."
         },
         {
-          "id": 39,
+          "id": 42,
           "title": "Datas ausentes no histórico",
           "type": "stat",
           "datasource": {
@@ -2578,7 +2835,7 @@ data:
           },
           "gridPos": {
             "x": 18,
-            "y": 90,
+            "y": 95,
             "w": 6,
             "h": 4
           },
@@ -2643,7 +2900,7 @@ data:
           "description": "Conta datas ausentes, não assume que houve geração zero."
         },
         {
-          "id": 40,
+          "id": 43,
           "title": "Datas ausentes (detalhe)",
           "type": "table",
           "datasource": {
@@ -2652,7 +2909,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 94,
+            "y": 99,
             "w": 12,
             "h": 10
           },
@@ -2700,7 +2957,7 @@ data:
           "description": "Datas entre o primeiro e o último registro sem medição importada."
         },
         {
-          "id": 41,
+          "id": 44,
           "title": "Últimos registros importados",
           "type": "table",
           "datasource": {
@@ -2709,7 +2966,7 @@ data:
           },
           "gridPos": {
             "x": 12,
-            "y": 94,
+            "y": 99,
             "w": 12,
             "h": 10
           },
