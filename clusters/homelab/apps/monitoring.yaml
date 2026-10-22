@@ -41,6 +41,7 @@ spec:
           plugins:
           - alexanderzobnin-zabbix-app
           - marcusolsson-dynamictext-panel
+          - grafana-postgresql-datasource
           additionalDataSources:
           - name: Loki
             type: loki
