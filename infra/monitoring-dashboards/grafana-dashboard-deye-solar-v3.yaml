@@ -1,0 +1,516 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-deye-solar-v3
+  namespace: monitoring
+  labels:
+    grafana_dashboard: '1'
+data:
+  deye-solar-v3.json: "{\n  \"id\": null,\n  \"uid\": \"deye-solar-homelab-v3\",\n  \"title\": \"DEYE Solar Analytics V3 |\
+    \ Histórico + Tempo Real\",\n  \"description\": \"SOLARMAN histórico importado até 21/10/2026 no PostgreSQL; telemetria\
+    \ ao vivo via Prometheus. Ausência de dados não significa geração zero. Consumo e rede não validados.\",\n  \"tags\":\
+    \ [\n    \"deye\",\n    \"solar\",\n    \"homelab\",\n    \"v3\",\n    \"postgresql\",\n    \"prometheus\"\n  ],\n  \"\
+    timezone\": \"America/Sao_Paulo\",\n  \"schemaVersion\": 42,\n  \"version\": 1,\n  \"refresh\": \"5m\",\n  \"time\": {\n\
+    \    \"from\": \"now-2y\",\n    \"to\": \"now\"\n  },\n  \"panels\": [\n    {\n      \"id\": 101,\n      \"title\": \"\
+    01 | Histórico consolidado — SOLARMAN\",\n      \"type\": \"row\",\n      \"gridPos\": {\n        \"x\": 0,\n        \"\
+    y\": 0,\n        \"w\": 24,\n        \"h\": 1\n      },\n      \"collapsed\": false,\n      \"panels\": []\n    },\n \
+    \   {\n      \"id\": 102,\n      \"title\": \"Produção total importada\",\n      \"type\": \"stat\",\n      \"datasource\"\
+    : {\n        \"type\": \"postgres\",\n        \"uid\": \"cg1y9v0o3durkf\"\n      },\n      \"gridPos\": {\n        \"\
+    x\": 0,\n        \"y\": 1,\n        \"w\": 6,\n        \"h\": 4\n      },\n      \"targets\": [\n        {\n         \
+    \ \"refId\": \"A\",\n          \"datasource\": {\n            \"type\": \"postgres\",\n            \"uid\": \"cg1y9v0o3durkf\"\
+    \n          },\n          \"rawSql\": \"SELECT COALESCE(SUM(production_kwh),0) AS \\\"Total (kWh)\\\" FROM public.solar_daily_production\
+    \ WHERE device_sn='2405054309';\",\n          \"format\": \"table\",\n          \"editorMode\": \"code\"\n        }\n\
+    \      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"kwatth\"\n        },\n        \"overrides\"\
+    : []\n      },\n      \"description\": \"Total apenas dos dias importados; não é a leitura vitalícia do inversor.\",\n\
+    \      \"options\": {\n        \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n          ],\n\
+    \          \"fields\": \"\",\n          \"values\": false\n        },\n        \"orientation\": \"auto\",\n        \"\
+    textMode\": \"value\",\n        \"colorMode\": \"value\",\n        \"graphMode\": \"none\"\n      }\n    },\n    {\n \
+    \     \"id\": 103,\n      \"title\": \"Produção em 2025\",\n      \"type\": \"stat\",\n      \"datasource\": {\n     \
+    \   \"type\": \"postgres\",\n        \"uid\": \"cg1y9v0o3durkf\"\n      },\n      \"gridPos\": {\n        \"x\": 6,\n\
+    \        \"y\": 1,\n        \"w\": 6,\n        \"h\": 4\n      },\n      \"targets\": [\n        {\n          \"refId\"\
+    : \"A\",\n          \"datasource\": {\n            \"type\": \"postgres\",\n            \"uid\": \"cg1y9v0o3durkf\"\n\
+    \          },\n          \"rawSql\": \"SELECT COALESCE(SUM(production_kwh),0) AS \\\"2025 (kWh)\\\" FROM public.solar_daily_production\
+    \ WHERE device_sn='2405054309' AND production_date >= DATE '2025-01-01' AND production_date < DATE '2026-01-01';\",\n\
+    \          \"format\": \"table\",\n          \"editorMode\": \"code\"\n        }\n      ],\n      \"fieldConfig\": {\n\
+    \        \"defaults\": {\n          \"unit\": \"kwatth\"\n        },\n        \"overrides\": []\n      },\n      \"options\"\
+    : {\n        \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\"\
+    : \"\",\n          \"values\": false\n        },\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\"\
+    ,\n        \"colorMode\": \"value\",\n        \"graphMode\": \"none\"\n      }\n    },\n    {\n      \"id\": 104,\n  \
+    \    \"title\": \"Produção em 2026 (importada)\",\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\"\
+    : \"postgres\",\n        \"uid\": \"cg1y9v0o3durkf\"\n      },\n      \"gridPos\": {\n        \"x\": 12,\n        \"y\"\
+    : 1,\n        \"w\": 6,\n        \"h\": 4\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n  \
+    \        \"datasource\": {\n            \"type\": \"postgres\",\n            \"uid\": \"cg1y9v0o3durkf\"\n          },\n\
+    \          \"rawSql\": \"SELECT COALESCE(SUM(production_kwh),0) AS \\\"2026 (kWh)\\\" FROM public.solar_daily_production\
+    \ WHERE device_sn='2405054309' AND production_date >= DATE '2026-01-01' AND production_date < DATE '2027-01-01';\",\n\
+    \          \"format\": \"table\",\n          \"editorMode\": \"code\"\n        }\n      ],\n      \"fieldConfig\": {\n\
+    \        \"defaults\": {\n          \"unit\": \"kwatth\"\n        },\n        \"overrides\": []\n      },\n      \"description\"\
+    : \"Dados de 2026 importados somente até 21/10/2026; não atualiza automaticamente.\",\n      \"options\": {\n        \"\
+    reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n \
+    \         \"values\": false\n        },\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n      \
+    \  \"colorMode\": \"value\",\n        \"graphMode\": \"none\"\n      }\n    },\n    {\n      \"id\": 105,\n      \"title\"\
+    : \"Última data importada\",\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"postgres\",\n  \
+    \      \"uid\": \"cg1y9v0o3durkf\"\n      },\n      \"gridPos\": {\n        \"x\": 18,\n        \"y\": 1,\n        \"\
+    w\": 6,\n        \"h\": 4\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"datasource\"\
+    : {\n            \"type\": \"postgres\",\n            \"uid\": \"cg1y9v0o3durkf\"\n          },\n          \"rawSql\"\
+    : \"SELECT EXTRACT(EPOCH FROM (CURRENT_DATE - MAX(production_date))) * 86400 AS \\\"Defasagem (segundos)\\\" FROM public.solar_daily_production\
+    \ WHERE device_sn='2405054309';\",\n          \"format\": \"table\",\n          \"editorMode\": \"code\"\n        }\n\
+    \      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"s\"\n        },\n        \"overrides\"\
+    : []\n      },\n      \"description\": \"Idade em segundos da data mais recente no PostgreSQL; não confundir com falha\
+    \ de coleta em tempo real.\",\n      \"options\": {\n        \"reduceOptions\": {\n          \"calcs\": [\n          \
+    \  \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\": false\n        },\n        \"orientation\"\
+    : \"auto\",\n        \"textMode\": \"value\",\n        \"colorMode\": \"value\",\n        \"graphMode\": \"none\"\n  \
+    \    }\n    },\n    {\n      \"id\": 106,\n      \"title\": \"02 | Séries históricas e comparativos\",\n      \"type\"\
+    : \"row\",\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 5,\n        \"w\": 24,\n        \"h\": 1\n      },\n\
+    \      \"collapsed\": false,\n      \"panels\": []\n    },\n    {\n      \"id\": 107,\n      \"title\": \"Produção diária\
+    \ (kWh)\",\n      \"type\": \"timeseries\",\n      \"datasource\": {\n        \"type\": \"postgres\",\n        \"uid\"\
+    : \"cg1y9v0o3durkf\"\n      },\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 6,\n        \"w\": 24,\n     \
+    \   \"h\": 9\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"datasource\": {\n  \
+    \          \"type\": \"postgres\",\n            \"uid\": \"cg1y9v0o3durkf\"\n          },\n          \"rawSql\": \"SELECT\
+    \ ((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo') AS time, production_kwh AS \\\"\
+    Produção diária\\\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND $__timeFilter(((production_date::timestamp\
+    \ + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo')) ORDER BY time;\",\n          \"format\": \"time_series\",\n\
+    \          \"editorMode\": \"code\"\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n        \
+    \  \"unit\": \"kwatth\"\n        },\n        \"overrides\": []\n      },\n      \"description\": \"Cada dia posicionado\
+    \ ao meio-dia local para evitar deslocamentos de data.\",\n      \"options\": {\n        \"legend\": {\n          \"displayMode\"\
+    : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n\
+    \          \"mode\": \"multi\",\n          \"sort\": \"desc\"\n        }\n      }\n    },\n    {\n      \"id\": 108,\n\
+    \      \"title\": \"Produção mensal (kWh)\",\n      \"type\": \"timeseries\",\n      \"datasource\": {\n        \"type\"\
+    : \"postgres\",\n        \"uid\": \"cg1y9v0o3durkf\"\n      },\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\"\
+    : 15,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n\
+    \          \"datasource\": {\n            \"type\": \"postgres\",\n            \"uid\": \"cg1y9v0o3durkf\"\n         \
+    \ },\n          \"rawSql\": \"SELECT (date_trunc('month',production_date::timestamp) + INTERVAL '12 hours') AT TIME ZONE\
+    \ 'America/Sao_Paulo' AS time, SUM(production_kwh) AS \\\"Produção mensal\\\" FROM public.solar_daily_production WHERE\
+    \ device_sn='2405054309' AND $__timeFilter((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo')\
+    \ GROUP BY 1 ORDER BY 1;\",\n          \"format\": \"time_series\",\n          \"editorMode\": \"code\"\n        }\n \
+    \     ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"kwatth\"\n        },\n        \"overrides\"\
+    : []\n      },\n      \"description\": \"Meses incompletos ou com dias sem medição não devem ser comparados diretamente\
+    \ com meses completos.\",\n      \"options\": {\n        \"legend\": {\n          \"displayMode\": \"list\",\n       \
+    \   \"placement\": \"bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n          \"mode\"\
+    : \"multi\",\n          \"sort\": \"desc\"\n        }\n      }\n    },\n    {\n      \"id\": 109,\n      \"title\": \"\
+    Produção acumulada no intervalo\",\n      \"type\": \"timeseries\",\n      \"datasource\": {\n        \"type\": \"postgres\"\
+    ,\n        \"uid\": \"cg1y9v0o3durkf\"\n      },\n      \"gridPos\": {\n        \"x\": 12,\n        \"y\": 15,\n     \
+    \   \"w\": 12,\n        \"h\": 8\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"\
+    datasource\": {\n            \"type\": \"postgres\",\n            \"uid\": \"cg1y9v0o3durkf\"\n          },\n        \
+    \  \"rawSql\": \"SELECT ((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo') AS time,\
+    \ SUM(production_kwh) OVER (ORDER BY production_date ROWS UNBOUNDED PRECEDING) AS \\\"Acumulado no período\\\" FROM public.solar_daily_production\
+    \ WHERE device_sn='2405054309' AND $__timeFilter(((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo'))\
+    \ ORDER BY time;\",\n          \"format\": \"time_series\",\n          \"editorMode\": \"code\"\n        }\n      ],\n\
+    \      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"kwatth\"\n        },\n        \"overrides\"\
+    : []\n      },\n      \"description\": \"Acumulado apenas dos dias dentro do período selecionado.\",\n      \"options\"\
+    : {\n        \"legend\": {\n          \"displayMode\": \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+    : true\n        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n          \"sort\": \"desc\"\n        }\n\
+    \      }\n    },\n    {\n      \"id\": 110,\n      \"title\": \"Comparativo mensal 2025 × 2026\",\n      \"type\": \"\
+    barchart\",\n      \"datasource\": {\n        \"type\": \"postgres\",\n        \"uid\": \"cg1y9v0o3durkf\"\n      },\n\
+    \      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 23,\n        \"w\": 24,\n        \"h\": 8\n      },\n      \"\
+    targets\": [\n        {\n          \"refId\": \"A\",\n          \"datasource\": {\n            \"type\": \"postgres\"\
+    ,\n            \"uid\": \"cg1y9v0o3durkf\"\n          },\n          \"rawSql\": \"SELECT EXTRACT(MONTH FROM production_date)::int\
+    \ AS \\\"Mês\\\", ROUND(SUM(production_kwh) FILTER (WHERE EXTRACT(YEAR FROM production_date)=2025),1) AS \\\"2025\\\"\
+    , ROUND(SUM(production_kwh) FILTER (WHERE EXTRACT(YEAR FROM production_date)=2026),1) AS \\\"2026\\\" FROM public.solar_daily_production\
+    \ WHERE device_sn='2405054309' AND EXTRACT(YEAR FROM production_date) IN (2025,2026) GROUP BY 1 ORDER BY 1;\",\n     \
+    \     \"format\": \"table\",\n          \"editorMode\": \"code\"\n        }\n      ],\n      \"fieldConfig\": {\n    \
+    \    \"defaults\": {\n          \"unit\": \"kwatth\"\n        },\n        \"overrides\": []\n      },\n      \"description\"\
+    : \"2025 começa em 18/jan e tem lacunas em julho; 2026 termina em 21/out e tem lacunas em janeiro. Compare apenas períodos\
+    \ equivalentes.\",\n      \"options\": {\n        \"orientation\": \"auto\",\n        \"xField\": \"Mês\",\n        \"\
+    showValue\": \"never\",\n        \"stacking\": \"none\",\n        \"groupWidth\": 0.7,\n        \"barWidth\": 0.9,\n \
+    \       \"legend\": {\n          \"displayMode\": \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+    : true\n        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n          \"sort\": \"desc\"\n        }\n\
+    \      }\n    },\n    {\n      \"id\": 111,\n      \"title\": \"03 | Qualidade e cobertura do histórico\",\n      \"type\"\
+    : \"row\",\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 31,\n        \"w\": 24,\n        \"h\": 1\n      },\n\
+    \      \"collapsed\": false,\n      \"panels\": []\n    },\n    {\n      \"id\": 112,\n      \"title\": \"Dias com registros\"\
+    ,\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"postgres\",\n        \"uid\": \"cg1y9v0o3durkf\"\
+    \n      },\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 32,\n        \"w\": 6,\n        \"h\": 4\n      },\n\
+    \      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"datasource\": {\n            \"type\": \"postgres\"\
+    ,\n            \"uid\": \"cg1y9v0o3durkf\"\n          },\n          \"rawSql\": \"SELECT COUNT(*) AS \\\"Dias com medição\\\
+    \" FROM public.solar_daily_production WHERE device_sn='2405054309';\",\n          \"format\": \"table\",\n          \"\
+    editorMode\": \"code\"\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"\
+    none\"\n        },\n        \"overrides\": []\n      },\n      \"options\": {\n        \"reduceOptions\": {\n        \
+    \  \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\": false\n\
+    \        },\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n        \"colorMode\": \"value\",\n\
+    \        \"graphMode\": \"none\"\n      }\n    },\n    {\n      \"id\": 113,\n      \"title\": \"Maior produção diária\"\
+    ,\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"postgres\",\n        \"uid\": \"cg1y9v0o3durkf\"\
+    \n      },\n      \"gridPos\": {\n        \"x\": 6,\n        \"y\": 32,\n        \"w\": 6,\n        \"h\": 4\n      },\n\
+    \      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"datasource\": {\n            \"type\": \"postgres\"\
+    ,\n            \"uid\": \"cg1y9v0o3durkf\"\n          },\n          \"rawSql\": \"SELECT MAX(production_kwh) AS \\\"Recorde\
+    \ diário\\\" FROM public.solar_daily_production WHERE device_sn='2405054309';\",\n          \"format\": \"table\",\n \
+    \         \"editorMode\": \"code\"\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n         \
+    \ \"unit\": \"kwatth\"\n        },\n        \"overrides\": []\n      },\n      \"options\": {\n        \"reduceOptions\"\
+    : {\n          \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\"\
+    : false\n        },\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n        \"colorMode\": \"value\"\
+    ,\n        \"graphMode\": \"none\"\n      }\n    },\n    {\n      \"id\": 114,\n      \"title\": \"Média por dia registrado\"\
+    ,\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"postgres\",\n        \"uid\": \"cg1y9v0o3durkf\"\
+    \n      },\n      \"gridPos\": {\n        \"x\": 12,\n        \"y\": 32,\n        \"w\": 6,\n        \"h\": 4\n      },\n\
+    \      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"datasource\": {\n            \"type\": \"postgres\"\
+    ,\n            \"uid\": \"cg1y9v0o3durkf\"\n          },\n          \"rawSql\": \"SELECT ROUND(AVG(production_kwh),2)\
+    \ AS \\\"Média por registro\\\" FROM public.solar_daily_production WHERE device_sn='2405054309';\",\n          \"format\"\
+    : \"table\",\n          \"editorMode\": \"code\"\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"unit\": \"kwatth\"\n        },\n        \"overrides\": []\n      },\n      \"description\": \"Média dos\
+    \ dias com registro, não de todos os dias do calendário.\",\n      \"options\": {\n        \"reduceOptions\": {\n    \
+    \      \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\": false\n\
+    \        },\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n        \"colorMode\": \"value\",\n\
+    \        \"graphMode\": \"none\"\n      }\n    },\n    {\n      \"id\": 115,\n      \"title\": \"Datas ausentes entre\
+    \ primeiro e último registro\",\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"postgres\",\n\
+    \        \"uid\": \"cg1y9v0o3durkf\"\n      },\n      \"gridPos\": {\n        \"x\": 18,\n        \"y\": 32,\n       \
+    \ \"w\": 6,\n        \"h\": 4\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"datasource\"\
+    : {\n            \"type\": \"postgres\",\n            \"uid\": \"cg1y9v0o3durkf\"\n          },\n          \"rawSql\"\
+    : \"SELECT COUNT(*) AS \\\"Datas sem registro\\\" FROM generate_series((SELECT MIN(production_date) FROM public.solar_daily_production\
+    \ WHERE device_sn='2405054309'),(SELECT MAX(production_date) FROM public.solar_daily_production WHERE device_sn='2405054309'),\
+    \ INTERVAL '1 day') AS d(day) LEFT JOIN public.solar_daily_production p ON p.production_date=d.day::date AND p.device_sn='2405054309'\
+    \ WHERE p.production_date IS NULL;\",\n          \"format\": \"table\",\n          \"editorMode\": \"code\"\n        }\n\
+    \      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"none\"\n        },\n        \"overrides\"\
+    : []\n      },\n      \"description\": \"Conta datas ausentes, não assume que houve geração zero.\",\n      \"options\"\
+    : {\n        \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\"\
+    : \"\",\n          \"values\": false\n        },\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\"\
+    ,\n        \"colorMode\": \"value\",\n        \"graphMode\": \"none\"\n      }\n    },\n    {\n      \"id\": 116,\n  \
+    \    \"title\": \"Datas ausentes (detalhe)\",\n      \"type\": \"table\",\n      \"datasource\": {\n        \"type\":\
+    \ \"postgres\",\n        \"uid\": \"cg1y9v0o3durkf\"\n      },\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\"\
+    : 36,\n        \"w\": 12,\n        \"h\": 10\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n\
+    \          \"datasource\": {\n            \"type\": \"postgres\",\n            \"uid\": \"cg1y9v0o3durkf\"\n         \
+    \ },\n          \"rawSql\": \"SELECT d.day::date AS \\\"Data sem registro\\\" FROM generate_series((SELECT MIN(production_date)\
+    \ FROM public.solar_daily_production WHERE device_sn='2405054309'),(SELECT MAX(production_date) FROM public.solar_daily_production\
+    \ WHERE device_sn='2405054309'), INTERVAL '1 day') AS d(day) LEFT JOIN public.solar_daily_production p ON p.production_date=d.day::date\
+    \ AND p.device_sn='2405054309' WHERE p.production_date IS NULL ORDER BY 1;\",\n          \"format\": \"table\",\n    \
+    \      \"editorMode\": \"code\"\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"\
+    unit\": \"none\"\n        },\n        \"overrides\": []\n      }\n    },\n    {\n      \"id\": 117,\n      \"title\":\
+    \ \"Últimos registros importados\",\n      \"type\": \"table\",\n      \"datasource\": {\n        \"type\": \"postgres\"\
+    ,\n        \"uid\": \"cg1y9v0o3durkf\"\n      },\n      \"gridPos\": {\n        \"x\": 12,\n        \"y\": 36,\n     \
+    \   \"w\": 12,\n        \"h\": 10\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"\
+    datasource\": {\n            \"type\": \"postgres\",\n            \"uid\": \"cg1y9v0o3durkf\"\n          },\n        \
+    \  \"rawSql\": \"SELECT production_date AS \\\"Data\\\", production_kwh AS \\\"Produção (kWh)\\\", source AS \\\"Origem\\\
+    \", imported_at AS \\\"Importado em\\\" FROM public.solar_daily_production WHERE device_sn='2405054309' ORDER BY production_date\
+    \ DESC LIMIT 15;\",\n          \"format\": \"table\",\n          \"editorMode\": \"code\"\n        }\n      ],\n     \
+    \ \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"none\"\n        },\n        \"overrides\": []\n \
+    \     }\n    },\n    {\n      \"id\": 1,\n      \"title\": \"04 | Visão geral da usina solar\",\n      \"type\": \"row\"\
+    ,\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\"\
+    : {\n        \"x\": 0,\n        \"y\": 47,\n        \"w\": 24,\n        \"h\": 1\n      },\n      \"targets\": [],\n \
+    \     \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"none\",\n          \"color\": {\n           \
+    \ \"mode\": \"fixed\",\n            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\": {\n         \
+    \   \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\",\n    \
+    \            \"value\": null\n              }\n            ]\n          }\n        },\n        \"overrides\": []\n   \
+    \   },\n      \"collapsed\": false,\n      \"panels\": []\n    },\n    {\n      \"id\": 2,\n      \"title\": \"Energia\
+    \ produzida hoje\",\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"\
+    uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 48,\n        \"w\": 6,\n    \
+    \    \"h\": 4\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"deye_energy_today_kwh{job=\\\
+    \"deye-exporter\\\"}\",\n          \"legendFormat\": \"\",\n          \"datasource\": {\n            \"type\": \"prometheus\"\
+    ,\n            \"uid\": \"prometheus\"\n          },\n          \"instant\": true,\n          \"range\": false\n     \
+    \   }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"kwatth\",\n          \"color\"\
+    : {\n            \"mode\": \"fixed\",\n            \"fixedColor\": \"#F2CC0C\"\n          },\n          \"thresholds\"\
+    : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#F2CC0C\"\
+    ,\n                \"value\": null\n              }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+    \      },\n      \"options\": {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\"\
+    : \"center\",\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n        \"reduceOptions\": {\n  \
+    \        \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\": false\n\
+    \        }\n      },\n      \"timeFrom\": \"1h\"\n    },\n    {\n      \"id\": 3,\n      \"title\": \"Energia histórica\
+    \ acumulada\",\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\"\
+    : \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\": 6,\n        \"y\": 48,\n        \"w\": 6,\n        \"\
+    h\": 4\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"deye_energy_total_kwh{job=\\\
+    \"deye-exporter\\\"}\",\n          \"legendFormat\": \"\",\n          \"datasource\": {\n            \"type\": \"prometheus\"\
+    ,\n            \"uid\": \"prometheus\"\n          },\n          \"instant\": true,\n          \"range\": false\n     \
+    \   }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"kwatth\",\n          \"color\"\
+    : {\n            \"mode\": \"fixed\",\n            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\"\
+    : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\"\
+    ,\n                \"value\": null\n              }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+    \      },\n      \"options\": {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\"\
+    : \"center\",\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n        \"reduceOptions\": {\n  \
+    \        \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\": false\n\
+    \        }\n      },\n      \"timeFrom\": \"1h\"\n    },\n    {\n      \"id\": 4,\n      \"title\": \"Potência solar instantânea\"\
+    ,\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\
+    \n      },\n      \"gridPos\": {\n        \"x\": 12,\n        \"y\": 48,\n        \"w\": 6,\n        \"h\": 4\n      },\n\
+    \      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"sum(deye_pv1_power_watts{job=\\\"\
+    deye-exporter\\\"}) + sum(deye_pv2_power_watts{job=\\\"deye-exporter\\\"})\",\n          \"legendFormat\": \"\",\n   \
+    \       \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\": \"prometheus\"\n          },\n\
+    \          \"instant\": true,\n          \"range\": false\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"unit\": \"watt\",\n          \"color\": {\n            \"mode\": \"fixed\",\n            \"fixedColor\"\
+    : \"#FF9830\"\n          },\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\":\
+    \ [\n              {\n                \"color\": \"#FF9830\",\n                \"value\": null\n              }\n    \
+    \        ]\n          }\n        },\n        \"overrides\": []\n      },\n      \"options\": {\n        \"colorMode\"\
+    : \"value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\": \"center\",\n        \"orientation\": \"auto\"\
+    ,\n        \"textMode\": \"value\",\n        \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\
+    \n          ],\n          \"fields\": \"\",\n          \"values\": false\n        }\n      },\n      \"timeFrom\": \"\
+    1h\"\n    },\n    {\n      \"id\": 5,\n      \"title\": \"Estado do inversor\",\n      \"type\": \"stat\",\n      \"datasource\"\
+    : {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\"\
+    : 18,\n        \"y\": 48,\n        \"w\": 6,\n        \"h\": 4\n      },\n      \"targets\": [\n        {\n          \"\
+    refId\": \"A\",\n          \"expr\": \"deye_inverter_up{job=\\\"deye-exporter\\\"}\",\n          \"legendFormat\": \"\"\
+    ,\n          \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\": \"prometheus\"\n         \
+    \ },\n          \"instant\": true,\n          \"range\": false\n        }\n      ],\n      \"fieldConfig\": {\n      \
+    \  \"defaults\": {\n          \"unit\": \"none\",\n          \"color\": {\n            \"mode\": \"thresholds\"\n    \
+    \      },\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n\
+    \                \"color\": \"red\",\n                \"value\": null\n              },\n              {\n           \
+    \     \"color\": \"green\",\n                \"value\": 1\n              }\n            ]\n          },\n          \"\
+    mappings\": [\n            {\n              \"type\": \"value\",\n              \"options\": {\n                \"0\"\
+    : {\n                  \"text\": \"OFFLINE\",\n                  \"color\": \"red\",\n                  \"index\": 0\n\
+    \                },\n                \"1\": {\n                  \"text\": \"ONLINE\",\n                  \"color\": \"\
+    green\",\n                  \"index\": 1\n                }\n              }\n            }\n          ]\n        },\n\
+    \        \"overrides\": []\n      },\n      \"options\": {\n        \"colorMode\": \"background\",\n        \"graphMode\"\
+    : \"area\",\n        \"justifyMode\": \"center\",\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\"\
+    ,\n        \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\"\
+    : \"\",\n          \"values\": false\n        }\n      },\n      \"timeFrom\": \"1h\"\n    },\n    {\n      \"id\": 6,\n\
+    \      \"title\": \"05 | Produção fotovoltaica\",\n      \"type\": \"row\",\n      \"datasource\": {\n        \"type\"\
+    : \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\":\
+    \ 52,\n        \"w\": 24,\n        \"h\": 1\n      },\n      \"targets\": [],\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"unit\": \"none\",\n          \"color\": {\n            \"mode\": \"fixed\",\n            \"fixedColor\"\
+    : \"#73BF69\"\n          },\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\":\
+    \ [\n              {\n                \"color\": \"#73BF69\",\n                \"value\": null\n              }\n    \
+    \        ]\n          }\n        },\n        \"overrides\": []\n      },\n      \"collapsed\": false,\n      \"panels\"\
+    : []\n    },\n    {\n      \"id\": 7,\n      \"title\": \"Curva de potência solar — PV1 + PV2\",\n      \"type\": \"timeseries\"\
+    ,\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\"\
+    : {\n        \"x\": 0,\n        \"y\": 53,\n        \"w\": 24,\n        \"h\": 9\n      },\n      \"targets\": [\n   \
+    \     {\n          \"refId\": \"A\",\n          \"expr\": \"deye_pv1_power_watts{job=\\\"deye-exporter\\\"}\",\n     \
+    \     \"legendFormat\": \"PV1\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\"\
+    : \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\": true\n        },\n        {\n    \
+    \      \"refId\": \"B\",\n          \"expr\": \"deye_pv2_power_watts{job=\\\"deye-exporter\\\"}\",\n          \"legendFormat\"\
+    : \"PV2\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\": \"prometheus\"\n\
+    \          },\n          \"instant\": false,\n          \"range\": true\n        },\n        {\n          \"refId\": \"\
+    C\",\n          \"expr\": \"sum(deye_pv1_power_watts{job=\\\"deye-exporter\\\"}) + sum(deye_pv2_power_watts{job=\\\"deye-exporter\\\
+    \"})\",\n          \"legendFormat\": \"Potência total\",\n          \"datasource\": {\n            \"type\": \"prometheus\"\
+    ,\n            \"uid\": \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\": true\n     \
+    \   }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"watt\",\n          \"color\"\
+    : {\n            \"mode\": \"fixed\",\n            \"fixedColor\": \"#F2CC0C\"\n          },\n          \"thresholds\"\
+    : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#F2CC0C\"\
+    ,\n                \"value\": null\n              }\n            ]\n          },\n          \"custom\": {\n          \
+    \  \"drawStyle\": \"line\",\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n         \
+    \   \"fillOpacity\": 18,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false,\n            \"stacking\"\
+    : {\n              \"mode\": \"none\",\n              \"group\": \"A\"\n            }\n          }\n        },\n     \
+    \   \"overrides\": []\n      },\n      \"options\": {\n        \"legend\": {\n          \"displayMode\": \"list\",\n \
+    \         \"placement\": \"bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n          \"\
+    mode\": \"multi\",\n          \"sort\": \"desc\"\n        }\n      },\n      \"timeFrom\": \"24h\"\n    },\n    {\n  \
+    \    \"id\": 8,\n      \"title\": \"Evolução da energia produzida no dia\",\n      \"type\": \"timeseries\",\n      \"\
+    datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n\
+    \        \"x\": 0,\n        \"y\": 62,\n        \"w\": 24,\n        \"h\": 8\n      },\n      \"targets\": [\n       \
+    \ {\n          \"refId\": \"A\",\n          \"expr\": \"deye_energy_today_kwh{job=\\\"deye-exporter\\\"}\",\n        \
+    \  \"legendFormat\": \"Energia diária\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n       \
+    \     \"uid\": \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\": true\n        }\n   \
+    \   ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"kwatth\",\n          \"color\": {\n \
+    \           \"mode\": \"fixed\",\n            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\": {\n\
+    \            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\"\
+    ,\n                \"value\": null\n              }\n            ]\n          },\n          \"custom\": {\n          \
+    \  \"drawStyle\": \"line\",\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n         \
+    \   \"fillOpacity\": 18,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false,\n            \"stacking\"\
+    : {\n              \"mode\": \"none\",\n              \"group\": \"A\"\n            }\n          }\n        },\n     \
+    \   \"overrides\": []\n      },\n      \"options\": {\n        \"legend\": {\n          \"displayMode\": \"list\",\n \
+    \         \"placement\": \"bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n          \"\
+    mode\": \"multi\",\n          \"sort\": \"desc\"\n        }\n      },\n      \"timeFrom\": \"24h\"\n    },\n    {\n  \
+    \    \"id\": 9,\n      \"title\": \"06 | Entradas fotovoltaicas / MPPT\",\n      \"type\": \"row\",\n      \"datasource\"\
+    : {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\"\
+    : 0,\n        \"y\": 70,\n        \"w\": 24,\n        \"h\": 1\n      },\n      \"targets\": [],\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"unit\": \"none\",\n          \"color\": {\n            \"mode\": \"fixed\",\n\
+    \            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+    ,\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\",\n                \"value\": null\n\
+    \              }\n            ]\n          }\n        },\n        \"overrides\": []\n      },\n      \"collapsed\": false,\n\
+    \      \"panels\": []\n    },\n    {\n      \"id\": 10,\n      \"title\": \"Potência por entrada\",\n      \"type\": \"\
+    timeseries\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n\
+    \      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 71,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"\
+    targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"deye_pv1_power_watts{job=\\\"deye-exporter\\\
+    \"}\",\n          \"legendFormat\": \"PV1\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n   \
+    \         \"uid\": \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\": true\n        },\n\
+    \        {\n          \"refId\": \"B\",\n          \"expr\": \"deye_pv2_power_watts{job=\\\"deye-exporter\\\"}\",\n  \
+    \        \"legendFormat\": \"PV2\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n            \"\
+    uid\": \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\": true\n        }\n      ],\n \
+    \     \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"watt\",\n          \"color\": {\n           \
+    \ \"mode\": \"fixed\",\n            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\": {\n         \
+    \   \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\",\n    \
+    \            \"value\": null\n              }\n            ]\n          },\n          \"custom\": {\n            \"drawStyle\"\
+    : \"line\",\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n            \"fillOpacity\"\
+    : 18,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false,\n            \"stacking\": {\n      \
+    \        \"mode\": \"none\",\n              \"group\": \"A\"\n            }\n          }\n        },\n        \"overrides\"\
+    : []\n      },\n      \"options\": {\n        \"legend\": {\n          \"displayMode\": \"list\",\n          \"placement\"\
+    : \"bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n  \
+    \        \"sort\": \"desc\"\n        }\n      },\n      \"timeFrom\": \"24h\"\n    },\n    {\n      \"id\": 11,\n    \
+    \  \"title\": \"Tensão DC por entrada\",\n      \"type\": \"timeseries\",\n      \"datasource\": {\n        \"type\":\
+    \ \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\": 12,\n        \"y\"\
+    : 71,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n\
+    \          \"expr\": \"deye_pv1_voltage_volts{job=\\\"deye-exporter\\\"}\",\n          \"legendFormat\": \"PV1\",\n  \
+    \        \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\": \"prometheus\"\n          },\n\
+    \          \"instant\": false,\n          \"range\": true\n        },\n        {\n          \"refId\": \"B\",\n      \
+    \    \"expr\": \"deye_pv2_voltage_volts{job=\\\"deye-exporter\\\"}\",\n          \"legendFormat\": \"PV2\",\n        \
+    \  \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\": \"prometheus\"\n          },\n     \
+    \     \"instant\": false,\n          \"range\": true\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\"\
+    : {\n          \"unit\": \"volt\",\n          \"color\": {\n            \"mode\": \"fixed\",\n            \"fixedColor\"\
+    : \"#73BF69\"\n          },\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\":\
+    \ [\n              {\n                \"color\": \"#73BF69\",\n                \"value\": null\n              }\n    \
+    \        ]\n          },\n          \"custom\": {\n            \"drawStyle\": \"line\",\n            \"lineInterpolation\"\
+    : \"smooth\",\n            \"lineWidth\": 2,\n            \"fillOpacity\": 18,\n            \"showPoints\": \"never\"\
+    ,\n            \"spanNulls\": false,\n            \"stacking\": {\n              \"mode\": \"none\",\n              \"\
+    group\": \"A\"\n            }\n          }\n        },\n        \"overrides\": []\n      },\n      \"options\": {\n  \
+    \      \"legend\": {\n          \"displayMode\": \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\"\
+    : true\n        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n          \"sort\": \"desc\"\n        }\n\
+    \      },\n      \"timeFrom\": \"24h\"\n    },\n    {\n      \"id\": 12,\n      \"title\": \"Corrente DC por entrada\"\
+    ,\n      \"type\": \"timeseries\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\
+    \n      },\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 79,\n        \"w\": 24,\n        \"h\": 8\n      },\n\
+    \      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"deye_pv1_current_amperes{job=\\\"\
+    deye-exporter\\\"}\",\n          \"legendFormat\": \"PV1\",\n          \"datasource\": {\n            \"type\": \"prometheus\"\
+    ,\n            \"uid\": \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\": true\n     \
+    \   },\n        {\n          \"refId\": \"B\",\n          \"expr\": \"deye_pv2_current_amperes{job=\\\"deye-exporter\\\
+    \"}\",\n          \"legendFormat\": \"PV2\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n   \
+    \         \"uid\": \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\": true\n        }\n\
+    \      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"amp\",\n          \"color\": {\n \
+    \           \"mode\": \"fixed\",\n            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\": {\n\
+    \            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\"\
+    ,\n                \"value\": null\n              }\n            ]\n          },\n          \"custom\": {\n          \
+    \  \"drawStyle\": \"line\",\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n         \
+    \   \"fillOpacity\": 18,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false,\n            \"stacking\"\
+    : {\n              \"mode\": \"none\",\n              \"group\": \"A\"\n            }\n          }\n        },\n     \
+    \   \"overrides\": []\n      },\n      \"options\": {\n        \"legend\": {\n          \"displayMode\": \"list\",\n \
+    \         \"placement\": \"bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n          \"\
+    mode\": \"multi\",\n          \"sort\": \"desc\"\n        }\n      },\n      \"timeFrom\": \"24h\"\n    },\n    {\n  \
+    \    \"id\": 13,\n      \"title\": \"07 | Parâmetros elétricos AC\",\n      \"type\": \"row\",\n      \"datasource\":\
+    \ {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\"\
+    : 0,\n        \"y\": 87,\n        \"w\": 24,\n        \"h\": 1\n      },\n      \"targets\": [],\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"unit\": \"none\",\n          \"color\": {\n            \"mode\": \"fixed\",\n\
+    \            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+    ,\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\",\n                \"value\": null\n\
+    \              }\n            ]\n          }\n        },\n        \"overrides\": []\n      },\n      \"collapsed\": false,\n\
+    \      \"panels\": []\n    },\n    {\n      \"id\": 14,\n      \"title\": \"Tensão AC atual\",\n      \"type\": \"stat\"\
+    ,\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\"\
+    : {\n        \"x\": 0,\n        \"y\": 88,\n        \"w\": 8,\n        \"h\": 4\n      },\n      \"targets\": [\n    \
+    \    {\n          \"refId\": \"A\",\n          \"expr\": \"deye_ac_voltage_volts{job=\\\"deye-exporter\\\"}\",\n     \
+    \     \"legendFormat\": \"\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\"\
+    : \"prometheus\"\n          },\n          \"instant\": true,\n          \"range\": false\n        }\n      ],\n      \"\
+    fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"volt\",\n          \"color\": {\n            \"mode\"\
+    : \"fixed\",\n            \"fixedColor\": \"#5794F2\"\n          },\n          \"thresholds\": {\n            \"mode\"\
+    : \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#5794F2\",\n                \"\
+    value\": null\n              }\n            ]\n          }\n        },\n        \"overrides\": []\n      },\n      \"\
+    options\": {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\": \"center\"\
+    ,\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n        \"reduceOptions\": {\n          \"calcs\"\
+    : [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\": false\n        }\n\
+    \      },\n      \"timeFrom\": \"1h\"\n    },\n    {\n      \"id\": 15,\n      \"title\": \"Corrente AC atual\",\n   \
+    \   \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n\
+    \      },\n      \"gridPos\": {\n        \"x\": 8,\n        \"y\": 88,\n        \"w\": 8,\n        \"h\": 4\n      },\n\
+    \      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"deye_ac_current_amperes{job=\\\"\
+    deye-exporter\\\"}\",\n          \"legendFormat\": \"\",\n          \"datasource\": {\n            \"type\": \"prometheus\"\
+    ,\n            \"uid\": \"prometheus\"\n          },\n          \"instant\": true,\n          \"range\": false\n     \
+    \   }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"amp\",\n          \"color\"\
+    : {\n            \"mode\": \"fixed\",\n            \"fixedColor\": \"#B877D9\"\n          },\n          \"thresholds\"\
+    : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#B877D9\"\
+    ,\n                \"value\": null\n              }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+    \      },\n      \"options\": {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\"\
+    : \"center\",\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n        \"reduceOptions\": {\n  \
+    \        \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\": false\n\
+    \        }\n      },\n      \"timeFrom\": \"1h\"\n    },\n    {\n      \"id\": 16,\n      \"title\": \"Frequência AC atual\"\
+    ,\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\
+    \n      },\n      \"gridPos\": {\n        \"x\": 16,\n        \"y\": 88,\n        \"w\": 8,\n        \"h\": 4\n      },\n\
+    \      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"deye_ac_frequency_hertz{job=\\\"\
+    deye-exporter\\\"}\",\n          \"legendFormat\": \"\",\n          \"datasource\": {\n            \"type\": \"prometheus\"\
+    ,\n            \"uid\": \"prometheus\"\n          },\n          \"instant\": true,\n          \"range\": false\n     \
+    \   }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"hertz\",\n          \"color\"\
+    : {\n            \"mode\": \"fixed\",\n            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\"\
+    : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\"\
+    ,\n                \"value\": null\n              }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+    \      },\n      \"options\": {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\"\
+    : \"center\",\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n        \"reduceOptions\": {\n  \
+    \        \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\": false\n\
+    \        }\n      },\n      \"timeFrom\": \"1h\"\n    },\n    {\n      \"id\": 17,\n      \"title\": \"Histórico de tensão\
+    \ AC\",\n      \"type\": \"timeseries\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\"\
+    : \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\": 0,\n        \"y\": 92,\n        \"w\": 12,\n        \"\
+    h\": 8\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"deye_ac_voltage_volts{job=\\\
+    \"deye-exporter\\\"}\",\n          \"legendFormat\": \"Tensão\",\n          \"datasource\": {\n            \"type\": \"\
+    prometheus\",\n            \"uid\": \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\":\
+    \ true\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"volt\",\n      \
+    \    \"color\": {\n            \"mode\": \"fixed\",\n            \"fixedColor\": \"#73BF69\"\n          },\n         \
+    \ \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"\
+    color\": \"#73BF69\",\n                \"value\": null\n              }\n            ]\n          },\n          \"custom\"\
+    : {\n            \"drawStyle\": \"line\",\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\":\
+    \ 2,\n            \"fillOpacity\": 18,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false,\n  \
+    \          \"stacking\": {\n              \"mode\": \"none\",\n              \"group\": \"A\"\n            }\n       \
+    \   }\n        },\n        \"overrides\": []\n      },\n      \"options\": {\n        \"legend\": {\n          \"displayMode\"\
+    : \"list\",\n          \"placement\": \"bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n\
+    \          \"mode\": \"multi\",\n          \"sort\": \"desc\"\n        }\n      },\n      \"timeFrom\": \"24h\"\n    },\n\
+    \    {\n      \"id\": 18,\n      \"title\": \"Histórico de frequência AC\",\n      \"type\": \"timeseries\",\n      \"\
+    datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n\
+    \        \"x\": 12,\n        \"y\": 92,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"targets\": [\n      \
+    \  {\n          \"refId\": \"A\",\n          \"expr\": \"deye_ac_frequency_hertz{job=\\\"deye-exporter\\\"}\",\n     \
+    \     \"legendFormat\": \"Frequência\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n        \
+    \    \"uid\": \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\": true\n        }\n    \
+    \  ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"hertz\",\n          \"color\": {\n   \
+    \         \"mode\": \"fixed\",\n            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\": {\n \
+    \           \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\"\
+    ,\n                \"value\": null\n              }\n            ]\n          },\n          \"custom\": {\n          \
+    \  \"drawStyle\": \"line\",\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n         \
+    \   \"fillOpacity\": 18,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false,\n            \"stacking\"\
+    : {\n              \"mode\": \"none\",\n              \"group\": \"A\"\n            }\n          }\n        },\n     \
+    \   \"overrides\": []\n      },\n      \"options\": {\n        \"legend\": {\n          \"displayMode\": \"list\",\n \
+    \         \"placement\": \"bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n          \"\
+    mode\": \"multi\",\n          \"sort\": \"desc\"\n        }\n      },\n      \"timeFrom\": \"24h\"\n    },\n    {\n  \
+    \    \"id\": 19,\n      \"title\": \"08 | Saúde e observabilidade\",\n      \"type\": \"row\",\n      \"datasource\":\
+    \ {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\"\
+    : 0,\n        \"y\": 100,\n        \"w\": 24,\n        \"h\": 1\n      },\n      \"targets\": [],\n      \"fieldConfig\"\
+    : {\n        \"defaults\": {\n          \"unit\": \"none\",\n          \"color\": {\n            \"mode\": \"fixed\",\n\
+    \            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\": {\n            \"mode\": \"absolute\"\
+    ,\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\",\n                \"value\": null\n\
+    \              }\n            ]\n          }\n        },\n        \"overrides\": []\n      },\n      \"collapsed\": false,\n\
+    \      \"panels\": []\n    },\n    {\n      \"id\": 20,\n      \"title\": \"Prometheus — coleta ativa\",\n      \"type\"\
+    : \"stat\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n \
+    \     \"gridPos\": {\n        \"x\": 0,\n        \"y\": 101,\n        \"w\": 8,\n        \"h\": 4\n      },\n      \"\
+    targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"up{job=\\\"deye-exporter\\\"}\",\n       \
+    \   \"legendFormat\": \"\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n            \"uid\":\
+    \ \"prometheus\"\n          },\n          \"instant\": true,\n          \"range\": false\n        }\n      ],\n      \"\
+    fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"none\",\n          \"color\": {\n            \"mode\"\
+    : \"fixed\",\n            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\": {\n            \"mode\"\
+    : \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\",\n                \"\
+    value\": null\n              }\n            ]\n          },\n          \"mappings\": [\n            {\n              \"\
+    type\": \"value\",\n              \"options\": {\n                \"0\": {\n                  \"text\": \"FALHA\",\n \
+    \                 \"color\": \"red\",\n                  \"index\": 0\n                },\n                \"1\": {\n\
+    \                  \"text\": \"OK\",\n                  \"color\": \"green\",\n                  \"index\": 1\n      \
+    \          }\n              }\n            }\n          ]\n        },\n        \"overrides\": []\n      },\n      \"options\"\
+    : {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\": \"center\",\n     \
+    \   \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n        \"reduceOptions\": {\n          \"calcs\": [\n\
+    \            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\": false\n        }\n    \
+    \  },\n      \"timeFrom\": \"1h\"\n    },\n    {\n      \"id\": 21,\n      \"title\": \"Erros de comunicação — última\
+    \ hora\",\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"\
+    prometheus\"\n      },\n      \"gridPos\": {\n        \"x\": 8,\n        \"y\": 101,\n        \"w\": 8,\n        \"h\"\
+    : 4\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"increase(deye_poll_errors_total{job=\\\
+    \"deye-exporter\\\"}[1h])\",\n          \"legendFormat\": \"\",\n          \"datasource\": {\n            \"type\": \"\
+    prometheus\",\n            \"uid\": \"prometheus\"\n          },\n          \"instant\": true,\n          \"range\": false\n\
+    \        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"short\",\n          \"\
+    color\": {\n            \"mode\": \"fixed\",\n            \"fixedColor\": \"#FF9830\"\n          },\n          \"thresholds\"\
+    : {\n            \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#FF9830\"\
+    ,\n                \"value\": null\n              }\n            ]\n          }\n        },\n        \"overrides\": []\n\
+    \      },\n      \"options\": {\n        \"colorMode\": \"value\",\n        \"graphMode\": \"area\",\n        \"justifyMode\"\
+    : \"center\",\n        \"orientation\": \"auto\",\n        \"textMode\": \"value\",\n        \"reduceOptions\": {\n  \
+    \        \"calcs\": [\n            \"lastNotNull\"\n          ],\n          \"fields\": \"\",\n          \"values\": false\n\
+    \        }\n      },\n      \"timeFrom\": \"1h\"\n    },\n    {\n      \"id\": 22,\n      \"title\": \"Idade da última\
+    \ amostra Prometheus\",\n      \"type\": \"stat\",\n      \"datasource\": {\n        \"type\": \"prometheus\",\n     \
+    \   \"uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\": 16,\n        \"y\": 101,\n        \"w\": 8,\n\
+    \        \"h\": 4\n      },\n      \"targets\": [\n        {\n          \"refId\": \"A\",\n          \"expr\": \"time()\
+    \ - timestamp(deye_inverter_up{job=\\\"deye-exporter\\\"})\",\n          \"legendFormat\": \"\",\n          \"datasource\"\
+    : {\n            \"type\": \"prometheus\",\n            \"uid\": \"prometheus\"\n          },\n          \"instant\":\
+    \ true,\n          \"range\": false\n        }\n      ],\n      \"fieldConfig\": {\n        \"defaults\": {\n        \
+    \  \"unit\": \"s\",\n          \"color\": {\n            \"mode\": \"fixed\",\n            \"fixedColor\": \"#5794F2\"\
+    \n          },\n          \"thresholds\": {\n            \"mode\": \"absolute\",\n            \"steps\": [\n         \
+    \     {\n                \"color\": \"#5794F2\",\n                \"value\": null\n              }\n            ]\n  \
+    \        }\n        },\n        \"overrides\": []\n      },\n      \"options\": {\n        \"colorMode\": \"value\",\n\
+    \        \"graphMode\": \"area\",\n        \"justifyMode\": \"center\",\n        \"orientation\": \"auto\",\n        \"\
+    textMode\": \"value\",\n        \"reduceOptions\": {\n          \"calcs\": [\n            \"lastNotNull\"\n          ],\n\
+    \          \"fields\": \"\",\n          \"values\": false\n        }\n      },\n      \"timeFrom\": \"1h\"\n    },\n \
+    \   {\n      \"id\": 23,\n      \"title\": \"Histórico de disponibilidade do inversor\",\n      \"type\": \"timeseries\"\
+    ,\n      \"datasource\": {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\"\
+    : {\n        \"x\": 0,\n        \"y\": 105,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"targets\": [\n  \
+    \      {\n          \"refId\": \"A\",\n          \"expr\": \"deye_inverter_up{job=\\\"deye-exporter\\\"}\",\n        \
+    \  \"legendFormat\": \"Inversor\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n            \"\
+    uid\": \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\": true\n        }\n      ],\n \
+    \     \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"none\",\n          \"color\": {\n           \
+    \ \"mode\": \"fixed\",\n            \"fixedColor\": \"#73BF69\"\n          },\n          \"thresholds\": {\n         \
+    \   \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#73BF69\",\n    \
+    \            \"value\": null\n              }\n            ]\n          },\n          \"custom\": {\n            \"drawStyle\"\
+    : \"line\",\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n            \"fillOpacity\"\
+    : 18,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false,\n            \"stacking\": {\n      \
+    \        \"mode\": \"none\",\n              \"group\": \"A\"\n            }\n          }\n        },\n        \"overrides\"\
+    : []\n      },\n      \"options\": {\n        \"legend\": {\n          \"displayMode\": \"list\",\n          \"placement\"\
+    : \"bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n  \
+    \        \"sort\": \"desc\"\n        }\n      },\n      \"timeFrom\": \"24h\"\n    },\n    {\n      \"id\": 24,\n    \
+    \  \"title\": \"Falhas de comunicação — eventos por 5 minutos\",\n      \"type\": \"timeseries\",\n      \"datasource\"\
+    : {\n        \"type\": \"prometheus\",\n        \"uid\": \"prometheus\"\n      },\n      \"gridPos\": {\n        \"x\"\
+    : 12,\n        \"y\": 105,\n        \"w\": 12,\n        \"h\": 8\n      },\n      \"targets\": [\n        {\n        \
+    \  \"refId\": \"A\",\n          \"expr\": \"increase(deye_poll_errors_total{job=\\\"deye-exporter\\\"}[5m])\",\n     \
+    \     \"legendFormat\": \"Falhas\",\n          \"datasource\": {\n            \"type\": \"prometheus\",\n            \"\
+    uid\": \"prometheus\"\n          },\n          \"instant\": false,\n          \"range\": true\n        }\n      ],\n \
+    \     \"fieldConfig\": {\n        \"defaults\": {\n          \"unit\": \"short\",\n          \"color\": {\n          \
+    \  \"mode\": \"fixed\",\n            \"fixedColor\": \"#E02F44\"\n          },\n          \"thresholds\": {\n        \
+    \    \"mode\": \"absolute\",\n            \"steps\": [\n              {\n                \"color\": \"#E02F44\",\n   \
+    \             \"value\": null\n              }\n            ]\n          },\n          \"custom\": {\n            \"drawStyle\"\
+    : \"line\",\n            \"lineInterpolation\": \"smooth\",\n            \"lineWidth\": 2,\n            \"fillOpacity\"\
+    : 18,\n            \"showPoints\": \"never\",\n            \"spanNulls\": false,\n            \"stacking\": {\n      \
+    \        \"mode\": \"none\",\n              \"group\": \"A\"\n            }\n          }\n        },\n        \"overrides\"\
+    : []\n      },\n      \"options\": {\n        \"legend\": {\n          \"displayMode\": \"list\",\n          \"placement\"\
+    : \"bottom\",\n          \"showLegend\": true\n        },\n        \"tooltip\": {\n          \"mode\": \"multi\",\n  \
+    \        \"sort\": \"desc\"\n        }\n      },\n      \"timeFrom\": \"24h\"\n    }\n  ],\n  \"templating\": {\n    \"\
+    list\": []\n  },\n  \"annotations\": {\n    \"list\": []\n  },\n  \"editable\": true\n}"

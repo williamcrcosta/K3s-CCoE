@@ -9,3 +9,4 @@ resources:
   - grafana-dashboard-srvad2025-zabbix.yaml
   - grafana-dashboard-deye-solar.yaml
   - grafana-dashboard-deye-solar-v2.yaml
+  - grafana-dashboard-deye-solar-v3.yaml
