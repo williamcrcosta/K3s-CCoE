@@ -144,7 +144,17 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "mappings": [],
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "—"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
               "overrides": [],
               "color": {
                 "mode": "fixed",
@@ -201,7 +211,17 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "mappings": [],
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "—"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
               "overrides": [],
               "color": {
                 "mode": "thresholds"
@@ -266,7 +286,17 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "mappings": [],
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "—"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
               "overrides": [],
               "color": {
                 "mode": "fixed",
@@ -323,7 +353,17 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "mappings": [],
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "—"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
               "overrides": [],
               "color": {
                 "mode": "fixed",
@@ -336,7 +376,7 @@ data:
           },
           "options": {
             "colorMode": "value",
-            "graphMode": "none",
+            "graphMode": "area",
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
@@ -400,7 +440,16 @@ data:
                   "options": {
                     "match": "null",
                     "result": {
-                      "text": "N/A"
+                      "text": "—"
+                    }
+                  },
+                  "type": "special"
+                },
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "—"
                     }
                   },
                   "type": "special"
@@ -411,7 +460,7 @@ data:
             "overrides": []
           },
           "options": {
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
             "justifyMode": "auto",
             "orientation": "auto",
@@ -456,7 +505,17 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "mappings": [],
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "—"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
               "overrides": [],
               "color": {
                 "mode": "thresholds"
@@ -485,7 +544,7 @@ data:
           },
           "options": {
             "colorMode": "value",
-            "graphMode": "none",
+            "graphMode": "area",
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
@@ -1639,7 +1698,16 @@ data:
                   "options": {
                     "match": "null",
                     "result": {
-                      "text": "N/A"
+                      "text": "—"
+                    }
+                  },
+                  "type": "special"
+                },
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "—"
                     }
                   },
                   "type": "special"
@@ -1650,7 +1718,7 @@ data:
             "overrides": []
           },
           "options": {
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
             "justifyMode": "auto",
             "orientation": "auto",
@@ -1695,7 +1763,17 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "mappings": [],
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "—"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
               "overrides": [],
               "color": {
                 "mode": "thresholds"
@@ -1724,7 +1802,7 @@ data:
           },
           "options": {
             "colorMode": "value",
-            "graphMode": "none",
+            "graphMode": "area",
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
@@ -1768,7 +1846,17 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "mappings": [],
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "—"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
               "overrides": [],
               "color": {
                 "mode": "thresholds"
@@ -1797,7 +1885,7 @@ data:
           },
           "options": {
             "colorMode": "value",
-            "graphMode": "none",
+            "graphMode": "area",
             "justifyMode": "auto",
             "orientation": "auto",
             "percentChangeColorMode": "standard",
@@ -2011,576 +2099,617 @@ data:
           "id": 29,
           "title": "🗃️ Histórico SOLARMAN — PostgreSQL",
           "type": "row",
-          "collapsed": false,
+          "collapsed": true,
           "gridPos": {
             "x": 0,
             "y": 64,
             "w": 24,
             "h": 1
           },
-          "panels": []
-        },
-        {
-          "id": 30,
-          "title": "Produção total importada",
-          "type": "stat",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 0,
-            "y": 65,
-            "w": 6,
-            "h": 4
-          },
-          "targets": [
+          "panels": [
             {
-              "refId": "A",
+              "id": 30,
+              "title": "Produção total importada",
+              "type": "stat",
               "datasource": {
                 "type": "postgres",
                 "uid": "cg1y9v0o3durkf"
               },
-              "rawSql": "SELECT COALESCE(SUM(production_kwh),0) AS \"Total (kWh)\" FROM public.solar_daily_production WHERE device_sn='2405054309';",
-              "format": "table",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "overrides": [],
-              "color": {
-                "mode": "fixed",
-                "fixedColor": "purple"
+              "gridPos": {
+                "x": 0,
+                "y": 65,
+                "w": 6,
+                "h": 4
               },
-              "unit": "kwatth",
-              "decimals": 1
-            },
-            "overrides": []
-          },
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "description": "Total apenas dos dias importados; não é a leitura vitalícia do inversor."
-        },
-        {
-          "id": 31,
-          "title": "Produção em 2025",
-          "type": "stat",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 6,
-            "y": 65,
-            "w": 6,
-            "h": 4
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "datasource": {
-                "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
-              },
-              "rawSql": "SELECT COALESCE(SUM(production_kwh),0) AS \"2025 (kWh)\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND production_date >= DATE '2025-01-01' AND production_date < DATE '2026-01-01';",
-              "format": "table",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "overrides": [],
-              "color": {
-                "mode": "fixed",
-                "fixedColor": "blue"
-              },
-              "unit": "kwatth",
-              "decimals": 1
-            },
-            "overrides": []
-          },
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          }
-        },
-        {
-          "id": 32,
-          "title": "Produção em 2026",
-          "type": "stat",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 12,
-            "y": 65,
-            "w": 6,
-            "h": 4
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "datasource": {
-                "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
-              },
-              "rawSql": "SELECT COALESCE(SUM(production_kwh),0) AS \"2026 (kWh)\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND production_date >= DATE '2026-01-01' AND production_date < DATE '2027-01-01';",
-              "format": "table",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "overrides": [],
-              "color": {
-                "mode": "fixed",
-                "fixedColor": "green"
-              },
-              "unit": "kwatth",
-              "decimals": 1
-            },
-            "overrides": []
-          },
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "description": "Dados de 2026 importados somente até 21/10/2026; não atualiza automaticamente."
-        },
-        {
-          "id": 33,
-          "title": "Defasagem da importação",
-          "type": "stat",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 18,
-            "y": 65,
-            "w": 6,
-            "h": 4
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "datasource": {
-                "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
-              },
-              "rawSql": "SELECT (CURRENT_DATE - MAX(production_date)) AS \"Dias sem importar\" FROM public.solar_daily_production WHERE device_sn='2405054309';",
-              "format": "table",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "overrides": [],
-              "color": {
-                "mode": "thresholds"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
                   },
-                  {
-                    "color": "yellow",
-                    "value": 14
+                  "rawSql": "SELECT COALESCE(SUM(production_kwh),0) AS \"Total (kWh)\" FROM public.solar_daily_production WHERE device_sn='2405054309';",
+                  "format": "table",
+                  "editorMode": "code"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "—"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "overrides": [],
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "purple"
                   },
-                  {
-                    "color": "red",
-                    "value": 45
-                  }
-                ]
+                  "unit": "kwatth",
+                  "decimals": 1
+                },
+                "overrides": []
               },
-              "unit": "d",
-              "decimals": 0
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "description": "Total apenas dos dias importados; não é a leitura vitalícia do inversor."
             },
-            "overrides": []
-          },
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "description": "Dias desde a data mais recente no PostgreSQL. Importação é manual; não confundir com falha de coleta em tempo real."
-        },
-        {
-          "id": 34,
-          "title": "Produção diária (kWh)",
-          "type": "timeseries",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 0,
-            "y": 69,
-            "w": 24,
-            "h": 9
-          },
-          "targets": [
             {
-              "refId": "A",
+              "id": 31,
+              "title": "Produção em 2025",
+              "type": "stat",
               "datasource": {
                 "type": "postgres",
                 "uid": "cg1y9v0o3durkf"
               },
-              "rawSql": "SELECT ((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo') AS time, production_kwh AS \"Produção diária\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND $__timeFilter(((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo')) ORDER BY time;",
-              "format": "time_series",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
+              "gridPos": {
+                "x": 6,
+                "y": 65,
+                "w": 6,
+                "h": 4
               },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "barWidthFactor": 0.6,
-                "drawStyle": "bars",
-                "fillOpacity": 70,
-                "gradientMode": "opacity",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "showValues": false,
-                "spanNulls": true,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT COALESCE(SUM(production_kwh),0) AS \"2025 (kWh)\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND production_date >= DATE '2025-01-01' AND production_date < DATE '2026-01-01';",
+                  "format": "table",
+                  "editorMode": "code"
                 }
-              },
-              "mappings": [],
-              "unit": "kwatth",
-              "decimals": 1
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Produção diária"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "mode": "fixed",
-                      "fixedColor": "#eab308"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "options": {
-            "legend": {
-              "calcs": [
-                "lastNotNull",
-                "max"
               ],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "—"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "overrides": [],
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "blue"
+                  },
+                  "unit": "kwatth",
+                  "decimals": 1
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
             },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          },
-          "description": "Cada dia posicionado ao meio-dia local. Janela fixa de 2 anos.",
-          "timeFrom": "2y"
-        },
-        {
-          "id": 35,
-          "title": "Produção mensal (kWh)",
-          "type": "timeseries",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 0,
-            "y": 78,
-            "w": 12,
-            "h": 8
-          },
-          "targets": [
             {
-              "refId": "A",
+              "id": 32,
+              "title": "Produção em 2026",
+              "type": "stat",
               "datasource": {
                 "type": "postgres",
                 "uid": "cg1y9v0o3durkf"
               },
-              "rawSql": "SELECT (date_trunc('month',production_date::timestamp) + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo' AS time, SUM(production_kwh) AS \"Produção mensal\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND $__timeFilter((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo') GROUP BY 1 ORDER BY 1;",
-              "format": "time_series",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
+              "gridPos": {
+                "x": 12,
+                "y": 65,
+                "w": 6,
+                "h": 4
               },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "barWidthFactor": 0.6,
-                "drawStyle": "bars",
-                "fillOpacity": 70,
-                "gradientMode": "opacity",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "showValues": false,
-                "spanNulls": true,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT COALESCE(SUM(production_kwh),0) AS \"2026 (kWh)\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND production_date >= DATE '2026-01-01' AND production_date < DATE '2027-01-01';",
+                  "format": "table",
+                  "editorMode": "code"
                 }
-              },
-              "mappings": [],
-              "unit": "kwatth",
-              "decimals": 1
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Produção mensal"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "mode": "fixed",
-                      "fixedColor": "blue"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "options": {
-            "legend": {
-              "calcs": [
-                "lastNotNull",
-                "max"
               ],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": false
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "—"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "overrides": [],
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "green"
+                  },
+                  "unit": "kwatth",
+                  "decimals": 1
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "description": "Dados de 2026 importados somente até 21/10/2026; não atualiza automaticamente."
             },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
-            }
-          },
-          "description": "Meses incompletos ou com dias sem medição não devem ser comparados diretamente. Janela fixa de 2 anos.",
-          "timeFrom": "2y"
-        },
-        {
-          "id": 36,
-          "title": "Produção acumulada no intervalo",
-          "type": "timeseries",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 12,
-            "y": 78,
-            "w": 12,
-            "h": 8
-          },
-          "targets": [
             {
-              "refId": "A",
+              "id": 33,
+              "title": "Defasagem da importação",
+              "type": "stat",
               "datasource": {
                 "type": "postgres",
                 "uid": "cg1y9v0o3durkf"
               },
-              "rawSql": "SELECT ((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo') AS time, SUM(production_kwh) OVER (ORDER BY production_date ROWS UNBOUNDED PRECEDING) AS \"Acumulado no período\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND $__timeFilter(((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo')) ORDER BY time;",
-              "format": "time_series",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
+              "gridPos": {
+                "x": 18,
+                "y": 65,
+                "w": 6,
+                "h": 4
               },
-              "custom": {
-                "axisBorderShow": false,
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "barWidthFactor": 0.6,
-                "drawStyle": "line",
-                "fillOpacity": 25,
-                "gradientMode": "opacity",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "insertNulls": false,
-                "lineInterpolation": "smooth",
-                "lineWidth": 2,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "never",
-                "showValues": false,
-                "spanNulls": true,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT (CURRENT_DATE - MAX(production_date)) AS \"Dias sem importar\" FROM public.solar_daily_production WHERE device_sn='2405054309';",
+                  "format": "table",
+                  "editorMode": "code"
                 }
-              },
-              "mappings": [],
-              "unit": "kwatth",
-              "decimals": 1
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Acumulado no período"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "mode": "fixed",
-                      "fixedColor": "green"
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "—"
+                        }
+                      },
+                      "type": "special"
                     }
+                  ],
+                  "overrides": [],
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "yellow",
+                        "value": 14
+                      },
+                      {
+                        "color": "red",
+                        "value": 45
+                      }
+                    ]
+                  },
+                  "unit": "d",
+                  "decimals": 0
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "description": "Dias desde a data mais recente no PostgreSQL. Importação é manual; não confundir com falha de coleta em tempo real."
+            },
+            {
+              "id": 34,
+              "title": "Produção diária (kWh)",
+              "type": "timeseries",
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "gridPos": {
+                "x": 0,
+                "y": 69,
+                "w": 24,
+                "h": 9
+              },
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT ((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo') AS time, production_kwh AS \"Produção diária\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND $__timeFilter(((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo')) ORDER BY time;",
+                  "format": "time_series",
+                  "editorMode": "code"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "bars",
+                    "fillOpacity": 70,
+                    "gradientMode": "opacity",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "smooth",
+                    "lineWidth": 2,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "unit": "kwatth",
+                  "decimals": 1
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Produção diária"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#eab308"
+                        }
+                      }
+                    ]
                   }
                 ]
-              }
-            ]
-          },
-          "options": {
-            "legend": {
-              "calcs": [
-                "lastNotNull",
-                "max"
-              ],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": false
+              },
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "lastNotNull",
+                    "max"
+                  ],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "description": "Cada dia posicionado ao meio-dia local. Janela fixa de 2 anos.",
+              "timeFrom": "2y"
             },
-            "tooltip": {
-              "mode": "multi",
-              "sort": "desc"
+            {
+              "id": 35,
+              "title": "Produção mensal (kWh)",
+              "type": "timeseries",
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "gridPos": {
+                "x": 0,
+                "y": 78,
+                "w": 12,
+                "h": 8
+              },
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT (date_trunc('month',production_date::timestamp) + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo' AS time, SUM(production_kwh) AS \"Produção mensal\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND $__timeFilter((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo') GROUP BY 1 ORDER BY 1;",
+                  "format": "time_series",
+                  "editorMode": "code"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "bars",
+                    "fillOpacity": 70,
+                    "gradientMode": "opacity",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "smooth",
+                    "lineWidth": 2,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "unit": "kwatth",
+                  "decimals": 1
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Produção mensal"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "blue"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "lastNotNull",
+                    "max"
+                  ],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": false
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "description": "Meses incompletos ou com dias sem medição não devem ser comparados diretamente. Janela fixa de 2 anos.",
+              "timeFrom": "2y"
+            },
+            {
+              "id": 36,
+              "title": "Produção acumulada no intervalo",
+              "type": "timeseries",
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "gridPos": {
+                "x": 12,
+                "y": 78,
+                "w": 12,
+                "h": 8
+              },
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT ((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo') AS time, SUM(production_kwh) OVER (ORDER BY production_date ROWS UNBOUNDED PRECEDING) AS \"Acumulado no período\" FROM public.solar_daily_production WHERE device_sn='2405054309' AND $__timeFilter(((production_date::timestamp + INTERVAL '12 hours') AT TIME ZONE 'America/Sao_Paulo')) ORDER BY time;",
+                  "format": "time_series",
+                  "editorMode": "code"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 25,
+                    "gradientMode": "opacity",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "smooth",
+                    "lineWidth": 2,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "unit": "kwatth",
+                  "decimals": 1
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Acumulado no período"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "green"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "legend": {
+                  "calcs": [
+                    "lastNotNull",
+                    "max"
+                  ],
+                  "displayMode": "table",
+                  "placement": "bottom",
+                  "showLegend": false
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "desc"
+                }
+              },
+              "description": "Acumulado apenas dos dias dentro da janela fixa de 2 anos.",
+              "timeFrom": "2y"
             }
-          },
-          "description": "Acumulado apenas dos dias dentro da janela fixa de 2 anos.",
-          "timeFrom": "2y"
+          ]
         },
         {
           "id": 37,
@@ -2644,402 +2773,443 @@ data:
           "id": 38,
           "title": "🧾 Qualidade e Cobertura do Histórico",
           "type": "row",
-          "collapsed": false,
+          "collapsed": true,
           "gridPos": {
             "x": 0,
             "y": 94,
             "w": 24,
             "h": 1
           },
-          "panels": []
-        },
-        {
-          "id": 39,
-          "title": "Dias com registros",
-          "type": "stat",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 0,
-            "y": 95,
-            "w": 6,
-            "h": 4
-          },
-          "targets": [
+          "panels": [
             {
-              "refId": "A",
+              "id": 39,
+              "title": "Dias com registros",
+              "type": "stat",
               "datasource": {
                 "type": "postgres",
                 "uid": "cg1y9v0o3durkf"
               },
-              "rawSql": "SELECT COUNT(*) AS \"Dias com medição\" FROM public.solar_daily_production WHERE device_sn='2405054309';",
-              "format": "table",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "overrides": [],
-              "color": {
-                "mode": "fixed",
-                "fixedColor": "blue"
+              "gridPos": {
+                "x": 0,
+                "y": 95,
+                "w": 6,
+                "h": 4
               },
-              "unit": "none",
-              "decimals": 0
-            },
-            "overrides": []
-          },
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          }
-        },
-        {
-          "id": 40,
-          "title": "Maior produção diária",
-          "type": "stat",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 6,
-            "y": 95,
-            "w": 6,
-            "h": 4
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "datasource": {
-                "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
-              },
-              "rawSql": "SELECT MAX(production_kwh) AS \"Recorde diário\" FROM public.solar_daily_production WHERE device_sn='2405054309';",
-              "format": "table",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "overrides": [],
-              "color": {
-                "mode": "fixed",
-                "fixedColor": "#eab308"
-              },
-              "unit": "kwatth",
-              "decimals": 1
-            },
-            "overrides": []
-          },
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          }
-        },
-        {
-          "id": 41,
-          "title": "Média por dia registrado",
-          "type": "stat",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 12,
-            "y": 95,
-            "w": 6,
-            "h": 4
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "datasource": {
-                "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
-              },
-              "rawSql": "SELECT ROUND(AVG(production_kwh),2) AS \"Média por registro\" FROM public.solar_daily_production WHERE device_sn='2405054309';",
-              "format": "table",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "overrides": [],
-              "color": {
-                "mode": "fixed",
-                "fixedColor": "green"
-              },
-              "unit": "kwatth",
-              "decimals": 2
-            },
-            "overrides": []
-          },
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "description": "Média dos dias com registro, não de todos os dias do calendário."
-        },
-        {
-          "id": 42,
-          "title": "Datas ausentes no histórico",
-          "type": "stat",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 18,
-            "y": 95,
-            "w": 6,
-            "h": 4
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "datasource": {
-                "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
-              },
-              "rawSql": "SELECT COUNT(*) AS \"Datas sem registro\" FROM generate_series((SELECT MIN(production_date) FROM public.solar_daily_production WHERE device_sn='2405054309'),(SELECT MAX(production_date) FROM public.solar_daily_production WHERE device_sn='2405054309'), INTERVAL '1 day') AS d(day) LEFT JOIN public.solar_daily_production p ON p.production_date=d.day::date AND p.device_sn='2405054309' WHERE p.production_date IS NULL;",
-              "format": "table",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "overrides": [],
-              "color": {
-                "mode": "thresholds"
-              },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
                   },
-                  {
-                    "color": "yellow",
-                    "value": 10
-                  },
-                  {
-                    "color": "red",
-                    "value": 60
-                  }
-                ]
-              },
-              "unit": "none",
-              "decimals": 0
-            },
-            "overrides": []
-          },
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "percentChangeColorMode": "standard",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
+                  "rawSql": "SELECT COUNT(*) AS \"Dias com medição\" FROM public.solar_daily_production WHERE device_sn='2405054309';",
+                  "format": "table",
+                  "editorMode": "code"
+                }
               ],
-              "fields": "",
-              "values": false
-            },
-            "showPercentChange": false,
-            "textMode": "auto",
-            "wideLayout": true
-          },
-          "description": "Conta datas ausentes, não assume que houve geração zero."
-        },
-        {
-          "id": 43,
-          "title": "Datas ausentes (detalhe)",
-          "type": "table",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 0,
-            "y": 99,
-            "w": 12,
-            "h": 10
-          },
-          "targets": [
-            {
-              "refId": "A",
-              "datasource": {
-                "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
-              },
-              "rawSql": "SELECT d.day::date AS \"Data sem registro\" FROM generate_series((SELECT MIN(production_date) FROM public.solar_daily_production WHERE device_sn='2405054309'),(SELECT MAX(production_date) FROM public.solar_daily_production WHERE device_sn='2405054309'), INTERVAL '1 day') AS d(day) LEFT JOIN public.solar_daily_production p ON p.production_date=d.day::date AND p.device_sn='2405054309' WHERE p.production_date IS NULL ORDER BY 1 DESC;",
-              "format": "table",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "cellOptions": {
-                  "type": "auto"
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "—"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "overrides": [],
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "blue"
+                  },
+                  "unit": "none",
+                  "decimals": 0
                 },
-                "inspect": false
+                "overrides": []
               },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "blue",
-                    "value": null
-                  }
-                ]
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
               }
             },
-            "overrides": []
-          },
-          "options": {
-            "cellHeight": "sm",
-            "showHeader": true
-          },
-          "description": "Datas entre o primeiro e o último registro sem medição importada."
-        },
-        {
-          "id": 44,
-          "title": "Últimos registros importados",
-          "type": "table",
-          "datasource": {
-            "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
-          },
-          "gridPos": {
-            "x": 12,
-            "y": 99,
-            "w": 12,
-            "h": 10
-          },
-          "targets": [
             {
-              "refId": "A",
+              "id": 40,
+              "title": "Maior produção diária",
+              "type": "stat",
               "datasource": {
                 "type": "postgres",
                 "uid": "cg1y9v0o3durkf"
               },
-              "rawSql": "SELECT production_date AS \"Data\", production_kwh AS \"Produção (kWh)\", source AS \"Origem\", imported_at AS \"Importado em\" FROM public.solar_daily_production WHERE device_sn='2405054309' ORDER BY production_date DESC LIMIT 30;",
-              "format": "table",
-              "editorMode": "code"
-            }
-          ],
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
+              "gridPos": {
+                "x": 6,
+                "y": 95,
+                "w": 6,
+                "h": 4
               },
-              "custom": {
-                "align": "auto",
-                "cellOptions": {
-                  "type": "auto"
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT MAX(production_kwh) AS \"Recorde diário\" FROM public.solar_daily_production WHERE device_sn='2405054309';",
+                  "format": "table",
+                  "editorMode": "code"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "—"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "overrides": [],
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#eab308"
+                  },
+                  "unit": "kwatth",
+                  "decimals": 1
                 },
-                "inspect": false
+                "overrides": []
               },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "blue",
-                    "value": null
-                  }
-                ]
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
               }
             },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Produção (kWh)"
+            {
+              "id": 41,
+              "title": "Média por dia registrado",
+              "type": "stat",
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "gridPos": {
+                "x": 12,
+                "y": 95,
+                "w": 6,
+                "h": 4
+              },
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT ROUND(AVG(production_kwh),2) AS \"Média por registro\" FROM public.solar_daily_production WHERE device_sn='2405054309';",
+                  "format": "table",
+                  "editorMode": "code"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "—"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "overrides": [],
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "green"
+                  },
+                  "unit": "kwatth",
+                  "decimals": 2
                 },
-                "properties": [
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "description": "Média dos dias com registro, não de todos os dias do calendário."
+            },
+            {
+              "id": 42,
+              "title": "Datas ausentes no histórico",
+              "type": "stat",
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "gridPos": {
+                "x": 18,
+                "y": 95,
+                "w": 6,
+                "h": 4
+              },
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT COUNT(*) AS \"Datas sem registro\" FROM generate_series((SELECT MIN(production_date) FROM public.solar_daily_production WHERE device_sn='2405054309'),(SELECT MAX(production_date) FROM public.solar_daily_production WHERE device_sn='2405054309'), INTERVAL '1 day') AS d(day) LEFT JOIN public.solar_daily_production p ON p.production_date=d.day::date AND p.device_sn='2405054309' WHERE p.production_date IS NULL;",
+                  "format": "table",
+                  "editorMode": "code"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "null",
+                        "result": {
+                          "text": "—"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "overrides": [],
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "yellow",
+                        "value": 10
+                      },
+                      {
+                        "color": "red",
+                        "value": 60
+                      }
+                    ]
+                  },
+                  "unit": "none",
+                  "decimals": 0
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              },
+              "description": "Conta datas ausentes, não assume que houve geração zero."
+            },
+            {
+              "id": 43,
+              "title": "Datas ausentes (detalhe)",
+              "type": "table",
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "gridPos": {
+                "x": 0,
+                "y": 99,
+                "w": 12,
+                "h": 10
+              },
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT d.day::date AS \"Data sem registro\" FROM generate_series((SELECT MIN(production_date) FROM public.solar_daily_production WHERE device_sn='2405054309'),(SELECT MAX(production_date) FROM public.solar_daily_production WHERE device_sn='2405054309'), INTERVAL '1 day') AS d(day) LEFT JOIN public.solar_daily_production p ON p.production_date=d.day::date AND p.device_sn='2405054309' WHERE p.production_date IS NULL ORDER BY 1 DESC;",
+                  "format": "table",
+                  "editorMode": "code"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "inspect": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "blue",
+                        "value": null
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true
+              },
+              "description": "Datas entre o primeiro e o último registro sem medição importada."
+            },
+            {
+              "id": 44,
+              "title": "Últimos registros importados",
+              "type": "table",
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "gridPos": {
+                "x": 12,
+                "y": 99,
+                "w": 12,
+                "h": 10
+              },
+              "targets": [
+                {
+                  "refId": "A",
+                  "datasource": {
+                    "type": "postgres",
+                    "uid": "cg1y9v0o3durkf"
+                  },
+                  "rawSql": "SELECT production_date AS \"Data\", production_kwh AS \"Produção (kWh)\", source AS \"Origem\", imported_at AS \"Importado em\" FROM public.solar_daily_production WHERE device_sn='2405054309' ORDER BY production_date DESC LIMIT 30;",
+                  "format": "table",
+                  "editorMode": "code"
+                }
+              ],
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "inspect": false
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "blue",
+                        "value": null
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
                   {
-                    "id": "unit",
-                    "value": "kwatth"
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Produção (kWh)"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "kwatth"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      }
+                    ]
                   },
                   {
-                    "id": "decimals",
-                    "value": 1
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Importado em"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "dateTimeAsIso"
+                      }
+                    ]
                   }
                 ]
               },
-              {
-                "matcher": {
-                  "id": "byName",
-                  "options": "Importado em"
-                },
-                "properties": [
-                  {
-                    "id": "unit",
-                    "value": "dateTimeAsIso"
-                  }
-                ]
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true
               }
-            ]
-          },
-          "options": {
-            "cellHeight": "sm",
-            "showHeader": true
-          }
+            }
+          ]
         }
       ]
     }
