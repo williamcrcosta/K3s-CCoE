@@ -59,6 +59,51 @@ spec:
             - hosts:
               - grafana.wccosta.com.br
               secretName: wccosta-tls
+        additionalPrometheusRulesMap:
+          windows-desktop-alerts:
+            groups:
+            - name: windows-desktop
+              rules:
+              - alert: WindowsDesktopOffline
+                expr: up{job="windows-desktop"} == 0
+                for: 1h
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Desktop X870AORUSELITE offline"
+                  description: "windows_exporter em 192.168.50.9:9182 sem resposta ha mais de 1h (desktop desligado/suspenso ou exporter parado)."
+              - alert: WindowsDesktopDiskSpaceHigh
+                expr: 100 * (windows_logical_disk_size_bytes{job="windows-desktop",volume!~"Harddisk.*"} - windows_logical_disk_free_bytes{job="windows-desktop",volume!~"Harddisk.*"}) / windows_logical_disk_size_bytes{job="windows-desktop",volume!~"Harddisk.*"} > 85
+                for: 15m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Desktop: volume {{ $labels.volume }} acima de 85%"
+                  description: "O volume {{ $labels.volume }} do desktop esta com {{ $value }}% de uso ha 15min."
+              - alert: WindowsDesktopDiskSpaceCritical
+                expr: 100 * (windows_logical_disk_size_bytes{job="windows-desktop",volume!~"Harddisk.*"} - windows_logical_disk_free_bytes{job="windows-desktop",volume!~"Harddisk.*"}) / windows_logical_disk_size_bytes{job="windows-desktop",volume!~"Harddisk.*"} > 95
+                for: 15m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "Desktop: volume {{ $labels.volume }} acima de 95%"
+                  description: "O volume {{ $labels.volume }} do desktop esta com {{ $value }}% de uso ha 15min."
+              - alert: WindowsDesktopCommitChargeHigh
+                expr: 100 * windows_memory_committed_bytes{job="windows-desktop"} / windows_memory_commit_limit{job="windows-desktop"} > 90
+                for: 15m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Desktop: commit charge acima de 90%"
+                  description: "Memoria comprometida (RAM+pagefile) do desktop em {{ $value }}% do limite ha 15min."
+              - alert: WindowsDesktopCpuHigh
+                expr: 100 - avg(irate(windows_cpu_time_total{job="windows-desktop",mode="idle"}[15m])) * 100 > 90
+                for: 30m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Desktop: CPU acima de 90% por 30min"
+                  description: "CPU do desktop sustentada acima de 90% ha 30min."
         prometheus:
           prometheusSpec:
             retention: 30d
