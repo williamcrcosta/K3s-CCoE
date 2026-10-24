@@ -7,7 +7,7 @@ postgresAccess:
   secretUserKey: "user"
   secretPasswordKey: "password"
   secretDBKey: "dbname"
-zabbixImageTag: ubuntu-7.0.29
+zabbixImageTag: ubuntu-7.0.32
 zabbixWeb:
   zabbixServerHost: zabbix-zabbix-server
   zabbixServerPort: 10051
