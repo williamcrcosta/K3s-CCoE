@@ -16,7 +16,7 @@
 ```text
 rke2-pgdb (192.168.50.30) — PostgreSQL 16
 ├── grafana     ← Grafana 13.2.2
-├── zabbix      ← Zabbix 7.0.30
+├── zabbix      ← Zabbix 7.0.32
 └── keycloak    ← reservado
 ```
 
@@ -24,11 +24,11 @@ rke2-pgdb (192.168.50.30) — PostgreSQL 16
 
 ## Melhorias Planejadas — Do Menor ao Maior Risco
 
-> **Versões verificadas em 2026-09-20.** Zabbix no último patch LTS (`7.0.30`, chart `7.1.0`); Longhorn, cert-manager, kube-prometheus-stack e ArgoCD atualizados.
+> **Versões verificadas em 2026-10-24** (análise completa do cluster). Zabbix em `7.0.32` LTS, chart `7.1.0` (ambos latest). Longhorn, cert-manager e ArgoCD atualizados. Pendente: kube-prometheus-stack `91.4.1 → 92.x`, RKE2 `v1.35 → v1.36+`.
 
-### 1. Resource Limits nos Deployments — Risco Baixo
+### 1. Resource Limits nos Deployments — Risco Baixo — ⏳ Parcial
 
-**Problema:** 65 de 75 containers sem `limits`/`requests` definidos (verificado 2026-09-17).
+**Problema:** 65 de 75 containers sem `limits`/`requests` (2026-09-17) → **restam 12 containers sem requests/limits fora do kube-system** (2026-10-24). LimitRange em `infra/limitranges` cobriu a maioria.
 
 **Benefício:** prevenção de OOM e CPU throttling.
 
@@ -63,33 +63,11 @@ resources:
 
 ---
 
-### 4. Backup Externo do PostgreSQL — Risco Médio
+### 4. Backup Externo do PostgreSQL — ✅ Coberto por vzdump (decisão 2026-10-24)
 
-**Problema:** banco só existe na VM `rke2-pgdb`. Sem backup off-site.
+**Resolvido:** a VM `rke2-pgdb` já é coberta por vzdump do Proxmox — restore de VM inteira funciona (crash-consistent, PG recupera via WAL). Aceito o risco residual: sem restore cirúrgico por database — um `DROP DATABASE` acidental exigiria reverter a VM toda com até 24h de perda.
 
-**Benefício:** recuperação em caso de falha da VM.
-
-**Ação:** cronjob `pg_dump` + `scp` para NFS/S3, ou CronJob no cluster.
-
-```yaml
-# CronJob de exemplo
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: postgres-backup
-spec:
-  schedule: "0 3 * * *"
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-          - name: pgdump
-            image: postgres:16
-            command: ["pg_dump", "-h", "192.168.50.30", "-U", "backup", "-Fc", "grafana", "-f", "/backup/grafana.dump"]
-```
-
-**Impacto:** precisa de credencial e destino de backup.
+**Se um dia quiser restore por-DB:** CronJob `pg_dump -Fc` por database (secrets `zabbix-db-access` / `grafana-db-credentials` já existem nos namespaces) → `hostPath /mnt/longhorn-backup` (NFS do Proxmox) no worker com `nodeSelector`, retenção ~7d.
 
 ---
 
@@ -99,15 +77,7 @@ spec:
 
 **Benefício:** disaster recovery completo.
 
-**Resolvido:** backup target configurado para NFS do Proxmox (`nfs://192.168.50.250:/var/lib/vz/longhorn-backup`). Backup `prometheus-pre-upgrade-172` concluído. Próximo passo opcional: `recurringJobs` automáticos.
-
-```yaml
-# Configuração no Longhorn UI ou manifesto
-recurringJobs:
-  - name: backup
-    task: backup
-    retain: 7
-```
+**Resolvido:** backup target NFS do Proxmox (`nfs://192.168.50.250:/var/lib/vz/longhorn-backup`) + `recurringJob daily-backup` (13h, retain 7) rodando diariamente — verificado 2026-10-24.
 
 **Impacto:** precisa de storage externo (S3, NFS, etc.).
 
@@ -178,18 +148,78 @@ recurringJobs:
 
 ---
 
+### 12. Zabbix 7.0.32 + fix de templates — ✅ Concluído (2026-10-24)
+
+- **Bump `ubuntu-7.0.30 → 7.0.32`** (LTS): fixes de `history.get`, `nodata()`, crashes de managers no shutdown. DB no mesmo PG externo (`dbversion 07000000/07000030`, sem patch de schema).
+- **Template `Proxmox VE by HTTP`**: `diskread/diskwrite` ausentes na API pra VM stopped → spam de "Preprocessing failed". Fix aplicado via UI: "Custom on fail → Set value to 0" no step JSONPath dos item prototypes `qemu` e `lxc` (diskread/diskwrite). Propagou pros itens descobertos em ~1 ciclo de LLD.
+- **Templates `Kubernetes cluster state by HTTP`** (hosts `k8s-rke2`, `k8s-rke2-nodes`): faltava `{$KUBE.API.TOKEN}` + `{$KUBE.STATE.ENDPOINT.NAME}`. Criado SA `zabbix-monitor` (role `view` + ClusterRole p/ nodes/pv/storageclasses — versionado em `infra/zabbix/zabbix-monitor-rbac.yaml`; **secret do token é manual** — selfHeal apagaria `.data`). Macros corrigidas via DB direto (paste na UI truncou o JWT de 917 chars).
+- **Pendente:** `srvawx01` (192.168.50.3) segue com o template linkado sem token — deslinkar na UI se não for monitorado como cluster próprio.
+
+---
+
+### 13. Disco do worker — ✅ Limpeza feita (2026-10-24), recorrente
+
+**Problema:** `/` do worker chegou a **84%** — 31.3GB em `/var/lib/rancher/rke2/agent/containerd` (imagens não usadas).
+
+**Resolvido:** `crictl rmi --prune` via `kubectl debug node` (SSH CP→worker está quebrado) → **43%** (~17GB liberados). SSH direto continua pendente de reparo.
+
+**Recorrência:** imagens acumulam a cada upgrade. Kubelet faz GC só acima de ~85% do imagefs — considerar baixar `image-gc-high-threshold` ou podar periodicamente.
+
+---
+
+### 14. Crashloops de pods API-dependentes em reboot do CP — Risco Médio
+
+**Problema:** a cada reboot do CP, pods que dependem do apiserver morrem com exit≠0 e acumulam restarts: kube-state-metrics (2412!), csi-provisioner (933), cert-manager-cainjector (875), kubernetes-dashboard (794) em 2026-10-24.
+
+**Mitigação barata:** `startupProbe`/`livenessProbe` com `failureThreshold` alto + `resources` nos afetados — toleram a janela de API indisponível sem crashar.
+
+**Causa raiz:** CP único — resolve de verdade só com 2º node de control-plane (relacionado ao item 11).
+
+---
+
+### 15. etcd snapshots off-site — Risco Baixo
+
+**Problema:** snapshots automáticos (cron 12h) ficam só em `/var/lib/rancher/rke2/server/db/snapshots` no CP — se o disco do CP morrer, os snapshots morrem junto.
+
+**Ação:** cron local de `rsync`/`cp` dos snapshots pro NFS do Proxmox, ou rotina `rke2 etcd-snapshot save` + copy.
+
+---
+
+### 16. Upgrades de versão pendentes — Risco Baixo/Médio
+
+- `kube-prometheus-stack` **91.4.1 → 92.x** (latest 92.13.1 em 2026-10-24) — major de chart
+- RKE2 **v1.35.8 → v1.36+** — 1.35 é o minor mais velho suportado (upstream em 1.37.x)
+- Zabbix 8.0: ainda RC (8.0.0rc2 em 2026-10-21) — DB `zabbix` está limpo (`07000000/07000030`), apto pra major quando sair GA
+
+---
+
+### 17. Hygiene do repo — Risco Baixo
+
+- `infra/zabbix/values.yaml` não entra no kustomization (valores efetivos são inline da Application) — alinhar ou remover
+- Secrets Grafana duplicados: `infra/monitoring/grafana-secret.yaml` vs `infra/monitoring-secrets/` — consolidar
+- `infra/sealed-secrets/application.yaml` usa repo bitnami-labs **morto** (chart pinned 2.18.5 ainda resolve) — migrar pra fonte OCI
+- Tags flutuantes: `postgres:16` (cronjob nodesclean), `busybox`
+
+---
+
 ## Prioridade Recomendada
 
 | Ordem | Item | Esforço | Benefício |
 |---|---|---|---|
-| 1 | Resource limits | 30min | Prevenção de falhas |
+| 1 | Resource limits (12 restantes) | 30min | Prevenção de falhas |
 | ~~2~~ | ~~AlertManager~~ ✅ | ~~1h~~ | ~~Notificações críticas~~ |
 | ~~3~~ | ~~Dashboard Zabbix~~ ✅ | ~~30min~~ | ~~Melhor visibilidade~~ |
-| 4 | Backup PostgreSQL | 1h | Proteção de dados |
+| ~~4~~ | ~~Backup PostgreSQL~~ ✅ vzdump | ~~1h~~ | ~~Proteção de dados~~ |
 | ~~5~~ | ~~Backup Longhorn~~ ✅ | ~~2h~~ | ~~DR completo~~ |
 | 6 | TLS PostgreSQL | 1h | Segurança |
 | ~~7~~ | ~~kube-prometheus-stack~~ ✅ | ~~2h~~ | ~~Updates + segurança~~ |
 | ~~8~~ | ~~Longhorn~~ ✅ | ~~4h~~ | ~~Storage moderno~~ |
 | ~~9~~ | ~~ArgoCD~~ ✅ | ~~2h~~ | ~~Updates + segurança~~ |
 | ~~10~~ | ~~cert-manager~~ ✅ | ~~3h~~ | ~~EOL resolvido~~ |
-| 11 | Multi-cluster | dias | DR real |
+| 11 | Multi-cluster / 2º CP | dias | DR real |
+| ~~12~~ | ~~Zabbix 7.0.32 + templates~~ ✅ | ~~1h~~ | ~~Spam zerado~~ |
+| ~~13~~ | ~~Disco worker~~ ✅ | ~~30min~~ | ~~84% → 43%~~ |
+| 14 | Probes p/ crashloop pós-reboot | 1h | Estabilidade |
+| 15 | etcd snapshots off-site | 30min | DR do CP |
+| 16 | Upgrades kube-prom 92.x + RKE2 1.36 | 3h | Suporte |
+| 17 | Hygiene do repo | 1h | Manutenibilidade |
