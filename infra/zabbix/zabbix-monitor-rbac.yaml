@@ -1,0 +1,61 @@
+# RBAC do service account usado pelo Zabbix para monitorar o cluster
+# (templates "Kubernetes cluster state by HTTP" nos hosts k8s-rke2 / k8s-rke2-nodes).
+#
+# O token NAO esta neste manifesto — o Secret type=kubernetes.io/service-account-token
+# e criado manualmente (ArgoCD selfHeal apagaria o .data em loop):
+#   kubectl -n zabbix apply -f - <<'EOT'
+#   apiVersion: v1
+#   kind: Secret
+#   metadata:
+#     name: zabbix-monitor-token
+#     namespace: zabbix
+#     annotations:
+#       kubernetes.io/service-account.name: zabbix-monitor
+#   type: kubernetes.io/service-account-token
+#   EOT
+# O valor vai na macro {$KUBE.API.TOKEN} dos hosts no Zabbix.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: zabbix-monitor
+  namespace: zabbix
+---
+# 'view' cobre recursos namespaced; nodes/pv/storageclasses precisam do role extra
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: zabbix-monitor-cluster
+rules:
+- apiGroups: [""]
+  resources: ["nodes", "namespaces", "componentstatuses", "persistentvolumes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: zabbix-monitor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+- kind: ServiceAccount
+  name: zabbix-monitor
+  namespace: zabbix
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: zabbix-monitor-cluster
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: zabbix-monitor-cluster
+subjects:
+- kind: ServiceAccount
+  name: zabbix-monitor
+  namespace: zabbix

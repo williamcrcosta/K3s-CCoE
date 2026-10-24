@@ -4,3 +4,4 @@ resources:
   - ingress.yaml
   - zabbix-server-nodeport.yaml
   - zabbix-db-access-sealed.yaml
+  - zabbix-monitor-rbac.yaml
