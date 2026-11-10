@@ -334,6 +334,16 @@ kubectl exec -n monitoring deployment/monitoring-grafana -c grafana -- \
 rke2 etcd-snapshot save --name "manual-$(date +%Y%m%d_%H%M%S)"
 ```
 
+### Dependência crítica: vzdump → desktop (CIFS) — 2026-11-10
+
+As storages `backup-*` do PVE são **CIFS no desktop Windows** (192.168.50.9, share `PVE-BACKUP`). O desktop dorme ~00:00–07:30 — nesse período:
+
+- Storages ficam offline → jobs vzdump falham com `storage ... is not online`
+- API do PVE enforca em chamadas de storage → `pve-exporter` (porta 9221) estoura scrape_timeout → lacuna de métricas no Grafana
+- **Mitigações aplicadas:** `repeat-missed=1` nos 5 jobs (cobre só missed start, não falha pós-start); `qm set 501 --agent enabled=1,freeze-fs=0` (fsfreeze falhava no CSI globalmount do Longhorn)
+- **Pendente:** WoL pve→desktop ~17:50 para garantir share acordado na janela de backup; ou PBS dedicado 24/7
+- Em DR: restaurações a partir desses backups exigem o desktop LIGADO — avaliar cópia dos `.vma.zst` mais recentes pra storage independente
+
 ### Chaves do Sealed Secrets (CRÍTICO — guardar em local seguro)
 
 ```bash

@@ -25,7 +25,9 @@ export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
 K=/var/lib/rancher/rke2/bin/kubectl    # kubectl fica neste path no CP
 ```
 
-Execuções nesta sessão rodam **no CP** (root). ~~Worker acessível via `ssh root@192.168.50.21`~~ — **SSH CP→worker quebrado (publickey denied, 2026-10-24)** — pendente reparo.
+Execuções nesta sessão rodam **no CP** (root). ~~Worker acessível via `ssh root@192.168.50.21`~~ — **SSH CP→worker quebrado (publickey denied, 2026-10-24)** — pendente reparo. **CP→pve idem.**
+
+**Git (push pro GitHub):** `~/.ssh/config` usa `id_ed25519_gitops` (sem passphrase, deploy key com write no repo — criada 2026-11-10). A antiga `id_ed25519_github` tem passphrase → falha não-interativo. Não remover/regerar sem atualizar a deploy key no GitHub.
 
 ## GitOps (ArgoCD)
 
@@ -45,7 +47,7 @@ Execuções nesta sessão rodam **no CP** (root). ~~Worker acessível via `ssh r
 | sealed-secrets | `kube-system` | chart 2.18.5 | SealedSecrets para credenciais (kubeseal local); repo bitnami-labs **morto** |
 | kubernetes-dashboard | `kubernetes-dashboard` | — | |
 
-Apps com manifests prontos mas **desativados** (comentados em `clusters/homelab/kustomization.yaml`): `ollama` (ns `ollama`), `powerdns` + `technitium` (ns `dns`), `observability`, **`loki` + `alloy`** (desativados 2026-09 em `a3c3f72` — "não utilizados"; manifests e datasource no Grafana continuam no repo) — sources em `apps/` na raiz do repo. `clusters/homelab/apps/observability.yaml` e `clusters/homelab/apps/longhorn.yaml` são arquivos vazios (Longhorn é deployado via `infra/longhorn` no kustomization, não via Application).
+Apps com manifests prontos mas **desativados** (comentados em `clusters/homelab/kustomization.yaml`): `ollama` (ns `ollama`), `powerdns` + `technitium` (ns `dns`), `observability`, **`loki` + `alloy`** (desativados 2026-09 em `a3c3f72`; **datasource Loki removido do Grafana em 2026-11-10** — `4e793d4` + ConfigMap `grafana-datasource-delete-loki` com deleteDatasources em `f1be0c2`) — sources em `apps/` na raiz do repo. `clusters/homelab/apps/observability.yaml` e `clusters/homelab/apps/longhorn.yaml` são arquivos vazios (Longhorn é deployado via `infra/longhorn` no kustomization, não via Application).
 
 ## Storage — Longhorn
 
@@ -55,6 +57,10 @@ Apps com manifests prontos mas **desativados** (comentados em `clusters/homelab/
 - Volume Prometheus: `pvc-484de07c-bcfe-48a0-9ddd-c215e43592e1` (20Gi, único volume Longhorn — PVC antigo `pvc-6d11925f` não existe mais)
 - **Backup funciona**: backup-target = NFS `nfs://192.168.50.250:/var/lib/vz/longhorn-backup`; `recurringJob daily-backup` (13h, retain 7) completando diariamente
 - NFS `/mnt/longhorn-backup` (do Proxmox) existe no fstab do worker com `nofail,_netdev`
+
+### vzdump do PVE → desktop (CIFS) — 2026-11-10
+
+As 5 storages `backup-*` do PVE são CIFS no **desktop Windows** (192.168.50.9, share `PVE-BACKUP`), que dorme ~00:00–07:30. Consequências: (1) **lacuna diária nos dashboards Proxmox/Windows ~00:43–07:33** — mount morto enforca a API do PVE e o `pve-exporter` estoura scrape_timeout; não é bug, é esperado; (2) backup falha se desktop off na hora do job (`storage not online` — ocorreu 05–06/set no pfSense). Aplicado: `repeat-missed=1` nos 5 jobs (⚠️ cobre só missed-start, **não** retenta falha pós-start) e `qm set 501 --agent enabled=1,freeze-fs=0` (fsfreeze quebrava no CSI globalmount). Fix real pendente: WoL pve→desktop ~17:50 ou PBS dedicado 24/7.
 
 ## Bancos (rke2-pgdb, PG 16)
 
@@ -107,6 +113,9 @@ kubectl get nodes.longhorn.io -n longhorn-system -o yaml   # scheduling/disks
 - TLS no PG: em standby — `Certificate pgdb-tls` já emitido via LE; pendente decidir distribuição pro pgdb (ver item 6 do IMPROVEMENTS.md: pull via API k8s vs ca-server/step-ca no Proxmox)
 - Tags flutuantes menores: `postgres:16` (cronjob nodesclean), `busybox`
 - `infra/sealed-secrets/application.yaml` aponta pra repo Helm morto; `infra/zabbix/values.yaml` não entra no kustomization (valores efetivos são inline da Application); secrets Grafana duplicados em `infra/monitoring/` e `infra/monitoring-secrets/`
+- Alertas cosméticos p/ silenciar (item 19 IMPROVEMENTS): `KubeProxyDown` (critical, falso positivo — RKE2 não expõe kube-proxy), `KubeDaemonSetMisScheduled`/`RolloutStuck` (CP tainted, by design), `NodeClockNotSynchronising` (flap; offset 0.0s em 2026-11-10)
+- Discos: `local` do pve **81%**; worker ~84% recorrente; CP 69%
+- kube-prometheus-stack 91.4.1→92.x: **upgrade planejado p/ 2026-11-10/11**
 
 ## Docs do repo
 

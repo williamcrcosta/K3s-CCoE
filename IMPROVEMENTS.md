@@ -67,6 +67,8 @@ resources:
 
 **Resolvido:** a VM `rke2-pgdb` já é coberta por vzdump do Proxmox — restore de VM inteira funciona (crash-consistent, PG recupera via WAL). Aceito o risco residual: sem restore cirúrgico por database — um `DROP DATABASE` acidental exigiria reverter a VM toda com até 24h de perda.
 
+> ⚠️ **Atualização 2026-11-10:** a cobertura por vzdump depende do share CIFS `PVE-BACKUP` hospedado no **desktop Windows** (192.168.50.9), que dorme ~00:00–07:30. Falhas reais em 05–06/set/2026 (job das 18h com storage offline). Ver item 18.
+
 **Se um dia quiser restore por-DB:** CronJob `pg_dump -Fc` por database (secrets `zabbix-db-access` / `grafana-db-credentials` já existem nos namespaces) → `hostPath /mnt/longhorn-backup` (NFS do Proxmox) no worker com `nodeSelector`, retenção ~7d.
 
 ---
@@ -187,7 +189,7 @@ resources:
 
 ### 16. Upgrades de versão pendentes — Risco Baixo/Médio
 
-- `kube-prometheus-stack` **91.4.1 → 92.x** (latest 92.13.1 em 2026-10-24) — major de chart
+- `kube-prometheus-stack` **91.4.1 → 92.x** (latest 92.13.1 em 2026-10-24) — major de chart — **upgrade planejado p/ 2026-11-10/11**
 - RKE2 **v1.35.8 → v1.36+** — 1.35 é o minor mais velho suportado (upstream em 1.37.x)
 - Zabbix 8.0: ainda RC (8.0.0rc2 em 2026-10-21) — DB `zabbix` está limpo (`07000000/07000030`), apto pra major quando sair GA
 
@@ -199,6 +201,31 @@ resources:
 - Secrets Grafana duplicados: `infra/monitoring/grafana-secret.yaml` vs `infra/monitoring-secrets/` — consolidar
 - `infra/sealed-secrets/application.yaml` usa repo bitnami-labs **morto** (chart pinned 2.18.5 ainda resolve) — migrar pra fonte OCI
 - Tags flutuantes: `postgres:16` (cronjob nodesclean), `busybox`
+
+---
+
+### 18. Backups PVE dependem do desktop (CIFS) — Risco Médio
+
+**Problema (diagnóstico 2026-11-09):** as 5 storages de backup do PVE são CIFS montadas do **desktop Windows** (192.168.50.9, share `PVE-BACKUP`, domain `X870AORUSELITE`), que dorme toda madrugada (~00:00–07:30). Efeitos observados:
+
+- **Lacuna diária de métricas** (`proxmox-pve` + `windows-desktop` down ~00:43–07:33 UTC): desktop dorme → mounts CIFS morrem → API do PVE enforca consultando status de storages → `pve-exporter` estoura o `scrape_timeout` de 10s → dashboards Proxmox/Windows sem dados de madrugada
+- **Falha de backup por storage offline**: se o desktop está off na hora do job, vzdump aborta com `storage ... is not online` (aconteceu 05 e 06/set/2026 no pfSense/VM 700)
+- **Risco adicional**: desktop dormir *no meio* de um backup corrompe/aborta a escrita
+
+**Feito (2026-11-10):**
+- `repeat-missed=1` nos 5 jobs vzdump — ⚠️ **atenção à semântica**: cobre apenas "missed start" (host/pvescheduler off), **NÃO retenta** job que iniciou e falhou (nosso caso storage-offline é execução com falha)
+- `qm set 501 --agent enabled=1,freeze-fs=0` — fsfreeze falhava toda noite no CSI `globalmount` do Longhorn (backup já era crash-consistent; agora sem ERROR falso no log)
+
+**Cobertura real pendente:** WoL do pve→desktop ~17:50 (`apt install wakeonlan` + cron) garante share disponível na janela 18–21h. Alternativa de hardware: PBS em mini-PC/NAS 24/7 (mantém backup off-host — melhor que disco local no pve).
+
+### 19. Alertas cosméticos para silenciar — Risco Baixo
+
+Levantamento 2026-11-10 — alertas permanentes que não indicam problema real:
+
+- `KubeProxyDown` (critical): RKE2 não expõe métricas do kube-proxy (static pod em localhost) — falso positivo permanente; dashboard `Kubernetes / Proxy` fica sempre vazio pela mesma razão
+- `KubeDaemonSetMisScheduled` + `KubeDaemonSetRolloutStuck` (8x): DaemonSets não agendam no CP tainted (NoSchedule) — by design
+- `NodeClockNotSynchronising` (2x): flap intermitente nos 2 nodes — offset medido 0.0s em 2026-11-10; conferir `chronyc sources` se recorrente
+- Datasource **Loki removido** (2026-11-10, commits `4e793d4`/`f1be0c2`): app desativado em a3c3f72 mas datasource continuava provisionado e quebrado; `infra/monitoring-dashboards/grafana-datasource-delete-loki.yaml` (deleteDatasources) garante remoção do banco do Grafana
 
 ---
 

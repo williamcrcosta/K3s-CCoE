@@ -197,6 +197,9 @@ K3s-CCoE/
 
 ## Monitoração
 
+> **Nota (2026-11-10):** lacunas diárias ~00:43–07:33 nos dashboards de Proxmox/Windows são **esperadas** — o desktop (192.168.50.9) dorme, o share CIFS de backup do PVE some, e o `pve-exporter` trava consultando a API. Detalhes no item 18 do IMPROVEMENTS.md.
+
+
 - **Prometheus** — coleta métricas de todos os nodes e pods via kube-prometheus-stack 82.2.0
 - **Grafana** — dashboards automáticos: Kubernetes, Nodes, Pods, Storage
 - **Zabbix** — monitoração tradicional dos nodes (CPU, RAM, disco, rede)
