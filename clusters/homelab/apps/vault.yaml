@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault
+  namespace: platform-argocd
+  annotations:
+    argocd.argoproj.io/compare-options: ServerSideDiff=false
+spec:
+  project: platform
+  source:
+    repoURL: https://helm.releases.hashicorp.com
+    chart: vault
+    targetRevision: 0.34.1
+    helm:
+      values: |
+        injector:
+          enabled: false
+        server:
+          standalone:
+            enabled: true
+            config: |
+              ui = true
+              listener "tcp" {
+                tls_disable = 1
+                address = "[::]:8200"
+                cluster_address = "[::]:8201"
+              }
+              storage "raft" {
+                path = "/vault/data"
+              }
+              service_registration "kubernetes" {}
+          dataStorage:
+            enabled: true
+            size: 10Gi
+            storageClass: longhorn
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+        ui:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vault
+  ignoreDifferences:
+    - group: apps
+      kind: StatefulSet
+      jqPathExpressions:
+        - .spec.persistentVolumeClaimRetentionPolicy
+        - .spec.podManagementPolicy
+        - .spec.revisionHistoryLimit
+        - .spec.updateStrategy
+        - .spec.volumeClaimTemplates
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true

@@ -1,0 +1,26 @@
+# Ingress da UI/API do Vault apontando para o service vault-ui.
+# Necessario usar vault-ui (publishNotReadyAddresses=true) em vez do ingress
+# embutido do chart: o chart aponta pro vault-active, que so roteia pod
+# unsealed — impossibilitaria o unseal via navegador.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vault-ui
+  namespace: vault
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: vault.wccosta.com.br
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: vault-ui
+                port:
+                  number: 8200
+  tls:
+    - hosts:
+        - vault.wccosta.com.br
+      secretName: wccosta-tls

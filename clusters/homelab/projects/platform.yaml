@@ -13,6 +13,8 @@ spec:
     - "https://zabbix-community.github.io/helm-zabbix"
     - "https://grafana.github.io/helm-charts"
     - "https://github.com/bitnami-labs/sealed-secrets.git"
+    - "https://helm.releases.hashicorp.com"
+    - "https://charts.external-secrets.io"
   destinations:
     - namespace: "*"
       server: https://kubernetes.default.svc

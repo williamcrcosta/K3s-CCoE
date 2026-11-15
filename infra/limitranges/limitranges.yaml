@@ -91,3 +91,33 @@ spec:
       default:
         cpu: 500m
         memory: 256Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-resources
+  namespace: vault
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 50m
+        memory: 128Mi
+      default:
+        cpu: 500m
+        memory: 512Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-resources
+  namespace: external-secrets
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 25m
+        memory: 64Mi
+      default:
+        cpu: 250m
+        memory: 256Mi
