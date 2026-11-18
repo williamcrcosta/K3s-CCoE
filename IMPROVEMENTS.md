@@ -28,7 +28,7 @@ rke2-pgdb (192.168.50.30) — PostgreSQL 16
 
 ### 1. Resource Limits nos Deployments — Risco Baixo — ⏳ Parcial
 
-**Problema:** 65 de 75 containers sem `limits`/`requests` (2026-09-17) → **restam 12 containers sem requests/limits fora do kube-system** (2026-10-24). LimitRange em `infra/limitranges` cobriu a maioria.
+**Problema:** 65 de 75 containers sem `limits`/`requests` (2026-09-17) → 12 containers (2026-10-24) → **restam 2** (`cert-controller` e `webhook` do ESO, resolvidos nos values do app em 2026-11-17). LimitRange em `infra/limitranges` cobriu a maioria.
 
 **Benefício:** prevenção de OOM e CPU throttling.
 
@@ -229,11 +229,25 @@ Levantamento 2026-11-10 — alertas permanentes que não indicam problema real:
 
 ---
 
+### 20. Vault + External Secrets Operator — ✅ Deployado 2026-11-15
+
+**Status:** Vault CE 2.0.4 (chart 0.34.1) standalone com storage Raft em PVC Longhorn 10Gi, ns `vault`; UI em `vault.wccosta.com.br` via ingress próprio (`infra/vault/` — aponta pro `vault-ui`, que roteia pod sealed para permitir unseal via browser). ESO 0.20.4 no ns `external-secrets`. **Sem migração de secrets** — SealedSecrets continuam em uso.
+
+**Feito:** init + unseal, auth `userpass` com policy `admin` (user `admin`), root token revogado. Unseal keys em `/root/vault-init.json` no CP.
+
+**Pendente:**
+
+- **Backup do `vault-init.json` fora do CP** — mesmo risco dos etcd snapshots (ponto único no disco do CP)
+- Habilitar `kv-v2` + auth `kubernetes` + `ClusterSecretStore` p/ ESO quando for migrar secrets (passo-a-passo em `docs/vault.md`)
+- Opções futuras: secrets engine `database` no rke2-pgdb (creds dinâmicas), PKI interno, `telemetry` + ServiceMonitor
+
+---
+
 ## Prioridade Recomendada
 
 | Ordem | Item | Esforço | Benefício |
 |---|---|---|---|
-| 1 | Resource limits (12 restantes) | 30min | Prevenção de falhas |
+| ~~1~~ | ~~Resource limits~~ ✅ | ~~30min~~ | ~~Prevenção de falhas~~ |
 | ~~2~~ | ~~AlertManager~~ ✅ | ~~1h~~ | ~~Notificações críticas~~ |
 | ~~3~~ | ~~Dashboard Zabbix~~ ✅ | ~~30min~~ | ~~Melhor visibilidade~~ |
 | ~~4~~ | ~~Backup PostgreSQL~~ ✅ vzdump | ~~1h~~ | ~~Proteção de dados~~ |

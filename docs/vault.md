@@ -50,35 +50,36 @@ done
 $K exec -n vault vault-0 -- vault status   # Sealed: false
 ```
 
-## 3. Configuração inicial (root token)
+## 3. Configuração inicial
+
+**Estado atual (2026-11-17):** auth `userpass` habilitado com user `admin`
+(policy `admin` = `path "*"` com todas as caps). **Root token já revogado** —
+o `vault-init.json` serve só pras unseal keys. Para executar os comandos
+abaixo, gere um token do admin (login na UI → user menu → Copy token, ou
+`vault login -method=userpass username=admin`).
+
+Quando for migrar secrets (ainda não feito):
 
 ```bash
-ROOT=$(jq -r .root_token /root/vault-init.json)
-$K exec -n vault vault-0 -- env VAULT_TOKEN=$ROOT vault secrets enable -path=secret kv-v2
-$K exec -n vault vault-0 -- env VAULT_TOKEN=$ROOT vault auth enable kubernetes
+TOK=<token-admin>
+$K exec -n vault vault-0 -- env VAULT_TOKEN=$TOK vault secrets enable -path=secret kv-v2
+$K exec -n vault vault-0 -- env VAULT_TOKEN=$TOK vault auth enable kubernetes
 
-$K exec -n vault vault-0 -- env VAULT_TOKEN=$ROOT vault write auth/kubernetes/config \
+$K exec -n vault vault-0 -- env VAULT_TOKEN=$TOK vault write auth/kubernetes/config \
   kubernetes_host="https://kubernetes.default.svc:443"
 ```
 
 Policy + role pro ESO (leitura em `secret/data/*`):
 
 ```bash
-$K exec -n vault vault-0 -- env VAULT_TOKEN=$ROOT sh -c 'vault policy write eso - <<EOF
+$K exec -n vault vault-0 -- env VAULT_TOKEN=$TOK sh -c 'vault policy write eso - <<EOF
 path "secret/data/*" { capabilities = ["read"] }
 EOF'
 
-$K exec -n vault vault-0 -- env VAULT_TOKEN=$ROOT vault write auth/kubernetes/role/eso \
+$K exec -n vault vault-0 -- env VAULT_TOKEN=$TOK vault write auth/kubernetes/role/eso \
   bound_service_account_names=external-secrets \
   bound_service_account_namespaces=external-secrets \
   policies=eso ttl=24h
-```
-
-Depois do bootstrap, **revogar o root token** e operar via UI com auth method
-de preferência (userpass/oidc) ou gerar tokens sob demanda:
-
-```bash
-$K exec -n vault vault-0 -- env VAULT_TOKEN=$ROOT vault token revoke -self
 ```
 
 ## 4. ESO — ClusterSecretStore + exemplo
