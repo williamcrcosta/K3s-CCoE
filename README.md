@@ -13,12 +13,14 @@ Internet
             │
             ├── rke2-cp-01      192.168.50.20  (Control Plane / RKE2 server)
             │     ├── OS: Rocky Linux 9.8 (Blue Onyx)
-            │     ├── RKE2: v1.35.6+rke2r1
+            │     ├── RKE2: v1.35.10+rke2r1
+            │     ├── Kernel: 5.14.0-741.24.1.el9_9.x86_64
             │     └── Runtime: containerd
             │
             ├── rke2-worker-01  192.168.50.21  (Worker / RKE2 agent)
             │     ├── OS: Rocky Linux 9.8 (Blue Onyx)
-            │     ├── RKE2: v1.35.6+rke2r1
+            │     ├── RKE2: v1.35.10+rke2r1
+            │     ├── Kernel: 5.14.0-741.24.1.el9_9.x86_64
             │     └── Runtime: containerd
             │
             └── rke2-pgdb       192.168.50.30  (VM dedicada de banco de dados)
@@ -34,7 +36,7 @@ Internet
 
 | Componente | Tecnologia | Função |
 |---|---|---|
-| Container Orchestration | RKE2 v1.35.6+rke2r1 | Kubernetes hardened para homelab/enterprise |
+| Container Orchestration | RKE2 v1.35.10+rke2r1 | Kubernetes hardened para homelab/enterprise |
 | CNI | Canal (Flannel + Calico) | Rede com suporte nativo a NetworkPolicy |
 | GitOps | ArgoCD v3.3.1 | Reconciliação contínua via Git |
 | Ingress Controller | NGINX Ingress Controller (RKE2 hardened) | Roteamento HTTP/HTTPS |
@@ -68,7 +70,7 @@ Longhorn (distribuído entre os 2 nodes)
 ├── ollama-models            20Gi  (Modelos Ollama)
 └── ollama-webui-data         5Gi  (Open WebUI)
 
-Replicação: 2 réplicas por volume (rke2-cp-01 + rke2-worker-01)
+Replicação observada em 21/11/2026: as duas réplicas de cada volume ativo estavam no mesmo disco da worker.
 StorageClass default: longhorn
 ```
 
@@ -110,12 +112,12 @@ psql -h 192.168.50.30 -U keycloak -d keycloak
 ## Arquitetura de Rede
 
 ```
-Cliente → 192.168.50.20:443 (NodePort NGINX / LoadBalancer)
+Cliente → 192.168.50.21:443 (hostPort do Ingress NGINX)
         → NGINX Ingress Controller (RKE2 hardened)
         → Service ClusterIP
         → Pod
 
-DNS: *.wccosta.com.br → 192.168.50.20 (AdGuard Home no Proxmox)
+DNS: domínios atendidos pelo ingress → 192.168.50.21 (AdGuard Home no Proxmox)
      Fallback: 1.1.1.1, 8.8.8.8
 
 Portas expostas:
@@ -262,6 +264,9 @@ Os ConfigMaps carregam automaticamente no Grafana via sidecar (`grafana_dashboar
 ---
 
 ## Manutenção
+
+- [Atualizações Rocky Linux e monitoramento no Zabbix](docs/observability/rocky-patching-zabbix.md)
+- [Incidente de ingress após atualização do RKE2](docs/incidentes/2026-11-21-ingress-apos-upgrade-rke2.md)
 
 ### Configurar kubectl no RKE2
 
