@@ -40,6 +40,8 @@ Após ligar as VMs, o cluster sobe automaticamente. Aguarde ~3 minutos e verifiq
 ~/cluster-health.sh
 ```
 
+Teste também as URLs de outra máquina usando o DNS normal. Se a porta 443 recusar conexão, compare o IP resolvido com o nó que executa o Ingress NGINX. Consulte o [incidente de 21/11/2026](docs/incidentes/2026-11-21-ingress-apos-upgrade-rke2.md).
+
 Se algum app estiver `Degraded`, force o sync:
 
 ```bash
@@ -59,9 +61,9 @@ kubectl get volumes.longhorn.io -n longhorn-system
 
 ### Impacto
 
-- Pods que estavam no worker são recriados no control plane
-- Volumes Longhorn ficam `degraded` (1 réplica) mas continuam funcionando
-- Cluster operacional com capacidade reduzida
+- O único Ingress NGINX roda na worker. A perda da VM interrompe o acesso por esse ingress.
+- O taint `NoSchedule` do control plane restringe o reagendamento de pods sem a tolerância correspondente.
+- Em 21/11/2026, as réplicas dos dois volumes ativos Longhorn estavam no mesmo disco da worker. Confira a distribuição atual e a disponibilidade dos backups para definir a recuperação.
 
 ### Recuperação
 

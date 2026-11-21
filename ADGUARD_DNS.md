@@ -46,6 +46,17 @@ Em , adicione cada registro:
 
 > **Dica:** o wildcard  continua apontando para  para compatibilidade legada, mas os certificados Let's Encrypt cobrem os domínios .
 
+### Aplicações do ingress
+
+Desde 21/11/2026, o Ingress NGINX atende na worker `192.168.50.21`. Os rewrites das aplicações abaixo devem apontar para esse endereço.
+
+| Domínios | IP |
+|---|---|
+| `grafana.wccosta.com.br`, `prometheus.wccosta.com.br`, `zabbix.wccosta.com.br` | `192.168.50.21` |
+| `vault.wccosta.com.br`, `argocd.wccosta.com.br`, `longhorn.wccosta.com.br`, `dashboard.wccosta.com.br` | `192.168.50.21` |
+
+A tabela anterior contém entradas sem nome no Git. Confira no AdGuard os registros dos demais serviços antes de editar. Consulte o [incidente de ingress](docs/incidentes/2026-11-21-ingress-apos-upgrade-rke2.md) para o diagnóstico.
+
 ## No cluster
 
 O Technitium ainda pode ser desativado quando o AdGuard estiver plenamente configurado e validado na rede.
