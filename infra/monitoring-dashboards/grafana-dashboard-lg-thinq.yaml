@@ -20,7 +20,7 @@ data:
         "energia"
       ],
       "schemaVersion": 42,
-      "version": 1,
+      "version": 2,
       "refresh": "1m",
       "time": {
         "from": "now-7d/d",
@@ -33,14 +33,11 @@ data:
             "label": "Aparelho",
             "type": "query",
             "datasource": {
-              "type": "prometheus",
-              "uid": "prometheus"
+              "type": "postgres",
+              "uid": "cg1y9v0o3durkf"
             },
-            "definition": "label_values(lg_thinq_state_collection_success, device)",
-            "query": {
-              "query": "label_values(lg_thinq_state_collection_success, device)",
-              "refId": "PrometheusVariableQueryEditor-VariableQuery"
-            },
+            "definition": "SELECT device FROM public.lg_thinq_daily_energy UNION SELECT device FROM public.lg_thinq_monthly_energy ORDER BY 1",
+            "query": "SELECT device FROM public.lg_thinq_daily_energy UNION SELECT device FROM public.lg_thinq_monthly_energy ORDER BY 1",
             "refresh": 1,
             "sort": 1,
             "multi": false,
@@ -747,7 +744,7 @@ data:
                 "type": "postgres",
                 "uid": "cg1y9v0o3durkf"
               },
-              "rawSql": "SELECT to_char(date_trunc('month', day::timestamp), 'YYYY-MM') AS \"Mês\",\n    SUM(energy_wh) / 1000.0 AS \"Consumo\", COUNT(*) AS \"Dias com leitura\"\n    FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date GROUP BY 1 ORDER BY 1 DESC",
+              "rawSql": "WITH bounds AS (\n  SELECT ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AS first_day,\n         LEAST(($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date,\n               (now() AT TIME ZONE 'America/Sao_Paulo')::date - 1) AS last_day\n), daily AS (\n  SELECT date_trunc('month', day::timestamp)::date AS month,\n         SUM(energy_wh) AS energy_wh, COUNT(*) AS days\n  FROM public.lg_thinq_daily_energy CROSS JOIN bounds\n  WHERE device = ${device:sqlstring} AND day BETWEEN first_day AND last_day\n  GROUP BY 1\n), imported AS (\n  SELECT month, energy_wh\n  FROM public.lg_thinq_monthly_energy CROSS JOIN bounds\n  WHERE device = ${device:sqlstring} AND month >= first_day\n    AND (month + interval '1 month')::date - 1 <= last_day\n), combined AS (\n  SELECT COALESCE(d.month, i.month) AS month, d.days,\n         CASE WHEN i.month IS NOT NULL AND COALESCE(d.days, 0) <\n              ((i.month + interval '1 month')::date - i.month)\n              THEN i.energy_wh ELSE d.energy_wh END AS energy_wh,\n         CASE WHEN i.month IS NOT NULL AND COALESCE(d.days, 0) <\n              ((i.month + interval '1 month')::date - i.month)\n              THEN 'Total mensal do app' ELSE 'Soma diária' END AS source\n  FROM daily d FULL OUTER JOIN imported i USING (month)\n)\nSELECT to_char(month, 'YYYY-MM') AS \"Mês\", energy_wh / 1000.0 AS \"Consumo\",\n       COALESCE(days, 0) AS \"Dias com leitura\", source AS \"Fonte\"\nFROM combined ORDER BY month DESC",
               "rawQuery": true,
               "format": "table",
               "editorMode": "code",
@@ -774,7 +771,7 @@ data:
             ]
           },
           "options": {},
-          "description": "A soma inclui apenas os dias do período que têm leitura. Meses parciais podem aparecer."
+          "description": "Para meses inteiros, usa a soma diária quando a cobertura é completa e o total do app quando a cobertura é incompleta. Meses parciais mostram apenas os dias com leitura."
         },
         {
           "id": 17,

@@ -1,6 +1,6 @@
 # LG ThinQ · Cockpit de Climatização
 
-O [ConfigMap do dashboard](../../infra/monitoring-dashboards/grafana-dashboard-lg-thinq.yaml) segue o provisionamento do Cockpit Deye. O seletor **Aparelho** usa um nome fixo por dispositivo. Mantenha esse mesmo nome no Prometheus e no PostgreSQL.
+O [ConfigMap do dashboard](../../infra/monitoring-dashboards/grafana-dashboard-lg-thinq.yaml) segue o provisionamento do Cockpit Deye. O seletor **Aparelho** lista os dispositivos com histórico no PostgreSQL e usa um nome fixo por dispositivo. Mantenha esse mesmo nome no Prometheus e no PostgreSQL.
 
 ## Contrato do exporter
 
@@ -36,3 +36,40 @@ CREATE TABLE public.lg_thinq_daily_energy (
 Busque `energyUsage` diário no ThinQ, use `usedDate` como a coluna `day` e faça upsert pela chave `(device, day)`. Preserve as lacunas quando a LG não devolver uma leitura. O painel converte Wh em kWh. A média divide o total somente pelos dias com leitura e a visão mensal respeita o intervalo selecionado.
 
 O piloto confirmou sete dias de consumo retrospectivo. O histórico de estado e temperatura começa com o scrape do exporter. Para testar após o provisionamento, selecione um aparelho e um período com registros e confira se as barras usam a data do consumo e se aparelho desligado aparece como **Desligado**.
+
+## Importar o histórico do AR - Office
+
+1. No Windows, mantenha o CSV diário `ar-office-consumo-completo.csv`. Crie `ar-office-consumo-mensal.csv` em UTF-8 com cabeçalho `aparelho;mes;consumo_wh` e 12 linhas, de novembro de 2024 a outubro de 2025. Use `AR - Office` na primeira coluna, o primeiro dia do mês em `AAAA-MM-01` na segunda e o total em Wh inteiro na terceira. Multiplique kWh por 1000. Guarde os CSVs fora do Git.
+2. Envie os dois CSVs ao seu usuário SSH na VM `rke2-pgdb`. No Windows, a partir da pasta dos arquivos, use:
+
+   ```powershell
+   scp .\ar-office-consumo-completo.csv .\ar-office-consumo-mensal.csv USUARIO@192.168.50.30:~/
+   ```
+
+3. Na VM, abra a pasta onde estão os dois CSVs. Use o [SQL de importação](../../infra/monitoring-dashboards/sql/lg-thinq-history.sql) da branch do PR. Informe o **mesmo banco** que a fonte PostgreSQL do Grafana usa e um usuário autorizado a criar e atualizar essas tabelas.
+
+   ```bash
+   psql -X -h 127.0.0.1 -U USUARIO_POSTGRES -d BANCO_DO_GRAFANA -f /caminho/lg-thinq-history.sql
+   ```
+
+   A transação valida as 389 datas diárias e os 12 meses antes de gravar. É possível repetir a carga sem duplicar registros.
+
+4. Dê ao papel que o Grafana usa acesso de leitura às tabelas novas, trocando `usuario_grafana` pelo papel configurado na fonte de dados:
+
+   ```sql
+   GRANT SELECT ON public.lg_thinq_daily_energy, public.lg_thinq_monthly_energy TO usuario_grafana;
+   ```
+
+   Confira os períodos importados antes de ativar o dashboard:
+
+   ```sql
+   SELECT count(*), min(day), max(day)
+   FROM public.lg_thinq_daily_energy WHERE device = 'AR - Office';
+
+   SELECT count(*), min(month), max(month)
+   FROM public.lg_thinq_monthly_energy WHERE device = 'AR - Office';
+   ```
+
+   A carga inicial deve mostrar 389 dias, de 2025-11-01 a 2026-11-24, e 12 meses, de 2024-11-01 a 2025-10-01. Compare os totais de novembro de 2025 e outubro de 2026 com os valores mensais já conferidos no ThinQ.
+
+Para ver os totais do app no Grafana, selecione um período que inclua os meses inteiros. A tabela mensal usa uma única fonte por mês. Com cobertura diária completa usa a soma diária. Caso contrário, usa o total mensal importado quando disponível. Os cards de total e média diária continuam baseados nas leituras diárias.
