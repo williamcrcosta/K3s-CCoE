@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: lg-thinq-exporter
+  namespace: monitoring
+  labels:
+    app: lg-thinq-exporter
+spec:
+  type: ClusterIP
+  selector:
+    app: lg-thinq-exporter
+  ports:
+    - name: metrics
+      port: 9810
+      targetPort: metrics

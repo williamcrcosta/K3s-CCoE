@@ -1,0 +1,52 @@
+name: LG ThinQ Exporter CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/lg-thinq-exporter/**"
+      - ".github/workflows/lg-thinq-exporter.yml"
+  pull_request:
+    paths:
+      - "apps/lg-thinq-exporter/**"
+      - ".github/workflows/lg-thinq-exporter.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Validate Python syntax
+        run: python -m compileall -q apps/lg-thinq-exporter
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./apps/lg-thinq-exporter
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: ghcr.io/williamcrcosta/lg-thinq-exporter:main
