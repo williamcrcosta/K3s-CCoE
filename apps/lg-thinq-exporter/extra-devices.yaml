@@ -1,0 +1,233 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lg-thinq-exporter-sala
+  namespace: monitoring
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: lg-thinq-exporter-sala
+  template:
+    metadata:
+      labels:
+        app: lg-thinq-exporter-sala
+        lg-thinq-group: extra
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: exporter
+          image: ghcr.io/williamcrcosta/lg-thinq-exporter:main
+          imagePullPolicy: Always
+          ports:
+            - name: metrics
+              containerPort: 9810
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+          env:
+            - name: LG_THINQ_DEVICE_NAME
+              value: "AR - Sala"
+            - name: LG_THINQ_DEVICE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-extra-devices
+                  key: sala
+            - name: LG_THINQ_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-credentials
+                  key: token
+            - name: LG_THINQ_PG_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-postgres
+                  key: dsn
+                  optional: true
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lg-thinq-exporter-quarto-bebe
+  namespace: monitoring
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: lg-thinq-exporter-quarto-bebe
+  template:
+    metadata:
+      labels:
+        app: lg-thinq-exporter-quarto-bebe
+        lg-thinq-group: extra
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: exporter
+          image: ghcr.io/williamcrcosta/lg-thinq-exporter:main
+          imagePullPolicy: Always
+          ports:
+            - name: metrics
+              containerPort: 9810
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+          env:
+            - name: LG_THINQ_DEVICE_NAME
+              value: "AR - Quarto do bebê"
+            - name: LG_THINQ_DEVICE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-extra-devices
+                  key: quarto-bebe
+            - name: LG_THINQ_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-credentials
+                  key: token
+            - name: LG_THINQ_PG_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-postgres
+                  key: dsn
+                  optional: true
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lg-thinq-exporter-suite
+  namespace: monitoring
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: lg-thinq-exporter-suite
+  template:
+    metadata:
+      labels:
+        app: lg-thinq-exporter-suite
+        lg-thinq-group: extra
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: exporter
+          image: ghcr.io/williamcrcosta/lg-thinq-exporter:main
+          imagePullPolicy: Always
+          ports:
+            - name: metrics
+              containerPort: 9810
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+          env:
+            - name: LG_THINQ_DEVICE_NAME
+              value: "AR - Suíte"
+            - name: LG_THINQ_DEVICE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-extra-devices
+                  key: suite
+            - name: LG_THINQ_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-credentials
+                  key: token
+            - name: LG_THINQ_PG_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-postgres
+                  key: dsn
+                  optional: true
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lg-thinq-extra
+  namespace: monitoring
+  labels:
+    app: lg-thinq-extra
+spec:
+  type: ClusterIP
+  selector:
+    lg-thinq-group: extra
+  ports:
+    - name: metrics
+      port: 9810
+      targetPort: metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: lg-thinq-extra
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: lg-thinq-extra
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 60s
+      scrapeTimeout: 15s
