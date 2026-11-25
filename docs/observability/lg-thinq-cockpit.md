@@ -154,3 +154,45 @@ kubectl -n monitoring rollout restart deployment/lg-thinq-exporter
 ```
 
 Confira `lg_thinq_energy_collection_success{device="AR - Office"}` no Prometheus e a última data em `public.lg_thinq_daily_energy`. Um retorno vazio válido da LG mantém a lacuna, e uma leitura de zero é gravada normalmente.
+
+## Adicionar Sala, Quarto do bebê e Suíte
+
+Cada unidade tem seu próprio ID ThinQ. No script de teste, selecione **Ar-Sala**, **Baby's bedroom** e **Suite-ar** e anote os IDs localmente. Os três Deployments reutilizam o token do Secret `lg-thinq-credentials` e a conexão de escrita do Secret `lg-thinq-postgres`. O Office mantém seu Deployment e seu ID.
+
+Antes de sincronizar os Deployments adicionais, crie no control plane o Secret com os três IDs:
+
+```bash
+(
+  set -euo pipefail
+  k() {
+    /var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml "$@"
+  }
+  umask 077
+  ids_dir=$(mktemp -d)
+  trap 'rm -f -- "$ids_dir/sala" "$ids_dir/quarto-bebe" "$ids_dir/suite"; rmdir -- "$ids_dir"' EXIT
+
+  read -rsp 'ID do Ar-Sala: ' sala
+  printf '\n'
+  read -rsp "ID do Baby's bedroom: " quarto
+  printf '\n'
+  read -rsp 'ID do Suite-ar: ' suite
+  printf '\n'
+
+  if [[ -z "$sala" || -z "$quarto" || -z "$suite" ||
+        "$sala" == "$quarto" || "$sala" == "$suite" || "$quarto" == "$suite" ]]; then
+    printf '%s\n' 'Informe três IDs diferentes.' >&2
+    exit 1
+  fi
+
+  printf '%s' "$sala" > "$ids_dir/sala"
+  printf '%s' "$quarto" > "$ids_dir/quarto-bebe"
+  printf '%s' "$suite" > "$ids_dir/suite"
+
+  k -n monitoring create secret generic lg-thinq-extra-devices \
+    --from-file="sala=$ids_dir/sala" --from-file="quarto-bebe=$ids_dir/quarto-bebe" \
+    --from-file="suite=$ids_dir/suite" --dry-run=client -o yaml |
+    k apply --server-side -f -
+)
+```
+
+No Argo CD, sincronize o app `lg-thinq-exporter`. O seletor do Cockpit mostra **AR - Sala**, **AR - Quarto do bebê** e **AR - Suíte** após a primeira leitura de consumo de cada aparelho ser gravada. Para acompanhar o estado antes disso, consulte `lg_thinq_state_collection_success{job="lg-thinq-extra"}` no Explore, com a fonte Prometheus. Se houver falha de conexão ao banco, confira em qual nó o novo pod está rodando e o endereço de origem registrado pelo PostgreSQL.
