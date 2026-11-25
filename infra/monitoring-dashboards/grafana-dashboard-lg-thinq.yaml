@@ -20,7 +20,7 @@ data:
         "energia"
       ],
       "schemaVersion": 42,
-      "version": 2,
+      "version": 3,
       "refresh": "1m",
       "time": {
         "from": "now-7d/d",
@@ -29,12 +29,24 @@ data:
       "templating": {
         "list": [
           {
+            "name": "lg_postgres",
+            "label": "Fonte LG",
+            "type": "datasource",
+            "query": "postgres",
+            "regex": "/^LG ThinQ PostgreSQL$/",
+            "hide": 2,
+            "refresh": 1,
+            "multi": false,
+            "includeAll": false,
+            "options": []
+          },
+          {
             "name": "device",
             "label": "Aparelho",
             "type": "query",
             "datasource": {
               "type": "postgres",
-              "uid": "cg1y9v0o3durkf"
+              "uid": "${lg_postgres}"
             },
             "definition": "SELECT device FROM public.lg_thinq_daily_energy UNION SELECT device FROM public.lg_thinq_monthly_energy ORDER BY 1",
             "query": "SELECT device FROM public.lg_thinq_daily_energy UNION SELECT device FROM public.lg_thinq_monthly_energy ORDER BY 1",
@@ -504,13 +516,13 @@ data:
           },
           "datasource": {
             "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
+            "uid": "${lg_postgres}"
           },
           "targets": [
             {
               "datasource": {
                 "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
+                "uid": "${lg_postgres}"
               },
               "rawSql": "SELECT SUM(energy_wh) / 1000.0 AS \"Valor\" FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date",
               "rawQuery": true,
@@ -551,13 +563,13 @@ data:
           },
           "datasource": {
             "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
+            "uid": "${lg_postgres}"
           },
           "targets": [
             {
               "datasource": {
                 "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
+                "uid": "${lg_postgres}"
               },
               "rawSql": "SELECT AVG(energy_wh) / 1000.0 AS \"Valor\" FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date",
               "rawQuery": true,
@@ -598,13 +610,13 @@ data:
           },
           "datasource": {
             "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
+            "uid": "${lg_postgres}"
           },
           "targets": [
             {
               "datasource": {
                 "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
+                "uid": "${lg_postgres}"
               },
               "rawSql": "SELECT NULLIF(COUNT(*), 0) AS \"Valor\" FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date",
               "rawQuery": true,
@@ -644,13 +656,13 @@ data:
           },
           "datasource": {
             "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
+            "uid": "${lg_postgres}"
           },
           "targets": [
             {
               "datasource": {
                 "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
+                "uid": "${lg_postgres}"
               },
               "rawSql": "SELECT MAX(day)::text AS \"Valor\" FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring}",
               "rawQuery": true,
@@ -690,13 +702,13 @@ data:
           },
           "datasource": {
             "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
+            "uid": "${lg_postgres}"
           },
           "targets": [
             {
               "datasource": {
                 "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
+                "uid": "${lg_postgres}"
               },
               "rawSql": "WITH readings AS (SELECT day, energy_wh FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date),\n    bounds AS (\n        SELECT ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AS first_day,\n               LEAST(($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date,\n                     (now() AT TIME ZONE 'America/Sao_Paulo')::date - 1) AS last_day\n    ), days AS (\n        SELECT first_day + n AS day FROM bounds\n        CROSS JOIN LATERAL generate_series(0, last_day - first_day) AS offsets(n)\n    )\n    SELECT to_char(days.day, 'DD/MM/YYYY') AS \"Dia\", energy_wh / 1000.0 AS \"Consumo\"\n    FROM days LEFT JOIN readings USING (day) ORDER BY days.day",
               "rawQuery": true,
@@ -736,13 +748,13 @@ data:
           },
           "datasource": {
             "type": "postgres",
-            "uid": "cg1y9v0o3durkf"
+            "uid": "${lg_postgres}"
           },
           "targets": [
             {
               "datasource": {
                 "type": "postgres",
-                "uid": "cg1y9v0o3durkf"
+                "uid": "${lg_postgres}"
               },
               "rawSql": "WITH bounds AS (\n  SELECT ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AS first_day,\n         LEAST(($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date,\n               (now() AT TIME ZONE 'America/Sao_Paulo')::date - 1) AS last_day\n), daily AS (\n  SELECT date_trunc('month', day::timestamp)::date AS month,\n         SUM(energy_wh) AS energy_wh, COUNT(*) AS days\n  FROM public.lg_thinq_daily_energy CROSS JOIN bounds\n  WHERE device = ${device:sqlstring} AND day BETWEEN first_day AND last_day\n  GROUP BY 1\n), imported AS (\n  SELECT month, energy_wh\n  FROM public.lg_thinq_monthly_energy CROSS JOIN bounds\n  WHERE device = ${device:sqlstring} AND month >= first_day\n    AND (month + interval '1 month')::date - 1 <= last_day\n), combined AS (\n  SELECT COALESCE(d.month, i.month) AS month, d.days,\n         CASE WHEN i.month IS NOT NULL AND COALESCE(d.days, 0) <\n              ((i.month + interval '1 month')::date - i.month)\n              THEN i.energy_wh ELSE d.energy_wh END AS energy_wh,\n         CASE WHEN i.month IS NOT NULL AND COALESCE(d.days, 0) <\n              ((i.month + interval '1 month')::date - i.month)\n              THEN 'Total mensal do app' ELSE 'Soma diária' END AS source\n  FROM daily d FULL OUTER JOIN imported i USING (month)\n)\nSELECT to_char(month, 'YYYY-MM') AS \"Mês\", energy_wh / 1000.0 AS \"Consumo\",\n       COALESCE(days, 0) AS \"Dias com leitura\", source AS \"Fonte\"\nFROM combined ORDER BY month DESC",
               "rawQuery": true,

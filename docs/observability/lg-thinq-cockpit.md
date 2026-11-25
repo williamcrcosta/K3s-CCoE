@@ -22,7 +22,7 @@ Os painéis ocultam leituras de estado com cinco minutos ou mais. O modo configu
 
 ## Consumo diário
 
-O Grafana consulta a fonte PostgreSQL que o Deye já usa. A tabela abaixo é o contrato para o coletor de consumo. Execute a criação da tabela com o papel responsável pela ingestão e dê ao usuário da fonte de dados do Grafana acesso de leitura.
+O Grafana consulta a fonte PostgreSQL dedicada **LG ThinQ PostgreSQL**. A tabela abaixo é o contrato para o coletor de consumo. Execute a criação da tabela com o papel responsável pela ingestão e dê ao usuário da fonte de dados do Grafana acesso de leitura.
 
 ```sql
 CREATE TABLE public.lg_thinq_daily_energy (
@@ -46,18 +46,20 @@ O piloto confirmou sete dias de consumo retrospectivo. O histórico de estado e 
    scp .\ar-office-consumo-completo.csv .\ar-office-consumo-mensal.csv USUARIO@192.168.50.30:~/
    ```
 
-3. Na VM, abra a pasta onde estão os dois CSVs. Use o [SQL de importação](../../infra/monitoring-dashboards/sql/lg-thinq-history.sql) da branch do PR. Informe o **mesmo banco** que a fonte PostgreSQL do Grafana usa e um usuário autorizado a criar e atualizar essas tabelas.
+3. Na VM, abra a pasta onde estão os dois CSVs. Use o [SQL de importação](../../infra/monitoring-dashboards/sql/lg-thinq-history.sql) da branch do PR. Use o banco dedicado **lg_thinq** e um usuário autorizado a criar e atualizar essas tabelas.
 
    ```bash
-   psql -X -h 127.0.0.1 -U USUARIO_POSTGRES -d BANCO_DO_GRAFANA -f /caminho/lg-thinq-history.sql
+   psql -X -h 127.0.0.1 -U USUARIO_POSTGRES -d lg_thinq -f /caminho/lg-thinq-history.sql
    ```
 
    A transação valida as 389 datas diárias e os 12 meses antes de gravar. É possível repetir a carga sem duplicar registros.
 
-4. Dê ao papel que o Grafana usa acesso de leitura às tabelas novas, trocando `usuario_grafana` pelo papel configurado na fonte de dados:
+4. Dê ao papel que o Grafana usa acesso de leitura às tabelas novas, a partir de uma sessão conectada ao banco `lg_thinq`:
 
    ```sql
-   GRANT SELECT ON public.lg_thinq_daily_energy, public.lg_thinq_monthly_energy TO usuario_grafana;
+   GRANT CONNECT ON DATABASE lg_thinq TO lg_thinq_grafana;
+   GRANT USAGE ON SCHEMA public TO lg_thinq_grafana;
+   GRANT SELECT ON public.lg_thinq_daily_energy, public.lg_thinq_monthly_energy TO lg_thinq_grafana;
    ```
 
    Confira os períodos importados antes de ativar o dashboard:
@@ -73,3 +75,17 @@ O piloto confirmou sete dias de consumo retrospectivo. O histórico de estado e 
    A carga inicial deve mostrar 389 dias, de 2025-11-01 a 2026-11-24, e 12 meses, de 2024-11-01 a 2025-10-01. Compare os totais de novembro de 2025 e outubro de 2026 com os valores mensais já conferidos no ThinQ.
 
 Para ver os totais do app no Grafana, selecione um período que inclua os meses inteiros. A tabela mensal usa uma única fonte por mês. Com cobertura diária completa usa a soma diária. Caso contrário, usa o total mensal importado quando disponível. Os cards de total e média diária continuam baseados nas leituras diárias.
+
+## Fonte de dados do Grafana
+
+Em **Connections → Data sources**, adicione uma fonte **PostgreSQL** com o nome exato **LG ThinQ PostgreSQL**. O dashboard resolve a fonte pelo nome, então o UID pode ser gerado pelo Grafana.
+
+| Campo | Valor |
+|---|---|
+| Host URL | `192.168.50.30:5432` |
+| Database name | `lg_thinq` |
+| Username | `lg_thinq_grafana` |
+| Password | Senha definida para esse papel, inserida na interface do Grafana |
+| TLS/SSL | Use a configuração compatível com o servidor, preferindo a validação do certificado quando configurada |
+
+Use **Save & test** e, depois da importação, confira se o seletor **Aparelho** mostra **AR - Office**. Os painéis de estado e temperatura começam a receber dados quando o exporter estiver em operação.
