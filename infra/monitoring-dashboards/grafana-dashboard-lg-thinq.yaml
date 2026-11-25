@@ -20,7 +20,7 @@ data:
         "energia"
       ],
       "schemaVersion": 42,
-      "version": 6,
+      "version": 7,
       "refresh": "1m",
       "time": {
         "from": "now-7d/d",
@@ -72,7 +72,7 @@ data:
           },
           "options": {
             "mode": "html",
-            "content": "<div style=\"display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 18px;min-height:92px;border-radius:10px;background:linear-gradient(105deg,#0d263e,#103b48);color:#eafaff;\">\n  <div><strong style=\"font-size:23px;\">Climatização LG ThinQ</strong><br><span style=\"color:#b8e5ed;\">Estado dos aparelhos, temperaturas e consumo</span></div>\n  <img src=\"https://www.lg.com/content/dam/channel/wcms/br/images/ar-condicionado-residencial/s3-w09aa31c_eb2gamz_essp_br_c/gallery/dz14.jpg?w=400\" alt=\"Unidade interna de ar-condicionado LG Dual Inverter\" width=\"240\" height=\"82\" style=\"width:32%;max-width:240px;object-fit:cover;object-position:center;border-radius:8px;\">\n</div>"
+            "content": "<div style=\"display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 18px;min-height:92px;border-radius:10px;background:linear-gradient(105deg,#0d263e,#103b48);color:#eafaff;\">\n  <div><strong style=\"font-size:23px;\">Climatização LG ThinQ</strong><br><span style=\"color:#b8e5ed;\">Estado dos aparelhos, temperaturas e consumo<br>Foto de referência do Office · 9.000 BTU/h</span></div>\n  <img src=\"https://www.lg.com/content/dam/channel/wcms/br/images/ar-condicionado-residencial/s3-w09aa31c_eb2gamz_essp_br_c/gallery/dz14.jpg?w=400\" alt=\"Foto de referência do ar-condicionado LG Dual Inverter do Office, 9.000 BTU/h\" width=\"240\" height=\"82\" style=\"width:32%;max-width:240px;object-fit:cover;object-position:center;border-radius:8px;\">\n</div>"
           }
         },
         {
@@ -90,7 +90,7 @@ data:
         },
         {
           "id": 24,
-          "title": "Office",
+          "title": "Office · 9.000 BTU/h",
           "type": "stat",
           "gridPos": {
             "x": 0,
@@ -157,7 +157,7 @@ data:
         },
         {
           "id": 25,
-          "title": "Sala",
+          "title": "Sala · 12.000 BTU/h",
           "type": "stat",
           "gridPos": {
             "x": 6,
@@ -220,11 +220,12 @@ data:
             "graphMode": "none",
             "colorMode": "background_solid",
             "textMode": "auto"
-          }
+          },
+          "description": "Capacidade nominal de 12.000 BTU/h com refrigeração e aquecimento."
         },
         {
           "id": 26,
-          "title": "Quarto do bebê",
+          "title": "Quarto do bebê · 12.000 BTU/h",
           "type": "stat",
           "gridPos": {
             "x": 12,
@@ -287,11 +288,12 @@ data:
             "graphMode": "none",
             "colorMode": "background_solid",
             "textMode": "auto"
-          }
+          },
+          "description": "Capacidade nominal de 12.000 BTU/h com refrigeração e aquecimento."
         },
         {
           "id": 27,
-          "title": "Suíte",
+          "title": "Suíte · 12.000 BTU/h",
           "type": "stat",
           "gridPos": {
             "x": 18,
@@ -354,7 +356,8 @@ data:
             "graphMode": "none",
             "colorMode": "background_solid",
             "textMode": "auto"
-          }
+          },
+          "description": "Capacidade nominal de 12.000 BTU/h com refrigeração e aquecimento."
         },
         {
           "id": 1,
