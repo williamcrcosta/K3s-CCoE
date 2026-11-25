@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lg-thinq-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: lg-thinq-exporter
+  template:
+    metadata:
+      labels:
+        app: lg-thinq-exporter
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: exporter
+          image: ghcr.io/williamcrcosta/lg-thinq-exporter:main
+          imagePullPolicy: Always
+          ports:
+            - name: metrics
+              containerPort: 9810
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+          env:
+            - name: LG_THINQ_DEVICE_NAME
+              value: "AR - Office"
+            - name: LG_THINQ_DEVICE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-credentials
+                  key: device-id
+            - name: LG_THINQ_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-credentials
+                  key: token
+            - name: LG_THINQ_PG_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: lg-thinq-postgres
+                  key: dsn
+                  optional: true
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault

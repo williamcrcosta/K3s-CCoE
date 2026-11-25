@@ -1,0 +1,4 @@
+thinqconnect==1.0.14
+prometheus-client==0.23.1
+psycopg[binary]==3.3.2
+tzdata==2025.3

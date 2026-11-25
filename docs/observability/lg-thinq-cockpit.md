@@ -89,3 +89,68 @@ Em **Connections → Data sources**, adicione uma fonte **PostgreSQL** com o nom
 | TLS/SSL | Use a configuração compatível com o servidor, preferindo a validação do certificado quando configurada |
 
 Use **Save & test** e, depois da importação, confira se o seletor **Aparelho** mostra **AR - Office**. Os painéis de estado e temperatura começam a receber dados quando o exporter estiver em operação.
+
+## Implantar o exporter no RKE2
+
+O app `lg-thinq-exporter` publica métricas no namespace `monitoring` e consulta o estado a cada minuto. O piloto está configurado com o nome `AR - Office`. A imagem é publicada no GHCR após o merge. Confirme que o cluster consegue lê-la antes de diagnosticar um eventual `ImagePullBackOff`. Quando a imagem for atualizada no mesmo tag, reinicie somente o Deployment do exporter para puxar a versão nova.
+
+1. No script de teste ThinQ que já lista os aparelhos, imprima `device_id` logo depois de selecionar **Ar-office**. Guarde esse valor localmente para a configuração. O índice da lista pode mudar.
+2. No control plane, crie o Secret com o ID e o token ThinQ. O token precisa das permissões de lista, estado e consumo. Confira o contexto do kubectl antes de gravar.
+
+   ```bash
+   (
+     set -euo pipefail
+     umask 077
+     secret_dir=$(mktemp -d)
+     trap 'rm -r -- "$secret_dir"' EXIT
+     read -rp 'ID do AR - Office: ' device_id
+     read -rsp 'Token ThinQ: ' token
+     printf '\n'
+     [ -n "$device_id" ] && [ -n "$token" ] || exit 1
+     printf '%s' "$device_id" > "$secret_dir/device-id"
+     printf '%s' "$token" > "$secret_dir/token"
+     kubectl -n monitoring create secret generic lg-thinq-credentials \
+       --from-file=device-id="$secret_dir/device-id" \
+       --from-file=token="$secret_dir/token" --dry-run=client -o yaml | kubectl apply --server-side -f -
+   )
+   ```
+
+3. Sincronize o app pelo Argo CD e confira o Deployment e o alvo do Prometheus:
+
+   ```bash
+   kubectl -n monitoring rollout status deployment/lg-thinq-exporter
+   kubectl -n monitoring logs deployment/lg-thinq-exporter --tail=30
+   ```
+
+   No Grafana Explore, selecione Prometheus e consulte `lg_thinq_state_collection_success{device="AR - Office"}`. O valor `1` confirma uma consulta de estado bem-sucedida.
+
+### Habilitar a atualização automática do consumo
+
+A coleta de consumo é opcional. Ela consulta os sete últimos dias completos a cada hora, para recuperar leituras que demoram a aparecer, e grava por `(device, day)`. As tabelas diárias e mensais permanecem separadas.
+
+No banco `lg_thinq`, crie um papel de escrita separado do usuário do Grafana:
+
+```sql
+CREATE ROLE lg_thinq_writer LOGIN;
+\password lg_thinq_writer
+GRANT CONNECT ON DATABASE lg_thinq TO lg_thinq_writer;
+GRANT USAGE ON SCHEMA public TO lg_thinq_writer;
+GRANT SELECT, INSERT, UPDATE ON public.lg_thinq_daily_energy TO lg_thinq_writer;
+```
+
+No `pg_hba.conf`, libere somente esse banco e papel para o IP de origem real do pod. A regra do Grafana pertence ao papel de leitura. Valide e recarregue o arquivo com `pg_reload_conf()`. Use uma DSN compatível com o TLS do servidor. Por exemplo, num ambiente com TLS habilitado, a DSN pode usar `host=192.168.50.30 port=5432 dbname=lg_thinq user=lg_thinq_writer password='SENHA' sslmode=require`. Use `sslmode=disable` somente se a VM estiver configurada para conexões sem TLS na LAN. Aplique o valor ao Secret `lg-thinq-postgres`, chave `dsn`, sem gravá-lo no Git:
+
+```bash
+(
+  set -euo pipefail
+  read -rsp 'DSN PostgreSQL do exporter: ' dsn
+  printf '\n'
+  [ -n "$dsn" ] || exit 1
+  printf '%s' "$dsn" | kubectl -n monitoring create secret generic lg-thinq-postgres \
+    --from-file=dsn=/dev/stdin --dry-run=client -o yaml |
+    kubectl apply --server-side -f -
+)
+kubectl -n monitoring rollout restart deployment/lg-thinq-exporter
+```
+
+Confira `lg_thinq_energy_collection_success{device="AR - Office"}` no Prometheus e a última data em `public.lg_thinq_daily_energy`. Um retorno vazio válido da LG mantém a lacuna, e uma leitura de zero é gravada normalmente.
