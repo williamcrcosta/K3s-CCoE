@@ -1,0 +1,1009 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-lg-thinq
+  namespace: monitoring
+  labels:
+    grafana_dashboard: '1'
+data:
+  lg-thinq.json: |-
+    {
+      "id": null,
+      "uid": "lg-thinq-climatizacao",
+      "title": "LG ThinQ · Cockpit de Climatização",
+      "description": "Estado e temperaturas via Prometheus. Consumo por data da LG via PostgreSQL. Consulte o contrato de coleta no repositório.",
+      "timezone": "America/Sao_Paulo",
+      "tags": [
+        "homelab",
+        "lg-thinq",
+        "climatizacao",
+        "energia"
+      ],
+      "schemaVersion": 42,
+      "version": 1,
+      "refresh": "1m",
+      "time": {
+        "from": "now-7d/d",
+        "to": "now"
+      },
+      "templating": {
+        "list": [
+          {
+            "name": "device",
+            "label": "Aparelho",
+            "type": "query",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
+            "definition": "label_values(lg_thinq_state_collection_success, device)",
+            "query": {
+              "query": "label_values(lg_thinq_state_collection_success, device)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 1,
+            "sort": 1,
+            "multi": false,
+            "includeAll": false,
+            "options": []
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1,
+          "type": "row",
+          "title": "Climatização — Agora",
+          "collapsed": false,
+          "gridPos": {
+            "x": 0,
+            "y": 0,
+            "w": 24,
+            "h": 1
+          },
+          "panels": []
+        },
+        {
+          "id": 2,
+          "title": "Estado do aparelho",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 1,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_power_on{device=\"$device\"} and on(device) (time() - lg_thinq_state_last_success_timestamp_seconds{device=\"$device\"} < 300)",
+              "instant": true,
+              "range": false,
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "mappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "0": {
+                      "text": "Desligado",
+                      "index": 0
+                    },
+                    "1": {
+                      "text": "Ligado",
+                      "index": 1
+                    }
+                  }
+                }
+              ]
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 3,
+          "title": "Temperatura ambiente",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 1,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_room_temperature_celsius{device=\"$device\"} and on(device) (time() - lg_thinq_state_last_success_timestamp_seconds{device=\"$device\"} < 300)",
+              "instant": true,
+              "range": false,
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 4,
+          "title": "Temperatura programada",
+          "type": "stat",
+          "gridPos": {
+            "x": 12,
+            "y": 1,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_target_temperature_celsius{device=\"$device\"} and on(device) (time() - lg_thinq_state_last_success_timestamp_seconds{device=\"$device\"} < 300)",
+              "instant": true,
+              "range": false,
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 5,
+          "title": "Última coleta há",
+          "type": "stat",
+          "gridPos": {
+            "x": 18,
+            "y": 1,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "time() - lg_thinq_state_last_success_timestamp_seconds{device=\"$device\"}",
+              "instant": true,
+              "range": false,
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "unit": "s"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 6,
+          "title": "Modo, ventilação, aletas, visor e temporizadores",
+          "type": "table",
+          "gridPos": {
+            "x": 0,
+            "y": 5,
+            "w": 24,
+            "h": 5
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_device_state_info{device=\"$device\"} and on(device) (time() - lg_thinq_state_last_success_timestamp_seconds{device=\"$device\"} < 300)",
+              "instant": true,
+              "range": false,
+              "editorMode": "code",
+              "format": "table",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados"
+            },
+            "overrides": []
+          },
+          "options": {},
+          "description": "Valores reportados pela LG. O modo configurado pode continuar selecionado com o aparelho desligado.",
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "Value": true,
+                  "__name__": true,
+                  "device": true,
+                  "instance": true,
+                  "job": true,
+                  "namespace": true,
+                  "pod": true,
+                  "service": true,
+                  "endpoint": true,
+                  "container": true
+                },
+                "renameByName": {
+                  "mode": "Modo",
+                  "fan": "Ventilação",
+                  "fan_detail": "Detalhe",
+                  "swing": "Oscilação vertical",
+                  "display": "Visor",
+                  "run_state": "Estado interno",
+                  "start_timer": "Início programado",
+                  "stop_timer": "Parada programada",
+                  "sleep_timer": "Timer de sono"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "type": "row",
+          "title": "Temperatura e funcionamento",
+          "collapsed": false,
+          "gridPos": {
+            "x": 0,
+            "y": 10,
+            "w": 24,
+            "h": 1
+          },
+          "panels": []
+        },
+        {
+          "id": 8,
+          "title": "Temperatura ambiente × programada",
+          "type": "timeseries",
+          "gridPos": {
+            "x": 0,
+            "y": 11,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_room_temperature_celsius{device=\"$device\"} and on(device) (time() - lg_thinq_state_last_success_timestamp_seconds{device=\"$device\"} < 300)",
+              "instant": false,
+              "range": true,
+              "editorMode": "code",
+              "legendFormat": "Ambiente",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_target_temperature_celsius{device=\"$device\"} and on(device) (time() - lg_thinq_state_last_success_timestamp_seconds{device=\"$device\"} < 300)",
+              "instant": false,
+              "range": true,
+              "editorMode": "code",
+              "legendFormat": "Programada",
+              "refId": "B"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "unit": "celsius",
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "showPoints": "never",
+                "spanNulls": false
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "legend": {
+              "showLegend": true,
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "none"
+            }
+          }
+        },
+        {
+          "id": 9,
+          "title": "Ligado / desligado",
+          "type": "state-timeline",
+          "gridPos": {
+            "x": 0,
+            "y": 19,
+            "w": 24,
+            "h": 4
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_power_on{device=\"$device\"} and on(device) (time() - lg_thinq_state_last_success_timestamp_seconds{device=\"$device\"} < 300)",
+              "instant": false,
+              "range": true,
+              "editorMode": "code",
+              "legendFormat": "Aparelho",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "mappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "0": {
+                      "text": "Desligado",
+                      "index": 0
+                    },
+                    "1": {
+                      "text": "Ligado",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "gray",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "mergeValues": true,
+            "showValue": "auto"
+          },
+          "description": "Estado de alimentação. A faixa mostra lacunas quando a coleta perde atualidade."
+        },
+        {
+          "id": 10,
+          "type": "row",
+          "title": "Consumo de energia",
+          "collapsed": false,
+          "gridPos": {
+            "x": 0,
+            "y": 23,
+            "w": 24,
+            "h": 1
+          },
+          "panels": []
+        },
+        {
+          "id": 11,
+          "title": "Total no período",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 24,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "postgres",
+            "uid": "cg1y9v0o3durkf"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "rawSql": "SELECT SUM(energy_wh) / 1000.0 AS \"Valor\" FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date",
+              "rawQuery": true,
+              "format": "table",
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "unit": "kwatth"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 12,
+          "title": "Média por dia com leitura",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 24,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "postgres",
+            "uid": "cg1y9v0o3durkf"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "rawSql": "SELECT AVG(energy_wh) / 1000.0 AS \"Valor\" FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date",
+              "rawQuery": true,
+              "format": "table",
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "unit": "kwatth"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 13,
+          "title": "Dias com leitura",
+          "type": "stat",
+          "gridPos": {
+            "x": 12,
+            "y": 24,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "postgres",
+            "uid": "cg1y9v0o3durkf"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "rawSql": "SELECT NULLIF(COUNT(*), 0) AS \"Valor\" FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date",
+              "rawQuery": true,
+              "format": "table",
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 14,
+          "title": "Última data disponível",
+          "type": "stat",
+          "gridPos": {
+            "x": 18,
+            "y": 24,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "postgres",
+            "uid": "cg1y9v0o3durkf"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "rawSql": "SELECT MAX(day)::text AS \"Valor\" FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring}",
+              "rawQuery": true,
+              "format": "table",
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 15,
+          "title": "Consumo diário por data da LG",
+          "type": "barchart",
+          "gridPos": {
+            "x": 0,
+            "y": 28,
+            "w": 24,
+            "h": 8
+          },
+          "datasource": {
+            "type": "postgres",
+            "uid": "cg1y9v0o3durkf"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "rawSql": "WITH readings AS (SELECT day, energy_wh FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date),\n    bounds AS (\n        SELECT ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AS first_day,\n               LEAST(($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date,\n                     (now() AT TIME ZONE 'America/Sao_Paulo')::date - 1) AS last_day\n    ), days AS (\n        SELECT first_day + n AS day FROM bounds\n        CROSS JOIN LATERAL generate_series(0, last_day - first_day) AS offsets(n)\n    )\n    SELECT to_char(days.day, 'DD/MM/YYYY') AS \"Dia\", energy_wh / 1000.0 AS \"Consumo\"\n    FROM days LEFT JOIN readings USING (day) ORDER BY days.day",
+              "rawQuery": true,
+              "format": "table",
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "unit": "kwatth"
+            },
+            "overrides": []
+          },
+          "options": {
+            "xField": "Dia",
+            "orientation": "vertical",
+            "tooltip": {
+              "mode": "single"
+            },
+            "legend": {
+              "showLegend": false
+            }
+          },
+          "description": "Cada barra usa a data original da leitura. Dias ausentes aparecem como lacunas."
+        },
+        {
+          "id": 16,
+          "title": "Consumo mensal no período selecionado",
+          "type": "table",
+          "gridPos": {
+            "x": 0,
+            "y": 36,
+            "w": 24,
+            "h": 6
+          },
+          "datasource": {
+            "type": "postgres",
+            "uid": "cg1y9v0o3durkf"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "postgres",
+                "uid": "cg1y9v0o3durkf"
+              },
+              "rawSql": "SELECT to_char(date_trunc('month', day::timestamp), 'YYYY-MM') AS \"Mês\",\n    SUM(energy_wh) / 1000.0 AS \"Consumo\", COUNT(*) AS \"Dias com leitura\"\n    FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date GROUP BY 1 ORDER BY 1 DESC",
+              "rawQuery": true,
+              "format": "table",
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Consumo"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "kwatth"
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {},
+          "description": "A soma inclui apenas os dias do período que têm leitura. Meses parciais podem aparecer."
+        },
+        {
+          "id": 17,
+          "type": "row",
+          "title": "Filtro e coleta",
+          "collapsed": false,
+          "gridPos": {
+            "x": 0,
+            "y": 42,
+            "w": 24,
+            "h": 1
+          },
+          "panels": []
+        },
+        {
+          "id": 18,
+          "title": "Uso do filtro · valor bruto",
+          "type": "stat",
+          "gridPos": {
+            "x": 0,
+            "y": 43,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_filter_used_time_raw{device=\"$device\"} and on(device) (time() - lg_thinq_state_last_success_timestamp_seconds{device=\"$device\"} < 300)",
+              "instant": true,
+              "range": false,
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          },
+          "description": "Valor retornado pela LG. Unidade e limites ainda não validados."
+        },
+        {
+          "id": 19,
+          "title": "Vida útil do filtro · valor bruto",
+          "type": "stat",
+          "gridPos": {
+            "x": 6,
+            "y": 43,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_filter_lifetime_raw{device=\"$device\"} and on(device) (time() - lg_thinq_state_last_success_timestamp_seconds{device=\"$device\"} < 300)",
+              "instant": true,
+              "range": false,
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          },
+          "description": "Valor retornado pela LG. Unidade e limites ainda não validados."
+        },
+        {
+          "id": 20,
+          "title": "Última consulta de estado",
+          "type": "stat",
+          "gridPos": {
+            "x": 12,
+            "y": 43,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_state_collection_success{device=\"$device\"}",
+              "instant": true,
+              "range": false,
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "mappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "0": {
+                      "text": "Falhou",
+                      "index": 0
+                    },
+                    "1": {
+                      "text": "OK",
+                      "index": 1
+                    }
+                  }
+                }
+              ]
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          }
+        },
+        {
+          "id": 21,
+          "title": "Última consulta de consumo",
+          "type": "stat",
+          "gridPos": {
+            "x": 18,
+            "y": 43,
+            "w": 6,
+            "h": 4
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "lg_thinq_energy_collection_success{device=\"$device\"}",
+              "instant": true,
+              "range": false,
+              "editorMode": "code",
+              "refId": "A"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "Sem dados",
+              "mappings": [
+                {
+                  "type": "value",
+                  "options": {
+                    "0": {
+                      "text": "Falhou",
+                      "index": 0
+                    },
+                    "1": {
+                      "text": "OK",
+                      "index": 1
+                    }
+                  }
+                }
+              ]
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "graphMode": "none",
+            "colorMode": "value",
+            "textMode": "auto"
+          }
+        }
+      ]
+    }

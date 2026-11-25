@@ -11,4 +11,5 @@ resources:
   - grafana-dashboard-deye-solar-v2.yaml
   - grafana-dashboard-deye-solar-v3.yaml
   - grafana-dashboard-deye-solar-cockpit.yaml
+  - grafana-dashboard-lg-thinq.yaml
   - grafana-datasource-delete-loki.yaml
