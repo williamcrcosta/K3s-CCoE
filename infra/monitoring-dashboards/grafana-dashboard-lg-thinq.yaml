@@ -20,7 +20,7 @@ data:
         "energia"
       ],
       "schemaVersion": 42,
-      "version": 3,
+      "version": 4,
       "refresh": "1m",
       "time": {
         "from": "now-7d/d",
@@ -33,7 +33,7 @@ data:
             "label": "Fonte LG",
             "type": "datasource",
             "query": "postgres",
-            "regex": "/^LG ThinQ PostgreSQL$/",
+            "regex": "/^Postgresql-LG-ThinQ$/",
             "hide": 2,
             "refresh": 1,
             "multi": false,

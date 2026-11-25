@@ -22,7 +22,7 @@ Os painéis ocultam leituras de estado com cinco minutos ou mais. O modo configu
 
 ## Consumo diário
 
-O Grafana consulta a fonte PostgreSQL dedicada **LG ThinQ PostgreSQL**. A tabela abaixo é o contrato para o coletor de consumo. Execute a criação da tabela com o papel responsável pela ingestão e dê ao usuário da fonte de dados do Grafana acesso de leitura.
+O Grafana consulta a fonte PostgreSQL dedicada **Postgresql-LG-ThinQ**. A tabela abaixo é o contrato para o coletor de consumo. Execute a criação da tabela com o papel responsável pela ingestão e dê ao usuário da fonte de dados do Grafana acesso de leitura.
 
 ```sql
 CREATE TABLE public.lg_thinq_daily_energy (
@@ -78,7 +78,7 @@ Para ver os totais do app no Grafana, selecione um período que inclua os meses 
 
 ## Fonte de dados do Grafana
 
-Em **Connections → Data sources**, adicione uma fonte **PostgreSQL** com o nome exato **LG ThinQ PostgreSQL**. O dashboard resolve a fonte pelo nome, então o UID pode ser gerado pelo Grafana.
+Em **Connections → Data sources**, adicione uma fonte **PostgreSQL** com o nome exato **Postgresql-LG-ThinQ**. O dashboard resolve a fonte pelo nome, então o UID pode ser gerado pelo Grafana.
 
 | Campo | Valor |
 |---|---|
