@@ -20,7 +20,7 @@ data:
         "energia"
       ],
       "schemaVersion": 42,
-      "version": 4,
+      "version": 5,
       "refresh": "1m",
       "time": {
         "from": "now-7d/d",
@@ -506,7 +506,7 @@ data:
         },
         {
           "id": 11,
-          "title": "Total no período",
+          "title": "Total dos dias com leitura",
           "type": "stat",
           "gridPos": {
             "x": 0,
@@ -547,7 +547,7 @@ data:
               "values": false
             },
             "graphMode": "none",
-            "colorMode": "value",
+            "colorMode": "none",
             "textMode": "auto"
           }
         },
@@ -594,7 +594,7 @@ data:
               "values": false
             },
             "graphMode": "none",
-            "colorMode": "value",
+            "colorMode": "none",
             "textMode": "auto"
           }
         },
@@ -640,7 +640,7 @@ data:
               "values": false
             },
             "graphMode": "none",
-            "colorMode": "value",
+            "colorMode": "none",
             "textMode": "auto"
           }
         },
@@ -664,7 +664,7 @@ data:
                 "type": "postgres",
                 "uid": "${lg_postgres}"
               },
-              "rawSql": "SELECT MAX(day)::text AS \"Valor\" FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring}",
+              "rawSql": "SELECT (EXTRACT(EPOCH FROM (MAX(day)::timestamp AT TIME ZONE 'America/Sao_Paulo')) * 1000)::bigint AS \"Valor\" FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring}",
               "rawQuery": true,
               "format": "table",
               "editorMode": "code",
@@ -673,7 +673,8 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "noValue": "Sem dados"
+              "noValue": "Sem dados",
+              "unit": "time:DD/MM/YYYY"
             },
             "overrides": []
           },
@@ -686,14 +687,14 @@ data:
               "values": false
             },
             "graphMode": "none",
-            "colorMode": "value",
+            "colorMode": "none",
             "textMode": "auto"
           }
         },
         {
           "id": 15,
           "title": "Consumo diário por data da LG",
-          "type": "barchart",
+          "type": "timeseries",
           "gridPos": {
             "x": 0,
             "y": 28,
@@ -710,9 +711,9 @@ data:
                 "type": "postgres",
                 "uid": "${lg_postgres}"
               },
-              "rawSql": "WITH readings AS (SELECT day, energy_wh FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date),\n    bounds AS (\n        SELECT ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AS first_day,\n               LEAST(($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date,\n                     (now() AT TIME ZONE 'America/Sao_Paulo')::date - 1) AS last_day\n    ), days AS (\n        SELECT first_day + n AS day FROM bounds\n        CROSS JOIN LATERAL generate_series(0, last_day - first_day) AS offsets(n)\n    )\n    SELECT to_char(days.day, 'DD/MM/YYYY') AS \"Dia\", energy_wh / 1000.0 AS \"Consumo\"\n    FROM days LEFT JOIN readings USING (day) ORDER BY days.day",
+              "rawSql": "WITH readings AS (SELECT day, energy_wh FROM public.lg_thinq_daily_energy WHERE device = ${device:sqlstring} AND day BETWEEN ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND ($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AND day < (now() AT TIME ZONE 'America/Sao_Paulo')::date),\n    bounds AS (\n        SELECT ($__timeFrom()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date AS first_day,\n               LEAST(($__timeTo()::timestamptz AT TIME ZONE 'America/Sao_Paulo')::date,\n                     (now() AT TIME ZONE 'America/Sao_Paulo')::date - 1) AS last_day\n    ), days AS (\n        SELECT first_day + n AS day FROM bounds\n        CROSS JOIN LATERAL generate_series(0, last_day - first_day) AS offsets(n)\n    )\n    SELECT days.day::timestamp AT TIME ZONE 'America/Sao_Paulo' AS \"time\", energy_wh / 1000.0 AS \"Consumo\"\n    FROM days LEFT JOIN readings USING (day) ORDER BY days.day",
               "rawQuery": true,
-              "format": "table",
+              "format": "time_series",
               "editorMode": "code",
               "refId": "A"
             }
@@ -720,18 +721,23 @@ data:
           "fieldConfig": {
             "defaults": {
               "noValue": "Sem dados",
-              "unit": "kwatth"
+              "unit": "kwatth",
+              "custom": {
+                "drawStyle": "bars",
+                "lineWidth": 0,
+                "fillOpacity": 85,
+                "showPoints": "never",
+                "spanNulls": false
+              }
             },
             "overrides": []
           },
           "options": {
-            "xField": "Dia",
-            "orientation": "vertical",
-            "tooltip": {
-              "mode": "single"
-            },
             "legend": {
               "showLegend": false
+            },
+            "tooltip": {
+              "mode": "single"
             }
           },
           "description": "Cada barra usa a data original da leitura. Dias ausentes aparecem como lacunas."
